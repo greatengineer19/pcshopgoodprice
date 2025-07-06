@@ -8,6 +8,8 @@ import { User } from "@/types/user"
 
 const { showErrorToast } = useToastError()
 const { showSuccessToast } = useToastSuccess()
+const SECRET_KEY_NAME = 'secret_key';
+const token = localStorage.getItem(SECRET_KEY_NAME);
 
 // Create order
 export const createSalesQuote = async (
@@ -34,6 +36,10 @@ export const createSalesQuote = async (
     const response = await fetch('http://localhost:8080/api/sales-quotes', {
         method: 'POST',
         body: JSON.stringify(salesQuoteParam),
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
     });
 
     if (!response.ok) {
@@ -52,6 +58,7 @@ export const cancelSalesQuote = async (id: number): Promise<any> => {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`
                 },
             });
             
@@ -69,7 +76,12 @@ export const cancelSalesQuote = async (id: number): Promise<any> => {
 
 // Fetch Orders
 export const fetchSalesQuotes = async (): Promise<FetchedSalesQuote[]> => {
-    const response = await fetch('http://localhost:8080/api/sales-quotes');
+    const response = await fetch('http://localhost:8080/api/sales-quotes', {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
 
     if (!response.ok) {
         const errorText = await response.text();

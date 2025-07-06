@@ -24,8 +24,8 @@ export function useProducts() {
 				const mutatedData: ProductInFrontend[] = data.map((p) => ({
 					...p,
 					image: p.images?.[0] ?? undefined,
-					price: p.price.toString(),
-					stock: p.stock.toString()
+					component_category_id: p.component_category_id,
+					computer_component_sell_price_settings: []
 				  }));
 
 				setProducts(mutatedData);

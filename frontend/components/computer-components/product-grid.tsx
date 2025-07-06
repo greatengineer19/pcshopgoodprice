@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/computer-components/product-card"
 import { useProducts } from "@/hooks/use-products"
 import { useOnEditProduct } from "@/context/OnEditProductContext"
 
-import type { ProductInFrontend } from "@/types/product"
+import type { ProductInFrontend, ProductResponseWithPriceSettings, ProductParams } from "@/types/product"
 
 interface ProductGridProps {
 	setIsDialogOpen: (value: boolean) => void,
@@ -16,18 +16,20 @@ export function ProductGrid({ setIsDialogOpen, setIsEditMode, setSelectedProduct
     const { products } = useProducts()
 	const { setOnEditProduct } = useOnEditProduct()
 
-    const handleProductClick = (product: any) => {
+    const handleProductClick = async (product: ProductInFrontend) => {
+		const response = await fetch("http://localhost:8080/api/computer-components/" + product.id);
+		const productResponse: ProductInFrontend = await response.json();
+
 		setOnEditProduct({
-			id: product.id,
-			name: product.name || "",
-			component_category_id: product.component_category_id,
-			product_code: product.product_code,
-			status: product.status,
-			component_category_name: product.component_category_name || "",
-			price: product.price || 0,
-			description: product.description || "",
-			stock: product.stock || 0,
-			image: product.image || "/placeholder.svg?height=300&width=300"
+			id: productResponse.id,
+			name: productResponse.name || "",
+			component_category_id: productResponse.component_category_id,
+			product_code: productResponse.product_code,
+			status: productResponse.status,
+			component_category_name: productResponse.component_category_name || "",
+			description: productResponse.description || "",
+			image: product.image || "/placeholder.svg?height=300&width=300",
+			computer_component_sell_price_settings_attributes: productResponse.computer_component_sell_price_settings
 		})
 		setSelectedProduct(product)
 		setIsDialogOpen(true)

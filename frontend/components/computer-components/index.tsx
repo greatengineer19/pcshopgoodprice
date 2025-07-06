@@ -5,9 +5,9 @@ import { useState, useRef, useCallback } from "react"
 
 import { ButtonAddProduct } from "@/components/computer-components/button-add-product"
 import { ProductGrid } from "@/components/computer-components/product-grid"
-import { ProductViewModal } from "@/components/computer-components/product-view-modal"
+import { ProductViewModal } from "@/components/computer-components/ProductViewModal"
 import { DeleteConfirmationModal } from "@/components/computer-components/delete-confirmation-modal"
-import { NewProductModal } from "@/components/computer-components/new-product-modal"
+import { NewProductModal } from "@/components/computer-components/NewProductModal"
 
 import { SelectedProductProvider } from '@/context/SelectedProductContext'
 import { OnEditProductProvider } from "@/context/OnEditProductContext"

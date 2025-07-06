@@ -8,6 +8,8 @@ import { useToastError } from "@/hooks/use-toast-error"
 import { handleApiError } from "@/utils/api/error-handlers"
 import { toast } from "sonner"
 import { ProductCategory } from "@/types/computer-component-category"
+const SECRET_KEY_NAME = 'secret_key';
+const token = localStorage.getItem(SECRET_KEY_NAME);
 
 export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: ShopContentListWrapper }> => {
     let queryString = ''
@@ -23,7 +25,13 @@ export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: 
         queryString = '?' + new URLSearchParams(query_params).toString();
     }
     
-    let response = await fetch("http://localhost:8080/api/sellable-products" + queryString);
+    let response = await fetch("http://localhost:8080/api/sellable-products" + queryString, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || "Failed to fetch products");
@@ -39,7 +47,12 @@ export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: 
 
 // Fetch product by slug
 export const fetchProductBySlug = async (slug: string): Promise<ShopContentProduct> => {
-    let response = await fetch("http://localhost:8080/api/sellable-products" + slug);
+    let response = await fetch("http://localhost:8080/api/sellable-products" + slug, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
 
     if (!response.ok) {
         const errorText = await response.text();

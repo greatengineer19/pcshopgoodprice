@@ -7,6 +7,8 @@ import { useToastSuccess } from "@/hooks/use-toast-success"
 
 const { showErrorToast } = useToastError()
 const { showSuccessToast } = useToastSuccess()
+const SECRET_KEY_NAME = 'secret_key';
+const token = localStorage.getItem(SECRET_KEY_NAME);
 
 // Payment methods
 export const listPaymentMethods = async (): Promise<PaymentMethod[]> => {
@@ -25,7 +27,12 @@ export const listPaymentMethods = async (): Promise<PaymentMethod[]> => {
 
 // Fetch cart
 export const fetchCart = async (): Promise<CartLine[]> => {
-    const response = await fetch('http://localhost:8080/api/cart');
+    const response = await fetch('http://localhost:8080/api/cart', {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
     
     if (!response.ok) {
         const errorText = await response.text();
@@ -49,7 +56,8 @@ export const addToCart = async (productId: number, quantity: number): Promise<st
     const response = await fetch("http://localhost:8080/api/cart/add-item", {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(payload),
     });
@@ -70,6 +78,7 @@ export const removeFromCart = async (itemId: number): Promise<string> => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             },
         });
         

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronDown, Globe, SwitchCamera, ShoppingBasket, FileText } from "lucide-react"
-import { userContext } from "@/context/user-context"
+// import { userContext } from "@/context/user-context"
 import { fetchUser } from "@/lib/user-service"
 import { fetchCart } from "@/lib/cart-service"
 import {

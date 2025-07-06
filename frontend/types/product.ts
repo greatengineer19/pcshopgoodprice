@@ -1,15 +1,39 @@
 export interface ProductBase {
     name: string;
+    product_code: string;
     component_category_name: string;
     description: string;
     [key: string]: any;
 }
 
 export interface ProductInFrontend extends ProductBase {
-    id: number | null | undefined;
+    id: number | null;
     image: string | undefined;
-    price: string;
-    stock: string;
+    component_category_id: number;
+    computer_component_sell_price_settings: DailyProductPrice[];
+}
+
+export interface DailyProductPrice {
+    id: number | null
+    day_type: string
+    price_per_unit: number
+    active: boolean
+}
+
+export interface ProductResponseWithPriceSettings extends ProductBase {
+    id: number;
+    component_category_name: string;
+    component_category_id: number;
+    computer_component_sell_price_settings: DailyProductPrice[]
+    images?: string[] | null;
+}
+
+export interface ProductParams extends ProductBase {
+    id: number | null;
+    component_category_name: string;
+    component_category_id: number | null;
+    computer_component_sell_price_settings_attributes: DailyProductPrice[]
+    images?: string[] | null;
 }
 
 export interface ProductFromBackend extends ProductBase {
