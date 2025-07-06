@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+python-multipart
+boto3
+requests
+pytest
+httpx
+alembic
+pydantic-settings
+passlib
+bcrypt
+python-jose
+jwt
+pyjwt

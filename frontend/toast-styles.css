@@ -1,0 +1,20 @@
+/* Custom styles for toast notifications */
+.toast-error {
+  background-color: #d84040 !important;
+  color: white !important;
+  border-color: #d84040 !important;
+}
+
+.toast-error .toast-title {
+  color: white !important;
+}
+
+.toast-error .toast-description {
+  color: white !important;
+}
+
+.toast-error .toast-action {
+  color: white !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+

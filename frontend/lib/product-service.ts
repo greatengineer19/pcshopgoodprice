@@ -1,0 +1,83 @@
+import type {
+    ShopContentListWrapper,
+    ProductBrand,
+    ShopContentProduct,
+    ProductFilter
+} from "@/types/product"
+import { useToastError } from "@/hooks/use-toast-error"
+import { handleApiError } from "@/utils/api/error-handlers"
+import { toast } from "sonner"
+import { ProductCategory } from "@/types/computer-component-category"
+
+export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: ShopContentListWrapper }> => {
+    let queryString = ''
+
+    if (filters) {
+        const query_params = {
+            component_category_ids: filters.categories?.length ? filters.categories.join(',') : '',
+            start_price: filters.priceRange ? String(filters.priceRange[0]) : '',
+            end_price: filters.priceRange ? String(filters.priceRange[1]) : '',
+            minRating: filters.ratings ? String(filters.ratings) : ''
+        }
+
+        queryString = '?' + new URLSearchParams(query_params).toString();
+    }
+    
+    let response = await fetch("http://localhost:8080/api/sellable-products" + queryString);
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch products");
+    }
+    
+    const responseData = await response.json();
+    const products: ShopContentListWrapper = responseData;
+
+    return {
+        result: products
+    }
+}
+
+// Fetch product by slug
+export const fetchProductBySlug = async (slug: string): Promise<ShopContentProduct> => {
+    let response = await fetch("http://localhost:8080/api/sellable-products" + slug);
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch products");
+    }
+    
+    const responseData = await response.json();
+    const product: ShopContentProduct = responseData;
+
+    return product
+}
+
+// Fetch product categories
+export const fetchProductCategories = async (): Promise<ProductCategory[]> => {
+    let response = await fetch("http://localhost:8080/api/computer-component-categories");
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch categories");
+    }
+    
+    const responseData = await response.json();
+    const categories: ProductCategory[] = responseData.computer_component_categories;
+
+    return categories
+}
+
+// Fetch product brands
+export const fetchProductBrands = async (): Promise<ProductBrand[]> => {
+    const response = await fetch('http://localhost:8080/api/product-brands');
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch product brands");
+    }
+
+    const responseData = await response.json();
+    const productBrands: ProductBrand[] = responseData.product_brands;
+
+    return productBrands
+}

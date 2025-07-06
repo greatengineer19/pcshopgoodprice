@@ -1,0 +1,83 @@
+import type { FetchedSalesQuote, SalesQuoteParam } from "@/types/sales-quote"
+import type { CartLine, PaymentMethod } from "@/types/cart"
+import { handleApiError } from "@/utils/api/error-handlers"
+import { useToastError } from "@/hooks/use-toast-error"
+import { useToastSuccess } from "@/hooks/use-toast-success"
+import { toast } from "sonner"
+import { User } from "@/types/user"
+
+const { showErrorToast } = useToastError()
+const { showSuccessToast } = useToastSuccess()
+
+// Create order
+export const createSalesQuote = async (
+    cartLines: CartLine[],
+    shippingAddress: string,
+    paymentInfo: any,
+    user: User
+): Promise<string> => {
+    const salesQuoteParam: SalesQuoteParam = {
+        id: null,
+        customer_id: user.id,
+        customer_name: user.fullname,
+        shipping_address: shippingAddress,
+        payment_method_id: paymentInfo.paymentMethodId,
+        payment_method_name: paymentInfo.paymentMethodName,
+        virtual_account_no: paymentInfo.virtualAccountNo,
+        paylater_account_reference: paymentInfo.paylaterAccountReference,
+        credit_card_customer_name: paymentInfo.creditCardCustomerName,
+        credit_card_customer_address: paymentInfo.creditCardCustomerAddress,
+        credit_card_bank_name: paymentInfo.creditCardBankName,
+        cart_lines: cartLines
+    }
+
+    const response = await fetch('http://localhost:8080/api/sales-quotes', {
+        method: 'POST',
+        body: JSON.stringify(salesQuoteParam),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch payment methods");
+    }
+
+    return 'ok'
+}
+
+export const cancelSalesQuote = async (id: number): Promise<any> => {  
+    try {
+        const response = await fetch(
+            "http://localhost:8080/api/sales-quotes/" + id,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+
+        if (!response.ok) {
+            await handleApiError(response, showErrorToast);
+        }
+
+        showSuccessToast("Product deleted successfully");
+        return 'ok'
+    } catch (error) {
+        showErrorToast("Failed to connect to the server. Please try again.");
+    }
+}
+
+// Fetch Orders
+export const fetchSalesQuotes = async (): Promise<FetchedSalesQuote[]> => {
+    const response = await fetch('http://localhost:8080/api/sales-quotes');
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch sales quotes");
+    }
+
+    const responseData = await response.json();
+    const salesQuotes: FetchedSalesQuote[] = responseData.sales_quotes;
+
+    return salesQuotes
+}

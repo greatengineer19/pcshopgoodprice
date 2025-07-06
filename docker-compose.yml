@@ -1,0 +1,70 @@
+version: "3.9"
+
+services:
+  backend:
+    container_name: hassle_free_comps-backend-1
+    build: ./backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/src
+      - /src/node_modules  # For Node.js apps, avoid overwriting node_modules
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=user
+      - DB_PASSWORD=h4ssl3.Fr33
+      - DB_NAME=hasslefreecomputers
+      - DEBUG=False  # Disable debug mode in production
+    command: python main.py
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    env_file:
+      - ./backend/.env
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: h4ssl3.Fr33
+      POSTGRES_DB: hasslefreecomputers
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d hasslefreecomputers"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - app-network
+    env_file:
+      - ./backend/.env
+  frontend:
+    container_name: hassle_free_comps-frontend-1
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

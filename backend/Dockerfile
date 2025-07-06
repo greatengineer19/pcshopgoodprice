@@ -1,0 +1,12 @@
+FROM python:3.10
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1
+COPY ./requirements.txt $WORKDIR
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+
+EXPOSE 8080
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--reload"]
