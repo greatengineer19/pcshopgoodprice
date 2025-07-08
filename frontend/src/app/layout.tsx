@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hassle Free Computers",
+  title: "Hassle Free Computers Shop",
   description: "Hassle free purchase, wait the delivery on your doorstep!"
 };
 

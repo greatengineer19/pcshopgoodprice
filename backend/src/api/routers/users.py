@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from typing import List, Optional
 from sqlalchemy import (select, func, delete, text, and_, or_)
-from src.schemas import (UserAPIResponse, UserParams)
+from src.schemas import (UserAPIResponse, UserParams, UserRoleParams)
 from src.models import (CartLine, User, ComputerComponent, PaymentMethod)
 import logging
 from src.api.s3_dependencies import ( bucket_name, s3_client )
@@ -16,18 +16,20 @@ router = APIRouter(
 
 @router.get("", response_model=UserAPIResponse)
 def user_by_role(
-        params: UserParams,
+        role: UserRoleParams = Query(None),
         db: Session = Depends(get_db)
     ):
     try:
+        role = 0 if role == "seller" else 1
+    
         user = (
             db.query(User)
-              .filter(User.role == params.role)
+              .filter(User.role == role)
               .first()
         )
 
         if user is None:
-            return { 'user': {}, 'secret_key': '', 'refresh_key': '' }
+            return { 'user': {}, 'access_token': '', 'refresh_token': '' }
         
         if user.refresh_token is not None:
             if user.refresh_token_expiry_at < datetime.utcnow():
@@ -45,10 +47,9 @@ def user_by_role(
                 'fullname': user.fullname,
                 'role': user.role
             },
-            'secret_key': access_token,
+            'access_token': access_token,
             'refresh_token': user.refresh_token
         }
-
 
         return response
     except Exception as e:

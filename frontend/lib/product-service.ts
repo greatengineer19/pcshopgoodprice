@@ -9,9 +9,12 @@ import { handleApiError } from "@/utils/api/error-handlers"
 import { toast } from "sonner"
 import { ProductCategory } from "@/types/computer-component-category"
 const SECRET_KEY_NAME = 'secret_key';
-const token = localStorage.getItem(SECRET_KEY_NAME);
 
 export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: ShopContentListWrapper }> => {
+    let token: string | null = null;
+    if (typeof window !== "undefined") {
+        token = localStorage.getItem(SECRET_KEY_NAME);
+    }
     let queryString = ''
 
     if (filters) {
@@ -47,6 +50,10 @@ export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: 
 
 // Fetch product by slug
 export const fetchProductBySlug = async (slug: string): Promise<ShopContentProduct> => {
+    let token: string | null = null;
+    if (typeof window !== "undefined") {
+        token = localStorage.getItem(SECRET_KEY_NAME);
+    }
     let response = await fetch("http://localhost:8080/api/sellable-products" + slug, {
         headers: {
             "Content-Type": "application/json",

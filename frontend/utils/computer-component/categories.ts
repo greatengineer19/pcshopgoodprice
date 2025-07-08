@@ -1,10 +1,12 @@
 export const categories = [
-    "Laptops",
-    "Macs",
-    "Monitors",
+    "Graphic Cards",
     "Processors",
-    "Graphics",
+    "Macs",
+    "Power Supplies",
+    "Cpu Coolers",
     "RAMs",
+    "Monitors",
+    "Laptops",
     "Motherboards",
     "Others"
 ]

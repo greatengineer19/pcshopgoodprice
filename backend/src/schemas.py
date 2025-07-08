@@ -493,6 +493,10 @@ class UserRoleEnum(int, Enum):
     SELLER = 0
     BUYER = 1
 
+class UserRoleParams(str, Enum):
+    seller = "seller"
+    buyer = "buyer"
+
 class UserResponse(BaseModel):
     id: int
     fullname: str
@@ -500,7 +504,7 @@ class UserResponse(BaseModel):
 
     @model_validator(mode='before')
     def convert_role(cls, values):
-        role = values.role
+        role = values.get('role')
         if isinstance(role, int):
             try:
                 values.role = UserRoleEnum(role).name
@@ -509,7 +513,7 @@ class UserResponse(BaseModel):
         return values
 
 class UserAPIResponse(BaseModel):
-    user: UserResponse
+    user: Union[UserResponse, dict]
     access_token: str
     refresh_token: str
 

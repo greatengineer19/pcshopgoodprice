@@ -9,7 +9,6 @@ import { User } from "@/types/user"
 const { showErrorToast } = useToastError()
 const { showSuccessToast } = useToastSuccess()
 const SECRET_KEY_NAME = 'secret_key';
-const token = localStorage.getItem(SECRET_KEY_NAME);
 
 // Create order
 export const createSalesQuote = async (
@@ -18,6 +17,11 @@ export const createSalesQuote = async (
     paymentInfo: any,
     user: User
 ): Promise<string> => {
+    let token: string | null = null;
+    if (typeof window !== "undefined") {
+        token = localStorage.getItem(SECRET_KEY_NAME);
+    }
+
     const salesQuoteParam: SalesQuoteParam = {
         id: null,
         customer_id: user.id,
@@ -52,6 +56,11 @@ export const createSalesQuote = async (
 
 export const cancelSalesQuote = async (id: number): Promise<any> => {  
     try {
+        let token: string | null = null;
+        if (typeof window !== "undefined") {
+            token = localStorage.getItem(SECRET_KEY_NAME);
+        }
+
         const response = await fetch(
             "http://localhost:8080/api/sales-quotes/" + id,
             {
@@ -76,6 +85,11 @@ export const cancelSalesQuote = async (id: number): Promise<any> => {
 
 // Fetch Orders
 export const fetchSalesQuotes = async (): Promise<FetchedSalesQuote[]> => {
+    let token: string | null = null;
+    if (typeof window !== "undefined") {
+        token = localStorage.getItem(SECRET_KEY_NAME);
+    }
+
     const response = await fetch('http://localhost:8080/api/sales-quotes', {
         headers: {
             "Content-Type": "application/json",

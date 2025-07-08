@@ -4,6 +4,7 @@ import requests
 import uuid
 import boto3
 from src.schemas import ( UploadResponseSchema, ListUploadResponseSchema )
+from src.models import ( ComputerComponentCategory, User )
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -22,12 +23,16 @@ from src.api.routers import (
     sales_quotes,
     sales_invoices,
     sales_deliveries,
-    user
+    users,
+    seeds
 )
 from src.api.routers.sales_payment import (
     bank_transfer,
     virtual_account
 )
+from sqlalchemy.orm import Session
+from src.api.dependencies import get_db
+from fastapi import Depends
 
 app = FastAPI()
 
@@ -59,7 +64,8 @@ app.include_router(bank_transfer.router)
 app.include_router(virtual_account.router)
 app.include_router(sales_invoices.router)
 app.include_router(sales_deliveries.router)
-app.include_router(user.router)
+app.include_router(users.router)
+app.include_router(seeds.router)
 
 @app.get("/")
 async def root():

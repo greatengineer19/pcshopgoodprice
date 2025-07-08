@@ -102,10 +102,8 @@ def create(params: ComputerComponentAsParams, db: Session = Depends(get_db)):
         computer_component = ComputerComponent(
             name=params.name,
             product_code=params.product_code,
-            price=params.price,
             images=images,
             description=params.description,
-            stock=params.stock,
             component_category_id=category.id,
             status=params.status
         )
@@ -124,7 +122,7 @@ def create(params: ComputerComponentAsParams, db: Session = Depends(get_db)):
                 )
             )
 
-        users = db.query(User.id, User.fullname).filter(User.fullname != "Seller").all()
+        users = db.query(User.id, User.fullname).filter(User.role != 0).all()
 
         reviews = []
         for _ in range(10):
@@ -174,8 +172,8 @@ def update(params: ComputerComponentAsParams, db: Session = Depends(get_db)):
         
         # Update only provided fields
         update_fields = [
-            'name', 'product_code', 'price',
-            'description', 'stock', 'status'
+            'name', 'product_code',
+            'description', 'status'
         ]
         
         for field in update_fields:

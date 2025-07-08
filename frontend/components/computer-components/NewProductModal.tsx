@@ -282,41 +282,47 @@ export function NewProductModal({
                                             min="0"
                                         />
                                     </div>
-
-                                    {/* Day Pricing */}
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium">Daily Pricing (Optional)</Label>
-                                        <div className="space-y-2 max-h-64 overflow-y-auto">
-                                            {
-                                                dayPricing.map((day, index) => (
-                                                    <div key={day.dayType} className="flex items-center justify-between p-3 border rounded-lg">
-                                                        <div className="flex-1">
-                                                            <Label className="font-medium">{day.dayType}</Label>
-                                                            <Input 
-                                                                type="number"
-                                                                placeholder="0.00"
-                                                                value={day.pricePerUnit}
-                                                                onChange={(e) => handlePriceChange(index, e.target.value)}
-                                                                className="mt-1"
-                                                                step="1"
-                                                                min="0"
-                                                            />
-                                                            <div className="flex items-center space-x-2 ml-4">
-                                                                <Label className="text-sm">Active</Label>
-                                                                <Switch 
-                                                                    checked={day.active}
-                                                                    onCheckedChange={(checked) => handleActiveToggle(index, checked)}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                        <p className="text-sm text-muted-foreground mt-2">
-                                            Activate daily pricing for specific days if different from the default.
-                                        </p>
+                                    <div className="flex items-center space-x-2 ml-4">
+                                        <Label htmlFor="default-active" className="text-sm">
+                                            Active
+                                        </Label>
+                                        <Switch id="default-active" checked={true} disabled={true} />
                                     </div>
+                                </div>
+
+                                {/* Daily Pricing */}
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">Daily Pricing (Optional)</Label>
+                                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                                        {
+                                            dayPricing.map((day, index) => (
+                                                <div key={day.dayType} className="flex items-center justify-between p-3 border rounded-lg">
+                                                    <div className="flex-1">
+                                                        <Label className="font-medium">{day.dayType}</Label>
+                                                        <Input 
+                                                            type="number"
+                                                            placeholder="0.00"
+                                                            value={day.pricePerUnit}
+                                                            onChange={(e) => handlePriceChange(index, e.target.value)}
+                                                            className="mt-1"
+                                                            step="1"
+                                                            min="0"
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 ml-4">
+                                                        <Label className="text-sm">Active</Label>
+                                                        <Switch 
+                                                            checked={day.active}
+                                                            onCheckedChange={(checked) => handleActiveToggle(index, checked)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                        Activate daily pricing for specific days if different from the default.
+                                    </p>
                                 </div>
                             </div>
                         </TabsContent>

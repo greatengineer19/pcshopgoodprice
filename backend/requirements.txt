@@ -13,5 +13,4 @@ pydantic-settings
 passlib
 bcrypt
 python-jose
-jwt
-pyjwt
+PyJWT>=2.0.0

@@ -64,7 +64,7 @@ export function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center">
                     <span className="text-xl font-normal" style={{ fontFamily: "'Tinos', serif", fontWeight: 400 }}>
-                        HASSLE FREE COMPUTERS
+                        HASSFREE COMPUTERS SHOP
                     </span>
                 </Link>
 
@@ -99,9 +99,9 @@ export function Navbar() {
                                                         href="/test_api"
                                                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                                                     >
-                                                        <div className="text-sm font-medium">*Seeds Categories</div>
+                                                        <div className="text-sm font-medium">*Demo Data Seeding</div>
                                                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                                            Seeds categories for first time use
+                                                            Seeds demo data for first time use
                                                         </p>
                                                     </Link>
                                                 </NavigationMenuLink>

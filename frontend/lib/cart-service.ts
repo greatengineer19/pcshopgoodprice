@@ -8,7 +8,6 @@ import { useToastSuccess } from "@/hooks/use-toast-success"
 const { showErrorToast } = useToastError()
 const { showSuccessToast } = useToastSuccess()
 const SECRET_KEY_NAME = 'secret_key';
-const token = localStorage.getItem(SECRET_KEY_NAME);
 
 // Payment methods
 export const listPaymentMethods = async (): Promise<PaymentMethod[]> => {
@@ -27,6 +26,11 @@ export const listPaymentMethods = async (): Promise<PaymentMethod[]> => {
 
 // Fetch cart
 export const fetchCart = async (): Promise<CartLine[]> => {
+    let token: string | null = null;
+    if (typeof window !== "undefined") {
+        token = localStorage.getItem(SECRET_KEY_NAME);
+    }
+
     const response = await fetch('http://localhost:8080/api/cart', {
         headers: {
             "Content-Type": "application/json",
@@ -47,6 +51,11 @@ export const fetchCart = async (): Promise<CartLine[]> => {
 
 // Add item to cart
 export const addToCart = async (productId: number, quantity: number): Promise<string> => {
+    let token: string | null = null;
+    if (typeof window !== "undefined") {
+        token = localStorage.getItem(SECRET_KEY_NAME);
+    }
+
     const payload = {
         id: null,
         component_id: productId,
@@ -72,6 +81,11 @@ export const addToCart = async (productId: number, quantity: number): Promise<st
 
 // Remove item from cart
 export const removeFromCart = async (itemId: number): Promise<string> => {
+    let token: string | null = null;
+    if (typeof window !== "undefined") {
+        token = localStorage.getItem(SECRET_KEY_NAME);
+    }
+
     const response = await fetch(
         "http://localhost:8080/api/cart/remove-item/" + itemId,
         {

@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta, time
 from fastapi import HTTPException, status, Request
 from typing import Union, Any, Optional
 import jwt
-from jwt.exceptions import InvalidTokenError
+from jwt import InvalidTokenError
 from fastapi import Depends
 from src.api.dependencies import get_db
 from src.models import ( User )
