@@ -36,7 +36,6 @@ export interface OnEditPurchaseInvoiceLine {
     component_name: string
     quantity: number
     price: number
-    stock: number
     component_category_id: number
     component_category_name: string
 }
@@ -45,8 +44,8 @@ export interface MappedProduct {
     id: number
     name: string
     quantity: number
-    price: number
-    stock: number
+    buyPrice: string
+    numberBuyPrice: number
     component_category_id: number
     component_category_name: string
 }

@@ -78,7 +78,7 @@ export function NewProductModal({
         setIsLoading(true);
       
         try {
-          if (!newProduct.name || !newProduct.component_category_name || !newProduct.price) {
+          if (!newProduct.name || !newProduct.component_category_name) {
             showErrorToast("Please fill in all required fields");
             return;
           }
@@ -97,9 +97,9 @@ export function NewProductModal({
           const dailyPriceSettings = dayPricing // Only include active days with a positive price
               .map((day) => ({
                   id: null,
-                  day_type: day.dayType.toLowerCase(), // Convert 'Monday' to 'monday'
-                  price_per_unit: Number(day.pricePerUnit), // Ensure it's a number
-                  active: true // These are active because they passed the filter
+                  day_type: day.dayType.toLowerCase(),
+                  price_per_unit: Number(day.pricePerUnit),
+                  active: day.active
               }));
 
           // 3. Combine all price settings

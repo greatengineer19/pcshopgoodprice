@@ -121,20 +121,22 @@ class ComputerComponent(Base):
     )
 
     computer_component_sell_price_settings: Mapped[List['ComputerComponentSellPriceSetting']] = relationship(
-        "ComputerComponentSellPriceSetting", back_populates="component"
+        "ComputerComponentSellPriceSetting", back_populates="component",
+        cascade="all, delete-orphan"
     )
 
     computer_component_reviews: Mapped[List['ComputerComponentReview']] = relationship(
-        "ComputerComponentReview", back_populates="component"
+        "ComputerComponentReview", back_populates="component",
+        cascade="all, delete-orphan"
     )
 
-    inventories: Mapped["Inventory"] = relationship(
-        back_populates="component"
-    )
-
-    cart_lines: Mapped["CartLine"] = relationship(
-        back_populates="component"
-    )
+    inventories: Mapped["Inventory"] = relationship(back_populates="component")
+    cart_lines: Mapped["CartLine"] = relationship(back_populates="component")
+    purchase_invoice_lines: Mapped["PurchaseInvoiceLine"] = relationship(back_populates="component")
+    sales_quote_lines: Mapped["SalesQuoteLine"] = relationship(back_populates="component")
+    sales_delivery_lines: Mapped["SalesDeliveryLine"] = relationship(back_populates="component")
+    sales_invoice_lines: Mapped["SalesInvoiceLine"] = relationship(back_populates="component")
+    inbound_delivery_lines: Mapped["InboundDeliveryLine"] = relationship(back_populates="component")
 
 class PurchaseInvoice(Base):
     __tablename__ = "purchase_invoices"
@@ -207,6 +209,10 @@ class PurchaseInvoiceLine(Base):
 
     inbound_delivery_lines: Mapped[List["InboundDeliveryLine"]] = relationship(
         back_populates="purchase_invoice_line"
+    )
+
+    component: Mapped["ComputerComponent"] = relationship(
+        back_populates="purchase_invoice_lines"
     )
 
 class InboundDelivery(Base):
@@ -300,6 +306,10 @@ class InboundDeliveryLine(Base):
     )
 
     purchase_invoice_line: Mapped[List["PurchaseInvoiceLine"]] = relationship(
+        back_populates="inbound_delivery_lines"
+    )
+
+    component: Mapped["ComputerComponent"] = relationship(
         back_populates="inbound_delivery_lines"
     )
 

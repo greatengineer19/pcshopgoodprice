@@ -41,14 +41,18 @@ export function PurchaseViewModal({ invoice, isViewModalOpen, closeViewModal, on
                 <div className="space-y-6 py-6">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-1">Date</h4>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-1">Invoice Date</h4>
                             <p className="flex items-center">
                                 <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                                {new Date(invoice.invoice_date).toLocaleDateString('en-GB')}
+                                {new Date(invoice.invoice_date).toLocaleDateString("en-GB", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                    })}
                             </p>
                         </div>
                         <div>
-                            <h4 className="text-sm font-medium text-muted foreground mb-1">Status</h4>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-1">Status</h4>
                             <Badge className={`${getStatusColor(invoice.status)} text-white`}>
                                 {invoice.status}
                             </Badge>
@@ -66,7 +70,14 @@ export function PurchaseViewModal({ invoice, isViewModalOpen, closeViewModal, on
                             <h4 className="text-sm font-medium text-muted-foreground mb-1">
                                 Expected Delivery
                             </h4>
-                            <p>{invoice.expected_delivery_date || "Not Specified"}</p>
+                            <p>{invoice.expected_delivery_date 
+                                ? new Date(invoice.expected_delivery_date).toLocaleDateString("en-GB", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                    })
+                                : "Not Specified"}
+                            </p>
                         </div>
                     </div>
 
@@ -99,18 +110,11 @@ export function PurchaseViewModal({ invoice, isViewModalOpen, closeViewModal, on
                                             <TableCell
                                                 className="font-medium flex items-center gap-2"
                                             >
-                                                <div className="relative h-8 w-8 rounded overflow-hidden">
-                                                    <Image src={"/placeholder.svg"}
-                                                           alt={invoice_line.component_name}
-                                                           fill
-                                                           className="object-cover"
-                                                           />
-                                                </div>
                                                 {invoice_line.component_name}
                                             </TableCell>
                                             <TableCell className="text-center">{invoice_line.quantity}</TableCell>
-                                            <TableCell className="text-right">{Number(invoice_line.price_per_unit).toFixed(2)}</TableCell>
-                                            <TableCell className="text-right">$ {Number(invoice_line.total_line_amount).toFixed(2)}</TableCell>
+                                            <TableCell className="text-right">{Number(invoice_line.price_per_unit).toLocaleString()}</TableCell>
+                                            <TableCell className="text-right">Rp {Number(invoice_line.total_line_amount).toLocaleString()}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -118,9 +122,9 @@ export function PurchaseViewModal({ invoice, isViewModalOpen, closeViewModal, on
                         </div>
                     </div>
 
-                    <div className="flex justify-between font-medium text-lg">
+                    <div className="flex justify-end gap-8 font-medium text-lg text-right">
                         <span>Total Amount:</span>
-                        <span>$ {Number(invoice.sum_total_line_amounts).toFixed(2)}</span>
+                        <span>Rp {Number(invoice.sum_total_line_amounts).toLocaleString()}</span>
                     </div>
                 </div>
                 <DialogFooter>

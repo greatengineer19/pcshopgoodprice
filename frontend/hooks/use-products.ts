@@ -25,7 +25,7 @@ export function useProducts() {
 					...p,
 					image: p.images?.[0] ?? undefined,
 					component_category_id: p.component_category_id,
-					computer_component_sell_price_settings: []
+					computer_component_sell_price_settings: p.computer_component_sell_price_settings
 				  }));
 
 				setProducts(mutatedData);

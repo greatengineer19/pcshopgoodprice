@@ -35,7 +35,7 @@ interface ParamsProps {
     handleSetLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function OpenForChangePurchaseModal({
+export function NewAndEditPurchaseInvoiceModal({
     isNewModalOpen,
     isLoading,
     isEditMode,
@@ -49,8 +49,8 @@ export function OpenForChangePurchaseModal({
                 id: Number(product.id),
                 name: product.name,
                 quantity: product.quantity,
-                price: Number(product.price),
-                stock: 10,
+                buyPrice: Number(product.computer_component_sell_price_settings.find(p => p.day_type === "default")?.price_per_unit || 0).toLocaleString(),
+                numberBuyPrice: Number(product.computer_component_sell_price_settings.find(p => p.day_type === "default")?.price_per_unit || 0),
                 component_category_id: product.component_category_id,
                 component_category_name: product.component_category_name
             })
@@ -132,7 +132,7 @@ export function OpenForChangePurchaseModal({
         }
     }
 
-    const updateExistingInvoice = async (id: number, purchaseForm: PurchaseForm) => {
+    const updatePurchaseInvoice = async (id: number, purchaseForm: PurchaseForm) => {
         handleSetLoading(true)
 
         try {
@@ -183,7 +183,7 @@ export function OpenForChangePurchaseModal({
 
     const handleSubmitPurchase = useCallback(async (formData: PurchaseForm, initialInvoice: PurchaseInvoice | null, isEditMode: boolean) => {
         if (isEditMode && initialInvoice) {
-            updateExistingInvoice(Number(initialInvoice.id), formData)
+            updatePurchaseInvoice(Number(initialInvoice.id), formData)
         } else {
             createNewInvoice(formData)
         }

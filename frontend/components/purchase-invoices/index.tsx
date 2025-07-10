@@ -5,10 +5,10 @@ import type { PurchaseInvoice } from "@/types/purchase-invoice"
 import type { SetStateAction } from "react"
 
 import { ButtonAddPurchaseInvoice } from "@/components/purchase-invoices/button-add-purchase-invoice"
-import { PurchaseInvoiceList } from "./purchase-invoice-list"
-import { PurchaseViewModal } from "./purchase-view-modal"
+import { PurchaseInvoiceList } from "./PurchaseInvoiceList"
+import { PurchaseViewModal } from "./PurchaseViewModal"
 import { DeleteConfirmationModal } from "./delete-confirmation-modal"
-import { OpenForChangePurchaseModal } from "./open-for-change-purchase-modal"
+import { NewAndEditPurchaseInvoiceModal } from "./open-for-change-purchase-modal"
 import { useToastError } from "@/hooks/use-toast-error"
 
 export default function PurchaseIndex() {
@@ -109,7 +109,7 @@ export default function PurchaseIndex() {
                 onEditModal={openEditPurchaseModal}
             />
 
-            <OpenForChangePurchaseModal 
+            <NewAndEditPurchaseInvoiceModal 
                 isNewModalOpen={isPurchaseModalOpen}
                 isLoading={isLoading}
                 isEditMode={isEditMode}

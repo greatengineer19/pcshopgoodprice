@@ -25,8 +25,6 @@ class ComputerComponentCategorySchema(BaseModel):
 class ComputerComponentBase(BaseModel):
     name: str
     product_code: str
-    price: float
-    stock: int
     component_category_name: Optional[str] = None
     description: Optional[str] = None
     status: int
@@ -98,7 +96,7 @@ class ComputerComponentSellPriceSettingAsParams(BaseModel):
     id: Optional[int] = None
     component_id: Optional[int] = None
     day_type: str
-    price_per_unit: str
+    price_per_unit: Union[str, int]
     active: bool = True
 
     @field_validator('day_type')
@@ -507,9 +505,9 @@ class UserResponse(BaseModel):
         role = values.get('role')
         if isinstance(role, int):
             try:
-                values.role = UserRoleEnum(role).name
+                values['role'] = UserRoleEnum(role).name.lower()
             except ValueError:
-                values.role = f"UNKNOWN({role})"
+                values['role'] = f"UNKNOWN({role})"
         return values
 
 class UserAPIResponse(BaseModel):

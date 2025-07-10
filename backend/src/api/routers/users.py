@@ -31,14 +31,13 @@ def user_by_role(
         if user is None:
             return { 'user': {}, 'access_token': '', 'refresh_token': '' }
         
-        if user.refresh_token is not None:
-            if user.refresh_token_expiry_at < datetime.utcnow():
-                expires_at = datetime.utcnow() + timedelta(minutes=3600)
-                new_refresh_token = create_refresh_token(user.id, expires_at)
-                user.refresh_token_expiry_at = expires_at
-                user.refresh_token = new_refresh_token
-                db.add(user)
-                db.commit()
+        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.utcnow()):
+            expires_at = datetime.utcnow() + timedelta(minutes=3600)
+            new_refresh_token = create_refresh_token(user.id, expires_at)
+            user.refresh_token_expiry_at = expires_at
+            user.refresh_token = new_refresh_token
+            db.add(user)
+            db.commit()
 
         access_token = create_access_token(user.id, 30)
         response = {

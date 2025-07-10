@@ -42,11 +42,9 @@ export function ProductSelection({ products, onAddProduct }: ParamsProps) {
                 <Table>
                     <TableHeader className="stticky top-0 bg-background z-10">
                         <TableRow>
-                            <TableHead className="w-[80px]">Image</TableHead>
                             <TableHead>Product</TableHead>
                             <TableHead>Category</TableHead>
                             <TableHead className="text-right">Price</TableHead>
-                            <TableHead className="text-right">Stock</TableHead>
                             <TableHead className="w-[100px] text-center">Action</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -60,16 +58,6 @@ export function ProductSelection({ products, onAddProduct }: ParamsProps) {
                         ) : (
                             filteredProducts.map((product) => (
                                 <TableRow key={product.id}>
-                                    <TableCell>
-                                        <div className="relative h-10 w-10 rounded overflow-hidden">
-                                            <Image
-                                                src={"/placeholder.svg"}
-                                                alt={product.name}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    </TableCell>
                                     <TableCell className="font-medium">
                                         {product.name}
                                     </TableCell>
@@ -77,12 +65,7 @@ export function ProductSelection({ products, onAddProduct }: ParamsProps) {
                                         {product.component_category_name}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        ${product.price.toFixed(2)}
-                                    </TableCell>
-                                    <TableCell 
-                                        className="text-right"
-                                    >
-                                        {product.stock}
+                                        Rp {product.buyPrice}
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Button 

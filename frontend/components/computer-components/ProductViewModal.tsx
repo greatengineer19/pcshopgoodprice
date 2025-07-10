@@ -59,9 +59,12 @@ export function ProductViewModal(
         handleFileSelect,
         uploadedImage
     }: ProductViewModalProps) {
+    if (!product) return null
+    
     const { showSuccessToast } = useToastSuccess()
     const { showErrorToast } = useToastError()
 
+    const [sellPricesAttributes, setSellPricesAttributes] = useState<DailyProductPrice[]>([]);
     const { onEditProduct, handleEditProductChange, handleEditProductChangeInt, defaultPrice, setDefaultPrice } = useOnEditProduct()
     const { resetForm } = useProductForm(product || undefined)
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -100,7 +103,7 @@ export function ProductViewModal(
 
     const handleUpdateProduct = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-    
+   
         if (!onEditProduct.name || !onEditProduct.component_category_name) {
             showErrorToast("Please fill in all required fields");
             return;
@@ -113,14 +116,15 @@ export function ProductViewModal(
     
         try {
             const imageUrl = uploadedImage?.s3_key;
-            const [sellPricesAttributes, setSellPricesAttributes] = useState<DailyProductPrice[]>([]);
 
             const productCategories = await fetchProductCategories();
-            const category = productCategories.find(category => category.name === onEditProduct.category);
+            const category = productCategories.find(category => category.name === onEditProduct.component_category_name);
 
             if (!category) {
                 throw new Error('Failed to fetch category');
             }
+
+            let tempSellPrices: DailyProductPrice[] = [];
 
             const defaultPriceSetting = onEditProduct.computer_component_sell_price_settings_attributes.find(sell_price => sell_price.day_type === 'default')
             if (defaultPriceSetting) {
@@ -130,7 +134,7 @@ export function ProductViewModal(
                     price_per_unit: Number(defaultPrice),
                     active: true
                 };
-                setSellPricesAttributes([...sellPricesAttributes, defaultPriceSettingParams])
+                tempSellPrices.push(defaultPriceSettingParams);
             }
             
 
@@ -145,14 +149,15 @@ export function ProductViewModal(
                         active: foundDayPricing?.active || priceSetting.active
                     };
                 });
-            setSellPricesAttributes([...sellPricesAttributes, ...dailyPriceSettingsParams])
+            tempSellPrices.push(...dailyPriceSettingsParams);
+            setSellPricesAttributes(tempSellPrices);
 
             const payload: ProductParams = {
                 ...onEditProduct,
                 id: onEditProduct.id,
                 category_id: category.id,
                 images: imageUrl ? [imageUrl] : [],
-                computer_component_sell_price_settings_attributes: sellPricesAttributes
+                computer_component_sell_price_settings_attributes: tempSellPrices
             };
     
             const response = await fetch("http://localhost:8080/api/computer-components/" + onEditProduct.id, {
@@ -187,7 +192,10 @@ export function ProductViewModal(
         setIsDialogOpen(false)
     };
 
-    if (!product) return null
+    function capitalizeFirstLetter(string: string) {
+        if (!string) return '';
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={handleClose}>
@@ -263,7 +271,7 @@ export function ProductViewModal(
                                             <Select 
                                                 defaultValue={product.component_category_name}
                                                 disabled={!isEditMode || isLoading}
-                                                onValueChange={isEditMode ? (value) => handleEditProductChange("category_name", value) : undefined}
+                                                onValueChange={isEditMode ? (value) => handleEditProductChange("component_category_name", value) : undefined}
                                                 required
                                             >
                                                 <SelectTrigger>
@@ -354,7 +362,7 @@ export function ProductViewModal(
                                                         id="default-price"
                                                         type="number"
                                                         placeholder="0.00"
-                                                        value={defaultPrice === "0" ? "" : defaultPrice}
+                                                        value={defaultPrice === "0" ? "" : parseFloat(defaultPrice).toFixed(0)}
                                                         onChange={(e) => setDefaultPrice(e.target.value)}
                                                         className="mt-1"
                                                         step="0.01"
@@ -369,14 +377,14 @@ export function ProductViewModal(
                                                 <Label className="text-base font-semibold">Daily Pricing (Optional)</Label>
                                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                                     {
-                                                        onEditProduct.computer_component_sell_price_settings_attributes.map((priceSetting, index) => (
+                                                        dayPricing.map((priceSetting, index) => (
                                                             <div key={priceSetting.day_type} className="flex items-center justify-between p-3 border rounded-lg">
                                                                 <div className="flex-1 mr-4">
-                                                                    <Label className="font-medium">{priceSetting.day_type}</Label>
+                                                                    <Label className="font-medium">{capitalizeFirstLetter(priceSetting.day_type)}</Label>
                                                                     <Input
                                                                         type="number"
                                                                         placeholder="0.00"
-                                                                        value={priceSetting.price_per_unit === 0 ? "" : priceSetting.price_per_unit}
+                                                                        value={priceSetting.price_per_unit === 0 ? "" : Number(priceSetting.price_per_unit).toFixed(0)}
                                                                         onChange={(e) => handlePriceChange(index, e.target.value)}
                                                                         className="mt-1"
                                                                         step="0.01"

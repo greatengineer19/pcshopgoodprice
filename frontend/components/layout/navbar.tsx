@@ -55,6 +55,7 @@ export function Navbar() {
         localStorage.setItem(REFRESH_KEY_NAME, response.refresh_token);
 
         const userRole: UserRole = responseUser.role.toLowerCase() as UserRole;
+        setUser(responseUser)
         setRole(userRole)
     }
 
@@ -62,7 +63,7 @@ export function Navbar() {
         <div className="border-b">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 {/* Logo */}
-                <Link href="/" className="flex items-center">
+                <Link href="/computer_components" className="flex items-center">
                     <span className="text-xl font-normal" style={{ fontFamily: "'Tinos', serif", fontWeight: 400 }}>
                         HASSFREE COMPUTERS SHOP
                     </span>

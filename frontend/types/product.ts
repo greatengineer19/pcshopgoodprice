@@ -39,8 +39,7 @@ export interface ProductParams extends ProductBase {
 export interface ProductFromBackend extends ProductBase {
     id: number | null;
     images?: string[] | null;
-    price: number;
-    stock: number;
+    computer_component_sell_price_settings: DailyProductPrice[];
 }
 
 export interface ComputerComponentSellPriceSetting {

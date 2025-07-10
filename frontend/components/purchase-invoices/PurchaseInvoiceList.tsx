@@ -49,8 +49,7 @@ export function PurchaseInvoiceList({
             <CardHeader>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <CardTitle>Purchase Invoices History</CardTitle>
-                        <CardDescription>View and manage all purchase invoices</CardDescription>
+                        <CardTitle>View and manage all purchase invoices</CardTitle>
                     </div>
                     <div className="w-full sm:w-auto">
                         <div className="relative">
@@ -105,7 +104,7 @@ export function PurchaseInvoiceList({
                                             })()}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            ${Number(invoice.sum_total_line_amounts).toFixed(2)}
+                                            IDR {Number(invoice.sum_total_line_amounts).toLocaleString()}
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">

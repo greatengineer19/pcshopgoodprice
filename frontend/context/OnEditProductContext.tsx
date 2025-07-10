@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import type { ProductInFrontend, ProductParams } from '@/types/product'; // adjust path
+import { useEffect } from 'react';
 
 type OnEditProductContextType = {
   onEditProduct: ProductParams;
@@ -32,11 +33,14 @@ export const OnEditProductProvider = ({ children, selectedProduct }: OnEditProdu
   });
     
   const [defaultPrice, setDefaultPrice] = useState("")
-  const defaultPriceSetting = onEditProduct.computer_component_sell_price_settings_attributes.find(sell_price => sell_price.day_type === 'default')
-
-  if (defaultPriceSetting) {
-    setDefaultPrice(String(defaultPriceSetting.price_per_unit))
-  }
+  useEffect(() => {
+    const defaultPriceSetting = onEditProduct.computer_component_sell_price_settings_attributes.find(
+      sell_price => sell_price.day_type === 'default'
+    );
+    if (defaultPriceSetting) {
+      setDefaultPrice(String(defaultPriceSetting.price_per_unit));
+    }
+  }, [onEditProduct.computer_component_sell_price_settings_attributes]);
 
   const handleEditProductChange = (field: string, value: any) => {
     setOnEditProduct({

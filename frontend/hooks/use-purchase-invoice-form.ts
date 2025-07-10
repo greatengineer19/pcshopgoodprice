@@ -46,7 +46,7 @@ export function usePurchaseInvoiceForm(initialData?: InitialDataProps) {
 
     const addProductToProcurement = (product: MappedProduct) => {
         const existingProduct = selectedInvoiceLines.find((invoice_line) => invoice_line.component_id === product.id)
-        
+
         if (existingProduct) {
             setSelectedInvoiceLines(
                 selectedInvoiceLines.map(
@@ -61,8 +61,7 @@ export function usePurchaseInvoiceForm(initialData?: InitialDataProps) {
                 component_id: product.id,
                 component_name: product.name,
                 quantity: 1,
-                price: product.price,
-                stock: 10,
+                price: Number(product.numberBuyPrice),
                 component_category_id: product.component_category_id,
                 component_category_name: product.component_category_name
             }])

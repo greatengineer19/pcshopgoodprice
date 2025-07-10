@@ -133,7 +133,7 @@ export function PurchaseSummary({
 
                     <div className="flex justify-between font-medium text-lg">
                         <span>Total:</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>Rp {total.toLocaleString()}</span>
                     </div>
                 </div>
             </div>

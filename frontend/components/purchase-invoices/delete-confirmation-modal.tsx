@@ -65,6 +65,7 @@ export function DeleteConfirmationModal({
         }
     }, []);
 
+    console.log(invoice)
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
@@ -81,7 +82,7 @@ export function DeleteConfirmationModal({
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Warning</AlertTitle>
                     <AlertDescription>
-                        You are about to delete invoice "{invoice.id}" for {invoice.supplierName}.
+                        You are about to delete invoice "{invoice.purchase_invoice_no}".
                     </AlertDescription>
                 </Alert>
 

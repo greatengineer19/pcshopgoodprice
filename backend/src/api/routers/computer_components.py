@@ -16,7 +16,14 @@ from src.models import (
     ComputerComponentCategory,
     ComputerComponentReview,
     ComputerComponentSellPriceSetting,
-    User
+    User,
+    Inventory,
+    CartLine,
+    PurchaseInvoiceLine,
+    SalesQuoteLine,
+    SalesDeliveryLine,
+    SalesInvoiceLine,
+    InboundDeliveryLine
 )
 import logging
 from src.api.s3_dependencies import ( bucket_name, s3_client )
@@ -32,7 +39,11 @@ router = APIRouter(
 @router.get("", response_model=ComputerComponentAsListResponse)
 def index(db: Session = Depends(get_db)):
     try:
-        components = db.query(ComputerComponent).options(joinedload(ComputerComponent.component_category)).all()
+        components = (
+            db.query(ComputerComponent)
+            .options(joinedload(ComputerComponent.component_category), joinedload(ComputerComponent.computer_component_sell_price_settings))
+            .order_by(ComputerComponent.name).all()
+        )
 
         if not components:
             return { 'computer_components': [] }
@@ -55,7 +66,7 @@ def index(db: Session = Depends(get_db)):
                     product_code=component.product_code,
                     component_category_name=getattr(component.component_category, 'name', None),
                     component_category_id=component.component_category_id,
-                    computer_component_sell_price_settings=[],
+                    computer_component_sell_price_settings=component.computer_component_sell_price_settings,
                     images=images,
                     description=component.description,
                     status=component.status,
@@ -73,12 +84,21 @@ def show(id: int, db: Session = Depends(get_db)):
     try:
         computer_component = (
             db.query(ComputerComponent)
-            .options(joinedload(ComputerComponent.computer_component_sell_price_settings))
+            .options(joinedload(ComputerComponent.computer_component_sell_price_settings), joinedload(ComputerComponent.component_category))
             .filter(ComputerComponent.id == id)
             .first()
         )
         if computer_component is None:
             raise HTTPException(status_code=404, detail="Computer not found")
+        
+        computer_component.component_category_name = computer_component.component_category.name
+
+        sell_price_settings = computer_component.computer_component_sell_price_settings
+        sorted_sell_price_settings = sorted(
+            sell_price_settings,
+            key=lambda setting: setting.day_type
+        )
+        computer_component.computer_component_sell_price_settings = sorted_sell_price_settings
 
         return computer_component
     finally:
@@ -118,7 +138,7 @@ def create(params: ComputerComponentAsParams, db: Session = Depends(get_db)):
                     component_id = computer_component.id,
                     day_type=price_setting_params.day_type,
                     price_per_unit=price_setting_params.price_per_unit,
-                    active=True
+                    active=price_setting_params.active
                 )
             )
 
@@ -219,10 +239,18 @@ def destroy(id: int, db: Session = Depends(get_db)):
     # Check if it exists
     if not db_computer_component:
         raise HTTPException(status_code=404, detail="Data not found")
+    
+    for model in [Inventory,
+     CartLine,
+     PurchaseInvoiceLine,
+     SalesQuoteLine,
+     SalesDeliveryLine,
+     SalesInvoiceLine,
+     InboundDeliveryLine]:
+        check_model = db.query(func.count(model.id)).filter(model.component_id == db_computer_component.id).scalar()
+        if check_model > 0:
+            raise HTTPException(status_code=422, detail="Association is exist, unable to delete")
 
-    # Delete and commit
-    stmt = delete(ComputerComponentSellPriceSetting).where(ComputerComponentSellPriceSetting.component_id == db_computer_component.id)
-    db.execute(stmt)
     db.delete(db_computer_component)
     db.commit()
 
