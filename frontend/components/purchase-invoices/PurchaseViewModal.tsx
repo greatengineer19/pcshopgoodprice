@@ -45,10 +45,10 @@ export function PurchaseViewModal({ invoice, isViewModalOpen, closeViewModal, on
                             <p className="flex items-center">
                                 <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
                                 {new Date(invoice.invoice_date).toLocaleDateString("en-GB", {
-                                    day: "numeric",
+                                    day: "2-digit",
                                     month: "long",
                                     year: "numeric",
-                                    })}
+                                })}
                             </p>
                         </div>
                         <div>

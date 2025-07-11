@@ -88,7 +88,12 @@ export function PurchaseInvoiceList({
                                 filteredInvoices.map((invoice: PurchaseInvoice) => (
                                     <TableRow key={invoice.id}>
                                         <TableCell className="font-medium">{invoice.purchase_invoice_no}</TableCell>
-                                        <TableCell>{new Date(invoice.invoice_date).toLocaleDateString()}</TableCell>
+                                        <TableCell>{new Date(invoice.invoice_date).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                        })}
+                                        </TableCell>
                                         <TableCell>{invoice.supplier_name}</TableCell>
                                         <TableCell>
                                             {(() => {

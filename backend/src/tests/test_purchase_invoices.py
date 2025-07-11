@@ -294,7 +294,7 @@ def test_update(client, db_session, purchase_invoice_update_params_1):
 
     invoice_lines = response_body['purchase_invoice_lines']
     assert(len(invoice_lines)) == 2
-    assert response_body['sum_total_line_amounts'] == '10925.000000'
+    assert response_body['sum_total_line_amounts'] == '7925.000000'
     assert str(old_amount) == '12900.000000'
 
     new_names = set()

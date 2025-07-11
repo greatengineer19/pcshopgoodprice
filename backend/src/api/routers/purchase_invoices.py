@@ -148,6 +148,7 @@ def update(id: int, params: PurchaseInvoiceAsParams, db: Session = Depends(get_d
         purchase_invoice.expected_delivery_date = params.expected_delivery_date
         purchase_invoice.notes = params.notes
 
+        invoice_lines = []
         for param_line in params.purchase_invoice_lines_attributes:
             if param_line.id:
                 invoice_line = existing_invoice_lines.get(param_line.id)
@@ -170,6 +171,8 @@ def update(id: int, params: PurchaseInvoiceAsParams, db: Session = Depends(get_d
                     invoice_line.quantity = quantity
                     invoice_line.price_per_unit = price
                     invoice_line.total_line_amount = quantity * price
+
+                    invoice_lines.append(invoice_line)
             else:
                 quantity = Decimal(param_line.quantity)
                 price = Decimal(param_line.price_per_unit)
@@ -183,8 +186,9 @@ def update(id: int, params: PurchaseInvoiceAsParams, db: Session = Depends(get_d
                     price_per_unit=price,
                     total_line_amount=quantity * price
                 )
-                purchase_invoice.purchase_invoice_lines.append(invoice_line)
+                invoice_lines.append(invoice_line)
 
+        purchase_invoice.purchase_invoice_lines = invoice_lines
         service.calculate_sum_total_line_amounts(purchase_invoice)
 
         db.add(purchase_invoice)
