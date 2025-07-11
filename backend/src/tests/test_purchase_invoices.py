@@ -31,7 +31,6 @@ def component_liquid_cooling_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Liquid Cooling RGB",
         product_code="cpu_liquid_cooling_1",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -43,7 +42,6 @@ def component_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Noctua Fan",
         product_code="cpu_noctua_fan_1",
-        price=1.5,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -54,7 +52,6 @@ def component_cubegaming_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Cubegaming Fan",
         product_code="cpu_cubegaming_fan_1",
-        price=0.75,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -297,7 +294,8 @@ def test_update(client, db_session, purchase_invoice_update_params_1):
 
     invoice_lines = response_body['purchase_invoice_lines']
     assert(len(invoice_lines)) == 2
-    assert str(int(Decimal(response_body['sum_total_line_amounts']))) != str(int(Decimal(old_amount)))
+    assert response_body['sum_total_line_amounts'] == '10925.000000'
+    assert str(old_amount) == '12900.000000'
 
     new_names = set()
     for invoice_line in invoice_lines:

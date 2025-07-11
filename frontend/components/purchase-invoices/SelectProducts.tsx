@@ -14,7 +14,7 @@ interface ParamsProps {
     onAddProduct: (product: MappedProduct) => void
 }
 
-export function ProductSelection({ products, onAddProduct }: ParamsProps) {
+export function SelectProducts({ products, onAddProduct }: ParamsProps) {
     const [searchTerm, setSearchTerm] = useState("")
 
     const filteredProducts = products.filter(

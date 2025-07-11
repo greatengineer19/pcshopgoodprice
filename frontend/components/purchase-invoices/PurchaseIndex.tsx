@@ -8,7 +8,7 @@ import { ButtonAddPurchaseInvoice } from "@/components/purchase-invoices/button-
 import { PurchaseInvoiceList } from "./PurchaseInvoiceList"
 import { PurchaseViewModal } from "./PurchaseViewModal"
 import { DeleteConfirmationModal } from "./delete-confirmation-modal"
-import { NewAndEditPurchaseInvoiceModal } from "./open-for-change-purchase-modal"
+import { NewAndEditPurchaseInvoiceModal } from "./NewAndEditPurchaseInvoiceModal"
 import { useToastError } from "@/hooks/use-toast-error"
 
 export default function PurchaseIndex() {

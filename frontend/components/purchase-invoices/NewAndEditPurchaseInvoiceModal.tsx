@@ -18,8 +18,8 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { ProductSelection } from "./product-selection"
-import { PurchaseSummary } from "./purchase-summary"
+import { SelectProducts } from "./SelectProducts"
+import { PurchaseSummary } from "./PurchaseSummary"
 import { usePurchaseInvoiceForm } from "@/hooks/use-purchase-invoice-form"
 import { useProducts } from "@/hooks/use-products"
 import { useToastError } from "@/hooks/use-toast-error"
@@ -65,6 +65,7 @@ export function NewAndEditPurchaseInvoiceModal({
 
     const {
         selectedInvoiceLines,
+        destroyableInvoiceLines,
         supplierName,
         setSupplierName,
         expectedDeliveryDate,
@@ -134,6 +135,8 @@ export function NewAndEditPurchaseInvoiceModal({
 
     const updatePurchaseInvoice = async (id: number, purchaseForm: PurchaseForm) => {
         handleSetLoading(true)
+        console.log(1)
+        console.log(destroyableInvoiceLines)
 
         try {
             const payload: PurchaseInvoiceToBackend = {
@@ -142,17 +145,27 @@ export function NewAndEditPurchaseInvoiceModal({
                 expected_delivery_date: purchaseForm.expectedDeliveryDate,
                 notes: purchaseForm.notes,
                 invoice_date: (new Date()).toISOString(),
-                purchase_invoice_lines_attributes: purchaseForm.selectedInvoiceLines.map(
-                    (invoiceLine) => ({
-                        id: invoiceLine.id,
-                        component_id: Number(invoiceLine.component_id),
-                        component_name: invoiceLine.component_name,
-                        component_category_id: invoiceLine.component_category_id,
-                        component_category_name: invoiceLine.component_category_name,
-                        quantity: invoiceLine.quantity,
-                        price_per_unit: invoiceLine.price
-                    })
-                )
+                purchase_invoice_lines_attributes: [
+                ...purchaseForm.selectedInvoiceLines.map((invoiceLine) => ({
+                    id: invoiceLine.id,
+                    component_id: Number(invoiceLine.component_id),
+                    component_name: invoiceLine.component_name,
+                    component_category_id: invoiceLine.component_category_id,
+                    component_category_name: invoiceLine.component_category_name,
+                    quantity: invoiceLine.quantity,
+                    price_per_unit: invoiceLine.price,
+                })),
+                ...destroyableInvoiceLines.map((invoiceLine) => ({
+                    id: invoiceLine.id,
+                    component_id: Number(invoiceLine.component_id),
+                    component_name: invoiceLine.component_name,
+                    component_category_id: invoiceLine.component_category_id,
+                    component_category_name: invoiceLine.component_category_name,
+                    quantity: invoiceLine.quantity,
+                    price_per_unit: invoiceLine.price,
+                    _destroy: true,
+                })),
+                ]
             }
 
             const response = await fetch("http://localhost:8080/api/purchase-invoices/" + id, {
@@ -181,18 +194,18 @@ export function NewAndEditPurchaseInvoiceModal({
         }
     }
 
-    const handleSubmitPurchase = useCallback(async (formData: PurchaseForm, initialInvoice: PurchaseInvoice | null, isEditMode: boolean) => {
-        if (isEditMode && initialInvoice) {
-            updatePurchaseInvoice(Number(initialInvoice.id), formData)
-        } else {
-            createNewInvoice(formData)
-        }
-    }, []);
-
     const handleSubmit = () => {
-        if (!validateForm()) return
-        handleSubmitPurchase(getFormData(), initialInvoice, isEditMode)
-    }
+        if (!validateForm()) return;
+
+        const formData = getFormData();
+
+        if (isEditMode && initialInvoice) {
+            updatePurchaseInvoice(Number(initialInvoice.id), formData);
+        } else {
+            createNewInvoice(formData);
+        }
+    };
+
 
     return (
         <Dialog open={isNewModalOpen} onOpenChange={closeModal}>
@@ -213,7 +226,7 @@ export function NewAndEditPurchaseInvoiceModal({
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
                     {/* Product Selection */}
                     <div className="lg:col-span-2">
-                        <ProductSelection products={mappedProducts} onAddProduct={addProductToProcurement} />
+                        <SelectProducts products={mappedProducts} onAddProduct={addProductToProcurement} />
                     </div>
 
                     {/* Procurement Summary */}

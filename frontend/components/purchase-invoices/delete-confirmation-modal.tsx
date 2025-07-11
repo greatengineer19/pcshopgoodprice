@@ -65,7 +65,7 @@ export function DeleteConfirmationModal({
         }
     }, []);
 
-    console.log(invoice)
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">

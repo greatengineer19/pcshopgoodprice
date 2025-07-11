@@ -15,6 +15,7 @@ interface InitialDataProps {
 
 export function usePurchaseInvoiceForm(initialData?: InitialDataProps) {
     const [selectedInvoiceLines, setSelectedInvoiceLines] = useState<OnEditPurchaseInvoiceLine[]>([]);
+    const [destroyableInvoiceLines, setDestroyableInvoiceLines] = useState<OnEditPurchaseInvoiceLine[]>([]);
     const [supplierName, setSupplierName] = useState("");
     const [expectedDeliveryDate, setExpectedDeliveryDate] = useState("");
     const [procurementNote, setProcurementNote] = useState("");
@@ -71,6 +72,14 @@ export function usePurchaseInvoiceForm(initialData?: InitialDataProps) {
     };
 
     const removeProductFromProcurement = (productId: number) => {
+        const hasIdInvoiceLine = selectedInvoiceLines.find((invoice_line) => invoice_line.id !== null && invoice_line.component_id === productId)
+        if (hasIdInvoiceLine) {
+            console.log(hasIdInvoiceLine);
+            setDestroyableInvoiceLines([
+                ...destroyableInvoiceLines,
+                hasIdInvoiceLine
+            ])
+        };
         setSelectedInvoiceLines(selectedInvoiceLines.filter((invoice_line) => invoice_line.component_id !== productId))
         toast.info("Product removed from procurement")
     };
@@ -126,6 +135,7 @@ export function usePurchaseInvoiceForm(initialData?: InitialDataProps) {
 
     return {
         selectedInvoiceLines,
+        destroyableInvoiceLines,
         supplierName,
         setSupplierName,
         expectedDeliveryDate,
