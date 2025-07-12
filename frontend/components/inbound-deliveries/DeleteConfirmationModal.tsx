@@ -79,7 +79,7 @@ export function DeleteConfirmationModal({
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Warning</AlertTitle>
                     <AlertDescription>
-                        You are about to delete purchase inbound "{inboundDelivery.inbound_delivery_no}" for invoice {inboundDelivery.purchase_invoice_no}.
+                        You are about to delete "{inboundDelivery.inbound_delivery_no}".
                     </AlertDescription>
                 </Alert>
 

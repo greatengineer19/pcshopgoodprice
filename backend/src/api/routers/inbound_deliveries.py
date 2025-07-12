@@ -25,33 +25,15 @@ from decimal import Decimal
 import re
 from src.api.dependencies import get_db
 from src.api.s3_dependencies import ( bucket_name, s3_client )
+from src.inbound_deliveries.build_service import ( BuildService )
+from src.inbound_deliveries.show_service import ( ShowService )
+from src.purchase_invoices.service import Service as PurchaseInvoiceService
+from src.inventories.create_from_inbound_delivery_service import CreateFromInboundDeliveryService
+from datetime import datetime
 
 router = APIRouter(
     prefix='/api/inbound-deliveries'
 )
-
-@event.listens_for(Session, "before_flush")
-def check_change_object(session: Session, flush_context, instances):
-    for obj in session.new.union(session.dirty):
-        if isinstance(obj, InboundDelivery) and not obj.inbound_delivery_no:
-            result = session.execute(text(
-                "SELECT inbound_delivery_no " \
-                "FROM inbound_deliveries " \
-                "ORDER BY id DESC LIMIT 1 " \
-                "FOR UPDATE"
-            )).first()
-
-            if result and result[0]:
-                match = re.search(r"IBD-(\d+)", result[0])
-                if match:
-                    last_number = int(match.group(1))
-                    next_number = last_number + 1
-                else:
-                    next_number = 1
-            else:
-                next_number = 1
-            
-            obj.inbound_delivery_no = f"IBD-{next_number:05d}"
 
 @router.get("", response_model=InboundDeliveriesList)
 def index(db: Session = Depends(get_db)):
@@ -124,33 +106,11 @@ def deliverable_purchase_invoices(db: Session = Depends(get_db)):
     finally:
         db.close()
 
-    
 @router.get('/{id}', response_model=InboundDeliveryAsResponse)
 def show(id: int, db: Session = Depends(get_db)):
     try:
-        inbound_delivery = (
-            db.query(InboundDelivery)
-            .options(
-                joinedload(InboundDelivery.inbound_delivery_lines),
-                joinedload(InboundDelivery.inbound_delivery_attachments)
-            )
-            .filter(InboundDelivery.id == id)
-            .first()
-        )
-
-        if inbound_delivery is None:
-            raise HTTPException(status_code=404, detail="Data not found")
-        
-        if inbound_delivery.inbound_delivery_date is not None:
-            inbound_delivery.inbound_delivery_date = inbound_delivery.inbound_delivery_date.strftime("%Y-%m-%d %H:%M:%S")
-        inbound_delivery.status = InboundDeliveryStatusEnum(inbound_delivery.status).name
-
-        for attachment in inbound_delivery.inbound_delivery_attachments:
-            attachment.file_link = s3_client().generate_presigned_url(
-                    'get_object',
-                    Params={'Bucket': bucket_name(), 'Key': attachment.file_s3_key},
-                    ExpiresIn=3600
-                )
+        show_service = ShowService(db)
+        inbound_delivery = show_service.build_response(id)
         
         return inbound_delivery
     finally:
@@ -159,53 +119,6 @@ def show(id: int, db: Session = Depends(get_db)):
 @router.post("", response_model=InboundDeliveryAsResponse)
 def create(params: InboundDeliveryAsParams, db: Session = Depends(get_db)):
     try:
-        inbound_delivery = InboundDelivery(
-            purchase_invoice_id=params.purchase_invoice_id,
-            purchase_invoice_no=params.purchase_invoice_no,
-            inbound_delivery_date=params.inbound_delivery_date,
-            inbound_delivery_reference=params.inbound_delivery_reference,
-            received_by=params.received_by,
-            notes=params.notes,
-            status=InboundDeliveryStatusEnum.DELIVERED
-        )
-
-        delivery_lines = []
-        for param_line in params.inbound_delivery_lines_attributes:
-            expected_quantity = Decimal(param_line.expected_quantity)
-            received_quantity = Decimal(param_line.received_quantity)
-            damaged_quantity = Decimal(param_line.damaged_quantity)
-            price = Decimal(param_line.price_per_unit)
-            total_line_amount = price * received_quantity
-
-            delivery_line = InboundDeliveryLine(
-                purchase_invoice_line_id=param_line.purchase_invoice_line_id,
-                component_id=param_line.component_id,
-                component_name=param_line.component_name,
-                component_category_id=param_line.component_category_id,
-                component_category_name=param_line.component_category_name,
-                expected_quantity=expected_quantity,
-                received_quantity=received_quantity,
-                damaged_quantity=damaged_quantity,
-                price_per_unit=price,
-                total_line_amount=total_line_amount
-            )
-            delivery_lines.append(delivery_line)
-
-        attachment_lines = []
-        for param_attachment in params.inbound_delivery_attachments_attributes:
-            attachment_line = InboundDeliveryAttachment(
-                uploaded_by=param_attachment.uploaded_by,
-                file_s3_key=param_attachment.file_s3_key
-            )
-            attachment_lines.append(attachment_line)
-
-        inbound_delivery.inbound_delivery_lines = delivery_lines
-        inbound_delivery.inbound_delivery_attachments = attachment_lines
-
-        db.add(inbound_delivery)
-        db.commit()
-        db.refresh(inbound_delivery)
-
         purchase_invoice = (
             db.query(PurchaseInvoice)
               .options(
@@ -215,49 +128,26 @@ def create(params: InboundDeliveryAsParams, db: Session = Depends(get_db)):
               .filter(PurchaseInvoice.id == params.purchase_invoice_id).first()
         )
 
-        total_unsent_quantity = 0
-        for invoice_line in purchase_invoice.purchase_invoice_lines:
-            delivery_lines = invoice_line.inbound_delivery_lines
-            total_unsent_quantity += invoice_line.quantity - sum(ib_line.received_quantity + ib_line.damaged_quantity for ib_line in delivery_lines)
+        if purchase_invoice is None:
+            raise HTTPException(status_code=404, detail="Invoice not found")
+        elif purchase_invoice.invoice_date > datetime.strptime(params.inbound_delivery_date, "%Y-%m-%d %H:%M:%S"):
+            raise HTTPException(status_code=422, detail="Invoice date cannot be greater than delivery date")
+        
+        build_service = BuildService(db)
+        inbound_delivery = build_service.build(params, purchase_invoice)
 
-        if total_unsent_quantity == 0:
-            purchase_invoice.status = StatusEnum.COMPLETED
-            db.add(purchase_invoice)
-            db.commit()
-            db.refresh(purchase_invoice)
-
-
-        for delivery_line in inbound_delivery.inbound_delivery_lines:
-            inventory = Inventory(
-                in_stock= delivery_line.received_quantity,
-                stock_date=inbound_delivery.inbound_delivery_date,
-                component_id=delivery_line.component_id,
-                resource_id=inbound_delivery.id,
-                resource_type='InboundDelivery',
-                resource_line_id=delivery_line.id,
-                resource_line_type='InboundDeliveryLine',
-                buy_price=delivery_line.price_per_unit
-            )
-            db.add(inventory)
-
+        db.add(inbound_delivery)
         db.commit()
+        db.refresh(inbound_delivery)
 
-        inbound_delivery = (
-            db.query(InboundDelivery)
-            .options(
-                joinedload(InboundDelivery.inbound_delivery_lines),
-                joinedload(InboundDelivery.inbound_delivery_attachments)
-            )
-            .filter(InboundDelivery.id == inbound_delivery.id)
-            .first()
-        )
+        invoice_service = PurchaseInvoiceService(db)
+        invoice_service.assign_status_after_create_inbound_delivery(purchase_invoice)
 
-        for attachment in inbound_delivery.inbound_delivery_attachments:
-            attachment.file_link = create_presigned_url(attachment.file_s3_key)
+        inventory_service = CreateFromInboundDeliveryService(db)
+        inventory_service.create_inventories(inbound_delivery)
 
-        if inbound_delivery.inbound_delivery_date is not None:
-            inbound_delivery.inbound_delivery_date = inbound_delivery.inbound_delivery_date.strftime("%Y-%m-%d %H:%M:%S")
-        inbound_delivery.status = InboundDeliveryStatusEnum(inbound_delivery.status).name
+        show_service = ShowService(db)
+        inbound_delivery = show_service.build_response(inbound_delivery.id)
 
         return inbound_delivery
     except Exception as e:
@@ -266,13 +156,6 @@ def create(params: InboundDeliveryAsParams, db: Session = Depends(get_db)):
         raise
     finally:
         db.close()
-
-def create_presigned_url(file_s3_key: str):
-    return s3_client().generate_presigned_url(
-        'get_object',
-        Params={'Bucket': bucket_name(), 'Key': file_s3_key },
-        ExpiresIn=3600
-    )
 
 @router.delete("/{id}", status_code=204)
 def destroy(id: int, db: Session = Depends(get_db)):

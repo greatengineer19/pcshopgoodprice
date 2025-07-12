@@ -25,6 +25,7 @@ from src.tests.conftest import ( client, db_session, setup_factories )
 from decimal import Decimal
 from datetime import datetime
 from unittest.mock import patch, ANY, MagicMock, AsyncMock
+from src.inbound_deliveries.show_service import ShowService
 
 @pytest.fixture
 def component_category_fan():
@@ -39,7 +40,6 @@ def component_liquid_cooling_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Liquid Cooling RGB",
         product_code="cpu_liquid_cooling_1",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -51,7 +51,6 @@ def component_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Noctua Fan",
         product_code="cpu_noctua_fan_1",
-        price=1.5,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -62,7 +61,6 @@ def component_cubegaming_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Cubegaming Fan",
         product_code="cpu_cubegaming_fan_1",
-        price=0.75,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -290,7 +288,7 @@ def test_show(client, db_session, inbound_delivery_1):
         'deleted': False,
         'id': inbound_delivery_1.id,
         'inbound_delivery_attachments': [],
-        'inbound_delivery_date': inbound_delivery_1.inbound_delivery_date,
+        'inbound_delivery_date': inbound_delivery_1.inbound_delivery_date.strftime("%Y-%m-%dT%H:%M:%S"),
         'inbound_delivery_lines': [{'component_category_id': noctua_fan.component_category_id,
                                     'component_category_name': 'FAN',
                                     'component_id': noctua_fan.component_id,
@@ -415,7 +413,7 @@ def test_create(client, db_session, inbound_delivery_create_params_1):
     db_session.commit()
 
     mock_s3_url = "http://test-s3-url.com"
-    with patch('src.api.routers.inbound_deliveries.create_presigned_url', return_value=mock_s3_url):
+    with patch('src.inbound_deliveries.show_service.ShowService.create_presigned_url', return_value=mock_s3_url):
         response = client.post("/api/inbound-deliveries", json = inbound_delivery_create_params_1.dict())
         response_body = response.json()
     
@@ -440,7 +438,7 @@ def test_create(client, db_session, inbound_delivery_create_params_1):
                 'updated_at': attachment.updated_at.isoformat(),
                 'uploaded_by': 'Sean Ali'
             }],
-        'inbound_delivery_date': inbound_delivery_1.inbound_delivery_date.strftime("%Y-%m-%d %H:%M:%S"),
+        'inbound_delivery_date': inbound_delivery_1.inbound_delivery_date.strftime("%Y-%m-%dT%H:%M:%S"),
         'inbound_delivery_lines': [{'component_category_id': noctua_fan.component_category_id,
                                     'component_category_name': 'FAN',
                                     'component_id': noctua_fan.component_id,

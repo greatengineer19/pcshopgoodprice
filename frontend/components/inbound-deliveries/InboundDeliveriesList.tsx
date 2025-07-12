@@ -46,8 +46,7 @@ export function InboundDeliveriesList({ handleView, handleDelete }: ParamsProps)
             <CardHeader>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <CardTitle>Inbound Deliveries History</CardTitle>
-                        <CardDescription>View and manage all Inbound Deliveries</CardDescription>
+                        <CardTitle>View and manage all Inbound Deliveries</CardTitle>
                     </div>
                     <div className="w-full sm:w-auto">
                         <div className="relative">
@@ -88,11 +87,15 @@ export function InboundDeliveriesList({ handleView, handleDelete }: ParamsProps)
                                     <TableRow key={inboundDelivery.id}>
                                         <TableCell className="font-medium">{inboundDelivery.inbound_delivery_no}</TableCell>
                                         <TableCell>{inboundDelivery.purchase_invoice_no}</TableCell>
-                                        <TableCell>{new Date(inboundDelivery.inbound_delivery_date).toLocaleDateString()}</TableCell>
+                                        <TableCell>{new Date(inboundDelivery.inbound_delivery_date).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                        })}</TableCell>
                                         <TableCell>{inboundDelivery.inbound_delivery_reference}</TableCell>
                                         <TableCell>{inboundDelivery.received_by}</TableCell>
                                         <TableCell>
-                                            <Badge className="bg-green-500 text-white">{inboundDelivery.status}</Badge>
+                                            <Badge className="bg-green-500 text-white">{inboundDelivery.status.toLocaleUpperCase()}</Badge>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">

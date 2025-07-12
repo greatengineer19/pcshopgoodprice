@@ -48,10 +48,26 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
         setIsGalleryOpen(true)
     }
 
+    // Original date object with 7 hours added
+    const originalDate = new Date(new Date(inboundDelivery.created_at).getTime() + (7 * 60 * 60 * 1000));
+
+    // Manually format the date
+    const day = originalDate.getDate();
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+    ];
+    const month = monthNames[originalDate.getMonth()];
+    const year = originalDate.getFullYear();
+    const hours = String(originalDate.getHours()).padStart(2, '0');
+    const minutes = String(originalDate.getMinutes()).padStart(2, '0');
+    const seconds = String(originalDate.getSeconds()).padStart(2, '0');
+
+    const formattedCreatedAt = `${day} ${month} ${year} at ${hours}:${minutes}:${seconds}`;
+
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onClose}>
-                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-[1200px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold">Inbound Delivery Detail</DialogTitle>
                         <DialogDescription>Inbound #{inboundDelivery.inbound_delivery_no}</DialogDescription>
@@ -74,13 +90,17 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Status</h4>
-                                    <Badge className="bg-green-500 text-white">{inboundDelivery.status}</Badge>
+                                    <Badge className="bg-green-500 text-white">{inboundDelivery.status.toLocaleUpperCase()}</Badge>
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-medium textt-muted-foreground mb-1">Inbound Date</h4>
                                     <p className="flex items-center">
                                         <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                                        { new Date(inboundDelivery.inbound_delivery_date).toLocaleDateString() }
+                                        {new Date(inboundDelivery.inbound_delivery_date).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                        })}
                                     </p>
                                 </div>
                                 <div>
@@ -96,14 +116,14 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Created</h4>
-                                    <p>{new Date(new Date(inboundDelivery.created_at).getTime() + (7 * 60 * 60 * 1000)).toLocaleString()}</p>
+                                    <p>{formattedCreatedAt}</p>
                                 </div>
 
                                 {
                                     inboundDelivery.notes && (
                                         <div>
-                                            <h4 className="text-sm font-medium text-mutted-foreground mb-1">Notes</h4>
-                                            <p className="text-sm bg-muted p-2 rounded">{inboundDelivery.notes}</p> 
+                                            <h4 className="text-sm font-medium text-muted-foreground mb-1">Notes</h4>
+                                            <p className="text-sm p-2 rounded">{inboundDelivery.notes}</p> 
                                         </div>
                                     )
                                 }
@@ -118,23 +138,25 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
-                                                    <TableHead>Product</TableHead>
-                                                    <TableHead className="text-center">Expected</TableHead>
+                                                    <TableHead>Component Name</TableHead>
+                                                    <TableHead className="text-center">Quantity invoice</TableHead>
                                                     <TableHead className="text-center">Received</TableHead>
                                                     <TableHead className="text-center">Damaged</TableHead>
-                                                    <TableHead className="text-right">Unit Price</TableHead>
+                                                    <TableHead className="text-right">Price per unit</TableHead>
                                                     <TableHead className="text-right">Total</TableHead>
+                                                    <TableHead className="text-right">Notes</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
                                                 {inboundDelivery.inbound_delivery_lines.map((inbound_line) => (
                                                     <TableRow key={inbound_line.id}>
-                                                        <TableCell className="font-medium">{inbound_line.component_name}</TableCell>
+                                                        <TableCell className="font-medium max-w-[200px] break-words whitespace-normal">{inbound_line.component_name}</TableCell>
                                                         <TableCell className="text-center">{inbound_line.expected_quantity}</TableCell>
                                                         <TableCell className="text-center">{inbound_line.received_quantity}</TableCell>
                                                         <TableCell className="text-center">{inbound_line.damaged_quantity}</TableCell>
-                                                        <TableCell className="text-right">${Number(inbound_line.price_per_unit).toFixed(2)}</TableCell>
-                                                        <TableCell className="text-right">${Number(inbound_line.total_line_amount).toFixed(2)}</TableCell>
+                                                        <TableCell className="text-right">Rp {Number(inbound_line.price_per_unit).toLocaleString()}</TableCell>
+                                                        <TableCell className="text-right">Rp {Number(inbound_line.total_line_amount).toLocaleString()}</TableCell>
+                                                        <TableCell className="text-right font-medium max-w-[200px] break-words whitespace-normal">{inbound_line.notes}</TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
@@ -142,12 +164,12 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                                     </div>
                                 </div>
 
-                                <div className="flex justify-between font-medium text-lg mt-4 mb-6">
+                                <div className="flex justify-end gap-8 font-medium text-lg text-right">
                                     <span>Total Amount:</span>
                                     <span>
-                                        ${inboundDelivery.inbound_delivery_lines.reduce((total, product) => {
+                                        Rp {inboundDelivery.inbound_delivery_lines.reduce((total, product) => {
                                             return total + Number(product.price_per_unit) * (product.received_quantity || 0 )
-                                        }, 0)}
+                                        }, 0).toLocaleString()}
                                     </span>
                                 </div>
                             </div>

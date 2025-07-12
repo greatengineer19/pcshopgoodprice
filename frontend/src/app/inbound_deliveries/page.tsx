@@ -1,5 +1,5 @@
-import InboundDeliveriesIndex from "@/components/inbound-deliveries"
+import InboundDeliveriesContent from "@/components/inbound-deliveries/InboundDeliveriesContent"
 
 export default function InboundDeliveries() {
-    return <InboundDeliveriesIndex />
+    return <InboundDeliveriesContent />
 }

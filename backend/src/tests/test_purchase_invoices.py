@@ -134,7 +134,7 @@ def purchase_invoice_update_params_1(
         status=StatusEnum.PENDING,
         expected_delivery_date=None,
         notes=None,
-        invoice_date=purchase_invoice_1.invoice_date.strftime('%Y-%m-%d %H:%H:%S'),
+        invoice_date=purchase_invoice_1.invoice_date.strftime('%Y-%m-%d %H:%M:%S'),
         purchase_invoice_lines_attributes=[
             PurchaseInvoiceLineAsParams(
                 id=invoice_line.id,
@@ -204,11 +204,15 @@ def test_show(client, db_session, purchase_invoice_1):
 
     invoice_line = purchase_invoice.purchase_invoice_lines[0]
     invoice_line_2 = purchase_invoice.purchase_invoice_lines[1]
+    datetime_object = datetime.strptime(purchase_invoice.invoice_date, '%Y-%m-%d %H:%M:%S')
+
+    formatted_date = datetime_object.strftime('%Y-%m-%d %H:%M:%S')
+
     assert response_body == {
             'deleted': False,
             'expected_delivery_date': None,
             'id': purchase_invoice.id,
-            'invoice_date': purchase_invoice.invoice_date.isoformat(),
+            'invoice_date': formatted_date,
             'notes': 'testing',
             'purchase_invoice_lines': [
                 {
@@ -250,7 +254,7 @@ def test_create(client, db_session, purchase_invoice_create_params_1):
         'deleted': False,
         'expected_delivery_date': None,
         'id': purchase_invoice.id,
-        'invoice_date': purchase_invoice.invoice_date.isoformat(),
+        'invoice_date': purchase_invoice.invoice_date.strftime('%Y-%m-%d %H:%M:%S'),
         'notes': None,
         'purchase_invoice_lines': [{'component_category_id': invoice_line.component_category_id,
                                     'component_category_name': 'FAN',

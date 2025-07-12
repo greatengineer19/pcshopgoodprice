@@ -6,14 +6,14 @@ import { Plus, ShowerHead } from "lucide-react"
 import type { InboundDelivery } from "@/types/inbound-delivery"
 
 import { Button } from "@/components/ui/button"
-import { InboundDeliveriesList } from "./inbound-deliveries-list"
-import { InboundDeliveryForm } from "./inbound-delivery-form"
-import { InboundViewModal } from "./inbound-view-modal"
-import { DeleteConfirmationModal } from "./delete-confirmation-modal"
+import { InboundDeliveriesList } from "./InboundDeliveriesList"
+import { InboundDeliveryForm } from "./InboundDeliveryForm"
+import { InboundViewModal } from "./InboundViewModal"
+import { DeleteConfirmationModal } from "./DeleteConfirmationModal"
 
 import { useToastError } from "@/hooks/use-toast-error"
 
-export default function InboundDeliveriesIndex() {
+export default function InboundDeliveriesContent() {
     const { showErrorToast } = useToastError()
     const [selectedInboundDelivery, setSelectedInboundDelivery] = useState<InboundDelivery | null>(null)
 

@@ -1,7 +1,8 @@
-from src.models import PurchaseInvoice
+from src.models import ( PurchaseInvoice, InboundDelivery )
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
+from src.schemas import ( StatusEnum )
 
 class Service:
     def __init__(self, db: Session):
@@ -34,4 +35,18 @@ class Service:
     def calculate_sum_total_line_amounts(self, invoice: PurchaseInvoice):
         invoice.sum_total_line_amounts = sum(invoice_line.total_line_amount for invoice_line in invoice.purchase_invoice_lines)
 
-            
+    def assign_status_after_create_inbound_delivery(self, purchase_invoice: PurchaseInvoice):
+        db = self.db
+
+        total_unsent_quantity = 0
+        for invoice_line in purchase_invoice.purchase_invoice_lines:
+            delivery_lines = invoice_line.inbound_delivery_lines
+            total_unsent_quantity += ( invoice_line.quantity -
+                                      sum(ib_line.received_quantity + ib_line.damaged_quantity for ib_line in delivery_lines)
+                                    )
+
+        if total_unsent_quantity == 0:
+            purchase_invoice.status = StatusEnum.COMPLETED
+            db.add(purchase_invoice)
+            db.commit()
+

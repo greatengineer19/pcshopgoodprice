@@ -231,10 +231,10 @@ export function InboundDeliveryForm({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Product</TableHead>
-                                        <TableHead className="text-center">Expected Qty</TableHead>
-                                        <TableHead className="text-center">Received Qty</TableHead>
-                                        <TableHead className="text-center">Damaged Qty</TableHead>
+                                        <TableHead>Component name</TableHead>
+                                        <TableHead className="text-center">Quantity invoice</TableHead>
+                                        <TableHead className="text-center">Received</TableHead>
+                                        <TableHead className="text-center">Damaged</TableHead>
                                         <TableHead>Notes</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -247,16 +247,8 @@ export function InboundDeliveryForm({
 
                                         return (
                                             <TableRow key={index}>
-                                                <TableCell>
+                                                <TableCell className="font-medium max-w-[200px] break-words whitespace-normal">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="relative h-8 w-8 rounded overflow-hidden">
-                                                            <Image 
-                                                                src={"/placeholder.svg"}
-                                                                alt={invoiceLine.component_name}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        </div>
                                                         <span className="font-medium">{invoiceLine.component_name}</span>
                                                     </div>
                                                 </TableCell>
@@ -306,7 +298,7 @@ export function InboundDeliveryForm({
                             <Alert variant="destructive" className="mt-4">
                                 <AlertTriangle className="h-4 w-4" />
                                 <AlertDescription>
-                                    Received quantity plus damaged quantity cannot exceed expected quantity
+                                    Received quantity plus damaged quantity cannot exceed quantity invoice
                                 </AlertDescription>
                             </Alert>
                         )}

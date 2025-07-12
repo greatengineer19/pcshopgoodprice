@@ -74,7 +74,6 @@ export function usePurchaseInvoiceForm(initialData?: InitialDataProps) {
     const removeProductFromProcurement = (productId: number) => {
         const hasIdInvoiceLine = selectedInvoiceLines.find((invoice_line) => invoice_line.id !== null && invoice_line.component_id === productId)
         if (hasIdInvoiceLine) {
-            console.log(hasIdInvoiceLine);
             setDestroyableInvoiceLines([
                 ...destroyableInvoiceLines,
                 hasIdInvoiceLine

@@ -135,8 +135,6 @@ export function NewAndEditPurchaseInvoiceModal({
 
     const updatePurchaseInvoice = async (id: number, purchaseForm: PurchaseForm) => {
         handleSetLoading(true)
-        console.log(1)
-        console.log(destroyableInvoiceLines)
 
         try {
             const payload: PurchaseInvoiceToBackend = {
