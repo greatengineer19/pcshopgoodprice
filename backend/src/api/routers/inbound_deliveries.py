@@ -30,6 +30,7 @@ from src.inbound_deliveries.show_service import ( ShowService )
 from src.purchase_invoices.service import Service as PurchaseInvoiceService
 from src.inventories.create_from_inbound_delivery_service import CreateFromInboundDeliveryService
 from datetime import datetime
+from dateutil.parser import parse as datetime_parse
 
 router = APIRouter(
     prefix='/api/inbound-deliveries'
@@ -130,7 +131,7 @@ def create(params: InboundDeliveryAsParams, db: Session = Depends(get_db)):
 
         if purchase_invoice is None:
             raise HTTPException(status_code=404, detail="Invoice not found")
-        elif purchase_invoice.invoice_date > datetime.strptime(params.inbound_delivery_date, "%Y-%m-%d %H:%M:%S"):
+        elif purchase_invoice.invoice_date > datetime_parse(params.inbound_delivery_date):
             raise HTTPException(status_code=422, detail="Invoice date cannot be greater than delivery date")
         
         build_service = BuildService(db)

@@ -220,9 +220,11 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <Button variant="outline" size="sm">
-                                                            Download
-                                                        </Button>
+                                                        <a href={attachment.file_link} target="_blank" rel="noopener noreferrer">
+                                                            <Button variant="outline" size="sm">
+                                                                Download
+                                                            </Button>
+                                                        </a>
                                                     </CardContent>
                                                 </Card>
                                             ))}
@@ -260,7 +262,7 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                                 className="absolute left-2 top-1/2 -translate-y-1/2 text-white bg-black/50 hover:bg-black/70 z-10"
                                 onClick={prevImage}
                             >
-                                <ChevronLeft className="h-6 w-6" />
+                                <ChevronLeft className="h-7 w-7" />
                             </Button>
 
                             <div className="relative w-full h-full">
@@ -275,7 +277,7 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolutte right-2 top-1/2 -translate-y-1/2 text-whitte bg-black/50 hover:bg-black/70 z-10"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-white bg-black/50 hover:bg-black/70 z-10"
                                 onClick={nextImage}
                             >
                                 <ChevronRight 
@@ -284,7 +286,7 @@ export function InboundViewModal({ inboundDelivery, isOpen, onClose }: ParamsPro
                             </Button>
 
                             <div className="absolute bottom-4 left-0 rightt-0 text-center text-white bg-black/50 py-2">
-                                {imageAttachments[currentImageIndex].file_link} ({currentImageIndex + 1}/{imageAttachments.length})
+                                {imageAttachments[currentImageIndex].file_link}
                             </div>
                         </div>
                     </DialogContent>

@@ -315,8 +315,12 @@ class InboundDeliveryAsParams(InboundDeliveryBase):
         use_enum_values = True
         validate_by_name = True
 
-class ReportBase(BaseModel):
+class ReportHeader(BaseModel):
     text: str
+
+class BodyCell(BaseModel):
+    text: str
+    cell_type: str
 
 class ReportPurchaseInvoiceParams(BaseModel):
     start_date: Optional[str] = None
@@ -338,8 +342,8 @@ class ReportPaging(BaseModel):
     pagination: ReportPagingPrevAndNext
 
 class ReportResponse(BaseModel):
-    report_headers: List[ReportBase]
-    report_body: List[List[ReportBase]]
+    report_headers: List[ReportHeader]
+    report_body: List[List[BodyCell]]
     paging: ReportPaging
 
 class CartLineResponse(BaseModel):

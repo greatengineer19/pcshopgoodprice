@@ -21,7 +21,7 @@ interface ParamsProps {
     isLoading: boolean
 }
 
-export function ReportPurchaseInvoiceFilters({ filters, onFilterChange, onApplyFilters, isLoading}: ParamsProps) {
+export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyFilters, isLoading}: ParamsProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const invoiceStatuses = ["Pending", "Processing", "Completed", "Cancelled"]
     const { componentCategories } = useComponentCategories()

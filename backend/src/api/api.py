@@ -15,7 +15,6 @@ from src.api.routers import (
     computer_components,
     purchase_invoices,
     inbound_deliveries,
-    report_purchase_invoice,
     report_inventory_movement,
     computer_component_categories,
     sellable_products,
@@ -24,7 +23,8 @@ from src.api.routers import (
     sales_invoices,
     sales_deliveries,
     users,
-    seeds
+    seeds,
+    report_purchase_invoices
 )
 from src.api.routers.sales_payment import (
     bank_transfer,
@@ -54,7 +54,7 @@ app.add_middleware(
 app.include_router(computer_components.router)
 app.include_router(purchase_invoices.router)
 app.include_router(inbound_deliveries.router)
-app.include_router(report_purchase_invoice.router)
+app.include_router(report_purchase_invoices.router)
 app.include_router(report_inventory_movement.router)
 app.include_router(computer_component_categories.router)
 app.include_router(sellable_products.router)
@@ -114,11 +114,9 @@ async def upload_files(files: List[UploadFile] = File(...)):
             'presigned_post': presigned_post
         }
         presigned_posts.append(post_result)
-        print('B')
 
     try:
         final_result = []
-        print('C')
         for i, post_result in enumerate(presigned_posts):
             presigned_post = post_result['presigned_post']
             s3_filename = post_result['s3_filename']
@@ -136,9 +134,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
                 's3_key': presigned_post['fields']['key']
             }
             final_result.append(result)
-            print('D')
 
-        print('E')
         return {'image_list': final_result}
     except ClientError as e:
         logging.error(e)

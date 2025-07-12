@@ -52,7 +52,8 @@ class BuildService:
                 received_quantity=received_quantity,
                 damaged_quantity=damaged_quantity,
                 price_per_unit=price,
-                total_line_amount=total_line_amount
+                total_line_amount=total_line_amount,
+                notes=param_line.notes
             )
 
             delivery_lines.append(delivery_line)

@@ -1,5 +1,5 @@
-import PurchaseInvoiceReport from "@/components/report/purchase-invoice"
+import PurchaseInvoiceReportContent from "@/components/report/purchase-invoice/PurchaseInvoiceReportContent"
 
 export default function ReportPage() {
-    return <PurchaseInvoiceReport />
+    return <PurchaseInvoiceReportContent />
 }

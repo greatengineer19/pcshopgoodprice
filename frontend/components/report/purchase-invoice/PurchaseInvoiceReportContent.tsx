@@ -1,10 +1,10 @@
 "use client"
 
 import { useReportPurchaseInvoice } from "@/hooks/use-report-purchase-invoice"
-import { ReportPurchaseInvoiceFilters } from "./report-filters"
-import { ReportTable } from "./report-table"
+import { FiltersReportPurchaseInvoice } from "./FiltersReportPurchaseInvoice"
+import { ReportTable } from "./ReportTable"
 
-export default function PurchaseInvoiceReport() {
+export default function PurchaseInvoiceReportContent() {
     const {
         reportData,
         isLoading,
@@ -20,11 +20,11 @@ export default function PurchaseInvoiceReport() {
             <div className="mb-8">
                 <h1 className="text-3xl font-bold">Purchase Invoice Report</h1>
                 <p className="text-muted-foreground mt-2">
-                    View detailed report of purchase invoices and their delivery status
+                    View purchase invoices details and its deliveries status
                 </p>
             </div>
 
-            <ReportPurchaseInvoiceFilters 
+            <FiltersReportPurchaseInvoice 
                 filters={filters}
                 onFilterChange={updateFilters}
                 onApplyFilters={loadReportData}
