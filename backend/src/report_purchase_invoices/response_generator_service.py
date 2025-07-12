@@ -1,4 +1,4 @@
-from src.report_purchase_invoices.row_builder import RowBuilder
+from src.report.row_builder import RowBuilder
 
 class ResponseGeneratorService:
     def call(self, purchase_invoices, component_name, component_category_id):

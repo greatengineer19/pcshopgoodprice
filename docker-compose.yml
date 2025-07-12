@@ -16,6 +16,7 @@ services:
       - DB_PASSWORD=h4ssl3.Fr33
       - DB_NAME=hasslefreecomputers
       - DEBUG=False  # Disable debug mode in production
+      - WEB_ENVIRONMENT=staging
     command: python main.py
     restart: unless-stopped
     depends_on:

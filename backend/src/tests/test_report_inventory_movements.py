@@ -39,7 +39,6 @@ def component_liquid_cooling_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Liquid Cooling RGB",
         product_code="cpu_liquid_cooling_1",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -51,7 +50,6 @@ def component_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Noctua Fan",
         product_code="cpu_noctua_fan_1",
-        price=1.5,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -62,7 +60,6 @@ def component_cubegaming_fan_1(component_category_fan):
     component = ComponentFactory(
         name="CPU Cubegaming Fan",
         product_code="cpu_cubegaming_fan_1",
-        price=0.75,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -244,7 +241,6 @@ def inbound_delivery_create_params_1(purchase_invoice_1):
 
     return params
 
-
 def test_empty_index(client):
     response = client.get("/api/report/inventory-movement")
     response_body = response.json()
@@ -280,44 +276,49 @@ def test_index(client, db_session, inbound_delivery_1, inventories_from_inbound_
     response_body = response.json()
     assert response.status_code == 200
     inventory = db_session.query(Inventory).first()
-
     assert response_body == {'paging': {'page': 1,
             'pagination': {'next_page_url': 'http://localhost:8080/api/report/inventory-movement?page=2',
                            'prev_page_url': None},
             'total_item': 2},
- 'report_body': [[{'text': 'FAN'},
-                  {'text': 'CPU Liquid Cooling RGB'},
-                  {'text': inventory.stock_date.strftime("%Y-%m-%d")},
-                  {'text': inventory.created_at.strftime("%d-%m-%Y %H:%M:%S")},
-                  {'text': 'InboundDelivery'},
-                  {'text': inbound_delivery_1.inbound_delivery_no},
-                  {'text': 'Sean Ali'},
-                  {'text': 'Sean Ali'},
-                  {'text': '2'},
-                  {'text': '0'},
-                  {'text': '2'},
-                  {'text': '1500.00'}],
-                 [{'text': 'FAN'},
-                  {'text': 'CPU Noctua Fan'},
-                  {'text': inventory.stock_date.strftime("%Y-%m-%d")},
-                  {'text': inventory.created_at.strftime("%d-%m-%Y %H:%M:%S")},
-                  {'text': 'InboundDelivery'},
-                  {'text': inbound_delivery_1.inbound_delivery_no},
-                  {'text': 'Sean Ali'},
-                  {'text': 'Sean Ali'},
-                  {'text': '3'},
-                  {'text': '0'},
-                  {'text': '3'},
-                  {'text': '3300.00'}]],
- 'report_headers': [{'text': 'Component Category'},
-                    {'text': 'Component'},
-                    {'text': 'Stock Date'},
-                    {'text': 'Created At'},
-                    {'text': 'Transaction Type'},
-                    {'text': 'Trx No.'},
-                    {'text': 'Received By'},
-                    {'text': 'Created By'},
-                    {'text': 'In Stock'},
-                    {'text': 'Out Stock'},
-                    {'text': 'Final Moving Stock'},
-                    {'text': 'Buy Price'}]}
+            'report_body':  [
+                                [
+                                    {'cell_type': 'text', 'text': 'FAN'},
+                                    {'cell_type': 'text', 'text': 'CPU Liquid Cooling RGB'},
+                                    {'cell_type': 'text', 'text': inventory.stock_date.strftime("%d %B %Y")},
+                                    {'cell_type': 'text', 'text': inventory.created_at.strftime("%d %B %Y %H:%M:%S")},
+                                    {'cell_type': 'text', 'text': 'InboundDelivery'},
+                                    {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_no},
+                                    {'cell_type': 'text', 'text': 'Sean Ali'},
+                                    {'cell_type': 'text', 'text': 'Sean Ali'},
+                                    {'cell_type': 'quantity', 'text': '2'},
+                                    {'cell_type': 'quantity', 'text': '0'},
+                                    {'cell_type': 'quantity', 'text': '2'},
+                                    {'cell_type': 'money', 'text': '1500.00'}
+                                ],
+                                [
+                                    {'cell_type': 'text', 'text': 'FAN'},
+                                    {'cell_type': 'text', 'text': 'CPU Noctua Fan'},
+                                    {'cell_type': 'text', 'text': inventory.stock_date.strftime("%d %B %Y")},
+                                    {'cell_type': 'text', 'text': inventory.created_at.strftime("%d %B %Y %H:%M:%S")},
+                                    {'cell_type': 'text', 'text': 'InboundDelivery'},
+                                    {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_no},
+                                    {'cell_type': 'text', 'text': 'Sean Ali'},
+                                    {'cell_type': 'text', 'text': 'Sean Ali'},
+                                    {'cell_type': 'quantity', 'text': '3'},
+                                    {'cell_type': 'quantity', 'text': '0'},
+                                    {'cell_type': 'quantity', 'text': '3'},
+                                    {'cell_type': 'money', 'text': '3300.00'}
+                                ]
+                            ],
+            'report_headers': [{'text': 'Component Category'},
+                                {'text': 'Component'},
+                                {'text': 'Stock Date'},
+                                {'text': 'Created At'},
+                                {'text': 'Transaction Type'},
+                                {'text': 'Trx No.'},
+                                {'text': 'Received By'},
+                                {'text': 'Created By'},
+                                {'text': 'In Stock'},
+                                {'text': 'Out Stock'},
+                                {'text': 'Final Moving Stock'},
+                                {'text': 'Buy Price'}]}

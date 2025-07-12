@@ -11,8 +11,9 @@ export default function PurchaseInvoiceReportContent() {
         currentPage,
         filters,
         updateFilters,
+        onFilterChangePromise,
         changePage,
-        loadReportData
+        loadPageWithFilters
     } = useReportPurchaseInvoice()
 
     return (
@@ -27,7 +28,8 @@ export default function PurchaseInvoiceReportContent() {
             <FiltersReportPurchaseInvoice 
                 filters={filters}
                 onFilterChange={updateFilters}
-                onApplyFilters={loadReportData}
+                onFilterChangePromise={onFilterChangePromise}
+                onApplyFilters={loadPageWithFilters}
                 isLoading={isLoading}
             />
 

@@ -17,17 +17,36 @@ import { Card, CardContent } from "@/components/ui/card"
 interface ParamsProps {
     filters: ReportInventoryMovementFilters
     onFilterChange: (filters: Partial<ReportInventoryMovementFilters>) => void
+    onFilterChangePromise: (filters: Partial<ReportInventoryMovementFilters>) => void
     onApplyFilters: () => void
     isLoading: boolean
 }
 
-export function ReportInventoryMovementFilters({ filters, onFilterChange, onApplyFilters, isLoading}: ParamsProps) {
+export function FilterReportInventoryMovement({ filters, onFilterChange, onApplyFilters, onFilterChangePromise, isLoading}: ParamsProps) {
+    const [isFilterApplied, setIsFilterApplied] = useState(false)
+    const onResetFilters = async () => {
+        await onFilterChangePromise(
+            {
+                keyword: "",
+                transactionType: "",
+                startDate: "",
+                wordingStartDate: "",
+                endDate: "",
+                wordingEndDate: "",
+                componentName: "",
+                componentCategoryId: ""
+            }
+        )
+        setIsFilterApplied(false)
+        onApplyFilters()
+    }
     const [isFilterOpen, setIsFilterOpen] = useState(false)
-    const transactionTypes = ["InboundDelivery", "SalesOrder"]
+    const transactionTypes = ["InboundDelivery", "SalesDelivery"]
     const { componentCategories } = useComponentCategories()
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
+            setIsFilterApplied(true)
             onApplyFilters()
         }
     }
@@ -40,7 +59,7 @@ export function ReportInventoryMovementFilters({ filters, onFilterChange, onAppl
                     <div className="relative flex-1">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input 
-                            placeholder="Search by invoice number..."
+                            placeholder="e.g InboundDelivery, SalesDelivery"
                             className="pl-8"
                             value={filters.keyword}
                             onChange={(e) => onFilterChange({ keyword: e.target.value })}
@@ -75,7 +94,7 @@ export function ReportInventoryMovementFilters({ filters, onFilterChange, onAppl
                                                 transactionTypes.map((transactionType, index) => {
                                                     return (
                                                         <SelectItem key={transactionType} value={transactionType}>
-                                                        {transactionType}
+                                                            {transactionType}
                                                         </SelectItem>
                                                     );
                                                 })
@@ -95,7 +114,12 @@ export function ReportInventoryMovementFilters({ filters, onFilterChange, onAppl
                                             type="date"
                                             className="pl-8"
                                             value={filters.startDate}
-                                            onChange={(e) => onFilterChange({ startDate: e.target.value })}
+                                            onChange={(e) => onFilterChange({ startDate: e.target.value,
+                                                wordingStartDate: new Date(e.target.value).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "long",
+                                                year: "numeric",
+                                            }) })}
                                         />
                                         </div>
                                     </div>
@@ -108,7 +132,12 @@ export function ReportInventoryMovementFilters({ filters, onFilterChange, onAppl
                                                 type='date'
                                                 className="pl-8"
                                                 value={filters.endDate}
-                                                onChange={(e) => onFilterChange({ endDate: e.target.value })}
+                                                onChange={(e) => onFilterChange({ endDate: e.target.value,
+                                                    wordingEndDate: new Date(e.target.value).toLocaleDateString("en-GB", {
+                                                    day: "2-digit",
+                                                    month: "long",
+                                                    year: "numeric",
+                                                }) })}
                                             />
                                         </div>
                                     </div>
@@ -150,6 +179,7 @@ export function ReportInventoryMovementFilters({ filters, onFilterChange, onAppl
                                     onClick={() => {
                                         onApplyFilters()
                                         setIsFilterOpen(false)
+                                        setIsFilterApplied(true)
                                     }}
                                     disabled={isLoading}
                                 >
@@ -160,54 +190,49 @@ export function ReportInventoryMovementFilters({ filters, onFilterChange, onAppl
                     </Popover>
 
                     {/* Apply Button (for mobile) */}
-                    <Button onClick={onApplyFilters} disabled={isLoading} className="md:hidden w-full">
+                    <Button onClick={() => {
+                                        onApplyFilters()
+                                        setIsFilterOpen(false)
+                                        setIsFilterApplied(true)
+                                    }} disabled={isLoading} className="md:hidden w-full">
                         Apply
                     </Button>
                 </div>
 
                 {/* Active Filters Display */}
                 <div className="flex flex-wrap gap-2 mt-4">
-                    {filters.keyword && (
+                    {
+                        <button className="bg-secondary text-secondary-fogreground px-3 py-1 rounded-full text-xs flex items-center"
+                                onClick={() => onResetFilters()}>
+                            Reset Filter
+                        </button>
+                    }
+                    {isFilterApplied && filters.keyword && (
                         <div className="bg-secondary text-secondary-fogreground px-3 py-1 rounded-full text-xs flex items-center">
                             Search: {filters.keyword}
-                            <button className='ml-2 hover:text-primary' onClick={() => onFilterChange({ keyword: "" })}>
-                                x
-                            </button>
                         </div>
                     )}
-                    {filters.transactionType && (
+                    {isFilterApplied && filters.transactionType && (
                         <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
                             Status: {filters.transactionType}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ transactionType: "" })}>
-                                x
-                            </button>
                         </div>
                     )}
-                    {filters.startDate && (
+                    {isFilterApplied && filters.startDate && (
                         <div className='bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center'>
-                            From: {filters.startDate}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ startDate: "" })}>
-                                x
-                            </button>
+                            From: {filters.wordingStartDate}
                         </div>
                     )}
-                    {filters.endDate && (
+                    {isFilterApplied && filters.endDate && (
                         <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
-                            To: {filters.endDate}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ endDate: "" })}>
-                                x
-                            </button>
+                            To: {filters.wordingEndDate}
                         </div>
                     )}
-                    {filters.componentName && (
+                    {isFilterApplied && filters.componentName && (
                         <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
                             Component: {filters.componentName}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ componentName: "" })}>
-                                x
-                            </button>
                         </div>
                     )}
-                    {filters.componentCategoryId !== '' && (() => {
+                    {isFilterApplied && filters.componentCategoryId !== '' && (() => {
                         const selectedCategory = componentCategories.find(
                             (category) => category.id === Number(filters.componentCategoryId)
                         );
@@ -215,9 +240,6 @@ export function ReportInventoryMovementFilters({ filters, onFilterChange, onAppl
                         return (
                             <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
                             Category: {selectedCategory?.name}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ componentCategoryId: ""})}>
-                                x
-                            </button>
                         </div>
                         )
                     })()}

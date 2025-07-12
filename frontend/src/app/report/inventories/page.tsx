@@ -1,5 +1,5 @@
-import InventoryMovementReportIndex from "@/components/report/inventory-movement"
+import ReportInventoryMovementContent from "@/components/report/inventory-movement/ReportInventoryMovementContent"
 
 export default function ReportPage() {
-    return <InventoryMovementReportIndex />
+    return <ReportInventoryMovementContent />
 }

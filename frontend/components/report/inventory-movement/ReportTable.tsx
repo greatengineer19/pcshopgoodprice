@@ -57,7 +57,24 @@ export function ReportTable({ reportData, isLoading, currentPage, onPageChange }
                                     {
                                         row.map((cell, cellIndex) => (
                                             <TableCell key={cellIndex} className="whitespace-nowrap">
-                                                {cell.text}
+                                                {
+                                                    cell.cell_type == "text" ?
+                                                    cell.text :
+                                                    (
+                                                        cell.cell_type == "money" ?
+                                                        Number(cell.text).toLocaleString('id-ID', {
+                                                            style: 'currency',
+                                                            currency: 'IDR',
+                                                            minimumFractionDigits: 0, // Typically no decimals for IDR
+                                                            maximumFractionDigits: 0, // Typically no decimals for IDR
+                                                        }) :
+                                                        (
+                                                            cell.cell_type == "quantity" ?
+                                                            Number(cell.text).toFixed(2) :
+                                                            cell.text
+                                                        )
+                                                    )
+                                                }
                                             </TableCell>
                                         ))
                                     }

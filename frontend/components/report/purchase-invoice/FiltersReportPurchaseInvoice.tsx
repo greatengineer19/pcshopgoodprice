@@ -17,13 +17,46 @@ import { Card, CardContent } from "@/components/ui/card"
 interface ParamsProps {
     filters: ReportPurchaseInvoiceFilters
     onFilterChange: (filters: Partial<ReportPurchaseInvoiceFilters>) => void
+    onFilterChangePromise: (filters: Partial<ReportPurchaseInvoiceFilters>) => void
     onApplyFilters: () => void
     isLoading: boolean
 }
 
-export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyFilters, isLoading}: ParamsProps) {
+interface InvoiceStatusMap {
+    [key: number]: string; // This is the index signature
+    0: "Pending";
+    1: "Processing";
+    2: "Completed";
+    3: "Cancelled";
+}
+
+export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onFilterChangePromise, onApplyFilters, isLoading}: ParamsProps) {
+    const [isFilterApplied, setIsFilterApplied] = useState(false)
+    const onResetFilters = async () => {
+        await onFilterChangePromise(
+            {
+                keyword: "",
+                invoiceStatus: "",
+                wordingInvoiceStatus: "",
+                startDate: "",
+                wordingStartDate: "",
+                endDate: "",
+                wordingEndDate: "",
+                componentName: "",
+                componentCategoryId: ""
+            }
+        )
+        setIsFilterApplied(false)
+        onApplyFilters()
+    }
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const invoiceStatuses = ["Pending", "Processing", "Completed", "Cancelled"]
+    const invoiceStatusMap: InvoiceStatusMap = {
+        0: "Pending",
+        1: "Processing",
+        2: "Completed",
+        3: "Cancelled"
+    };
     const { componentCategories } = useComponentCategories()
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -65,7 +98,7 @@ export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyF
                                     <Label htmlFor="status">Invoice Status</Label>
                                     <Select
                                         value={filters.invoiceStatus}
-                                        onValueChange={(value) => onFilterChange({ invoiceStatus: value})}
+                                        onValueChange={(value: string) => onFilterChange({ invoiceStatus: value, wordingInvoiceStatus: invoiceStatusMap[Number(value)]})}
                                     >
                                         <SelectTrigger id="status" className="w-full">
                                             <SelectValue placeholder="Select status" />
@@ -73,10 +106,9 @@ export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyF
                                         <SelectContent>
                                             {
                                                 invoiceStatuses.map((status, index) => {
-                                                    // const value = index === 0 ? '' : String(index - 1);
                                                     return (
                                                         <SelectItem key={status} value={String(index)}>
-                                                        {status}
+                                                            {status}
                                                         </SelectItem>
                                                     );
                                                 })
@@ -96,7 +128,12 @@ export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyF
                                             type="date"
                                             className="pl-8"
                                             value={filters.startDate}
-                                            onChange={(e) => onFilterChange({ startDate: e.target.value })}
+                                            onChange={(e) => onFilterChange({ startDate: e.target.value,
+                                                wordingStartDate: new Date(e.target.value).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "long",
+                                                year: "numeric",
+                                            }) })}
                                         />
                                         </div>
                                     </div>
@@ -109,7 +146,12 @@ export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyF
                                                 type='date'
                                                 className="pl-8"
                                                 value={filters.endDate}
-                                                onChange={(e) => onFilterChange({ endDate: e.target.value })}
+                                                onChange={(e) => onFilterChange({ endDate: e.target.value,
+                                                    wordingEndDate: new Date(e.target.value).toLocaleDateString("en-GB", {
+                                                    day: "2-digit",
+                                                    month: "long",
+                                                    year: "numeric",
+                                                }) })}
                                             />
                                         </div>
                                     </div>
@@ -151,6 +193,7 @@ export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyF
                                     onClick={() => {
                                         onApplyFilters()
                                         setIsFilterOpen(false)
+                                        setIsFilterApplied(true)
                                     }}
                                     disabled={isLoading}
                                 >
@@ -161,54 +204,49 @@ export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyF
                     </Popover>
 
                     {/* Apply Button (for mobile) */}
-                    <Button onClick={onApplyFilters} disabled={isLoading} className="md:hidden w-full">
+                    <Button onClick={() => {
+                                        onApplyFilters()
+                                        setIsFilterOpen(false)
+                                        setIsFilterApplied(true)
+                                    }} disabled={isLoading} className="md:hidden w-full">
                         Apply
                     </Button>
                 </div>
 
                 {/* Active Filters Display */}
                 <div className="flex flex-wrap gap-2 mt-4">
-                    {filters.keyword && (
+                    {
+                        <button className="bg-secondary text-secondary-fogreground px-3 py-1 rounded-full text-xs flex items-center"
+                                onClick={() => onResetFilters()}>
+                            Reset Filter
+                        </button>
+                    }
+                    {isFilterApplied && filters.keyword && (
                         <div className="bg-secondary text-secondary-fogreground px-3 py-1 rounded-full text-xs flex items-center">
                             Search: {filters.keyword}
-                            <button className='ml-2 hover:text-primary' onClick={() => onFilterChange({ keyword: "" })}>
-                                x
-                            </button>
                         </div>
                     )}
-                    {filters.invoiceStatus !== "All" && (
+                    {isFilterApplied && filters.invoiceStatus !== "" && (
                         <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
-                            Status: {filters.invoiceStatus}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ invoiceStatus: 'All '})}>
-                                x
-                            </button>
+                            Status: {filters.wordingInvoiceStatus}
                         </div>
                     )}
-                    {filters.startDate && (
+                    {isFilterApplied && filters.startDate && (
                         <div className='bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center'>
-                            From: {filters.startDate}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ startDate: "" })}>
-                                x
-                            </button>
+                            From: {filters.wordingStartDate}
                         </div>
                     )}
-                    {filters.endDate && (
+                    {isFilterApplied && filters.endDate && (
                         <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
-                            To: {filters.endDate}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ endDate: "" })}>
-                                x
-                            </button>
+                            To: {filters.wordingEndDate}
                         </div>
                     )}
-                    {filters.componentName && (
+                    {isFilterApplied && filters.componentName && (
                         <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
                             Component: {filters.componentName}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ componentName: "" })}>
-                                x
-                            </button>
                         </div>
                     )}
-                    {filters.componentCategoryId !== '' && (() => {
+                    {isFilterApplied && filters.componentCategoryId !== '' && (() => {
                         const selectedCategory = componentCategories.find(
                             (category) => category.id === Number(filters.componentCategoryId)
                         );
@@ -216,9 +254,6 @@ export function FiltersReportPurchaseInvoice({ filters, onFilterChange, onApplyF
                         return (
                             <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs flex items-center">
                             Category: {selectedCategory?.name}
-                            <button className="ml-2 hover:text-primary" onClick={() => onFilterChange({ componentCategoryId: ""})}>
-                                x
-                            </button>
                         </div>
                         )
                     })()}

@@ -4,6 +4,7 @@ export interface ReportHeader {
 
 export interface ReportCell {
     text: string
+    cell_type?: string
 }
 
 export interface ReportPagination {
@@ -26,8 +27,11 @@ export interface ReportData {
 export interface ReportPurchaseInvoiceFilters {
     keyword: string
     invoiceStatus: string
+    wordingInvoiceStatus: string
     startDate: string
+    wordingStartDate: string
     endDate: string
+    wordingEndDate: string
     componentName: string
     componentCategoryId: string
 }
@@ -36,7 +40,9 @@ export interface ReportInventoryMovementFilters {
     keyword: string
     transactionType: string
     startDate: string
+    wordingStartDate: string
     endDate: string
+    wordingEndDate: string
     componentName: string
     componentCategoryId: string
 }

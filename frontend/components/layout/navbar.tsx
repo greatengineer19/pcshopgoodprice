@@ -65,7 +65,7 @@ export function Navbar() {
                 {/* Logo */}
                 <Link href="/computer_components" className="flex items-center">
                     <span className="text-xl font-normal" style={{ fontFamily: "'Tinos', serif", fontWeight: 400 }}>
-                        HASSFREE COMPUTERS SHOP
+                        PCSHOP GOOD PRICE
                     </span>
                 </Link>
 

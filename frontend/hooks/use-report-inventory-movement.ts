@@ -24,7 +24,9 @@ export function useReportInventoryMovement() {
         keyword: "",
         transactionType: "",
         startDate: "",
+        wordingStartDate: "",
         endDate: "",
+        wordingEndDate: "",
         componentName: "",
         componentCategoryId: ""
     })
@@ -91,10 +93,24 @@ export function useReportInventoryMovement() {
         loadReportData();
     }, [currentPage]); // Only depend on currentPage
 
-    const updateFilters = (newFilters: Partial<ReportInventoryMovementFilters>) => {
+    const updateFilters = useCallback((newFilters: Partial<ReportInventoryMovementFilters>) => {
         setFilters((prev) => ({ ...prev, ...newFilters }))
-        setCurrentPage(1)
+    }, []);
+
+    const loadPageWithFilters =() => {
+        loadReportData();
     }
+
+    const onFilterChangePromise = useCallback((newFilters: Partial<ReportInventoryMovementFilters>) => {
+            return new Promise<ReportInventoryMovementFilters>(resolve => { // Explicitly type the resolved value
+                setFilters((prev) => {
+                    const updatedState = { ...prev, ...newFilters };
+                    filtersRef.current = updatedState; // Synchronously update the ref
+                    resolve(updatedState); // Resolve the promise with the new state
+                    return updatedState; // Return the new state for React
+                });
+            });
+        }, []);
 
     const changePage = (page: number) => {
         setCurrentPage(page)
@@ -106,7 +122,8 @@ export function useReportInventoryMovement() {
         currentPage,
         filters,
         updateFilters,
+        onFilterChangePromise,
         changePage,
-        loadReportData
+        loadPageWithFilters
     }
 }

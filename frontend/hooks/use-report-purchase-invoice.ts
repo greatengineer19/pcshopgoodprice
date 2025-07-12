@@ -23,8 +23,11 @@ export function useReportPurchaseInvoice() {
     const [filters, setFilters] = useState<ReportPurchaseInvoiceFilters>({
         keyword: "",
         invoiceStatus: "",
+        wordingInvoiceStatus: "",
         startDate: "",
+        wordingStartDate: "",
         endDate: "",
+        wordingEndDate: "",
         componentName: "",
         componentCategoryId: ""
     })
@@ -36,9 +39,9 @@ export function useReportPurchaseInvoice() {
         filtersRef.current = filters
     }, [filters])
 
-    const loadReportData = useCallback(async () => {
+    const loadReportData = useCallback(async (change: boolean = true) => {
         if (isLoading) return; // Prevent concurrent requests
-        setIsLoading(true)
+        setIsLoading(true);
 
         try {
             const query_params = {
@@ -88,13 +91,27 @@ export function useReportPurchaseInvoice() {
 
     // Only load data on mount and when currentPage changes
     useEffect(() => {
-        loadReportData();
+        loadReportData(false);
     }, [currentPage]); // Only depend on currentPage
 
-    const updateFilters = (newFilters: Partial<ReportPurchaseInvoiceFilters>) => {
-        setFilters((prev) => ({ ...prev, ...newFilters }))
-        setCurrentPage(1)
+    const loadPageWithFilters =() => {
+        loadReportData();
     }
+
+    const updateFilters = useCallback((newFilters: Partial<ReportPurchaseInvoiceFilters>) => {
+        setFilters((prev) => ({ ...prev, ...newFilters }))
+    }, []);
+
+    const onFilterChangePromise = useCallback((newFilters: Partial<ReportPurchaseInvoiceFilters>) => {
+        return new Promise<ReportPurchaseInvoiceFilters>(resolve => { // Explicitly type the resolved value
+            setFilters((prev) => {
+                const updatedState = { ...prev, ...newFilters };
+                filtersRef.current = updatedState; // Synchronously update the ref
+                resolve(updatedState); // Resolve the promise with the new state
+                return updatedState; // Return the new state for React
+            });
+        });
+    }, []);
 
     const changePage = (page: number) => {
         setCurrentPage(page)
@@ -106,7 +123,8 @@ export function useReportPurchaseInvoice() {
         currentPage,
         filters,
         updateFilters,
+        onFilterChangePromise,
         changePage,
-        loadReportData
+        loadPageWithFilters
     }
 }

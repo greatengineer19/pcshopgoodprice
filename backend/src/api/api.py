@@ -1,13 +1,8 @@
-import os
-import io
 import requests
 import uuid
-import boto3
 from src.schemas import ( UploadResponseSchema, ListUploadResponseSchema )
-from src.models import ( ComputerComponentCategory, User )
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from botocore.exceptions import ClientError
 from src.api.s3_dependencies import ( bucket_name, s3_client )
 from typing import List
@@ -15,7 +10,6 @@ from src.api.routers import (
     computer_components,
     purchase_invoices,
     inbound_deliveries,
-    report_inventory_movement,
     computer_component_categories,
     sellable_products,
     cart,
@@ -24,15 +18,13 @@ from src.api.routers import (
     sales_deliveries,
     users,
     seeds,
+    report_inventory_movements,
     report_purchase_invoices
 )
 from src.api.routers.sales_payment import (
     bank_transfer,
     virtual_account
 )
-from sqlalchemy.orm import Session
-from src.api.dependencies import get_db
-from fastapi import Depends
 
 app = FastAPI()
 
@@ -55,7 +47,7 @@ app.include_router(computer_components.router)
 app.include_router(purchase_invoices.router)
 app.include_router(inbound_deliveries.router)
 app.include_router(report_purchase_invoices.router)
-app.include_router(report_inventory_movement.router)
+app.include_router(report_inventory_movements.router)
 app.include_router(computer_component_categories.router)
 app.include_router(sellable_products.router)
 app.include_router(cart.router)
@@ -100,7 +92,7 @@ async def upload_file(file: UploadFile):
 @app.post("/api/multi_upload_url", response_model=ListUploadResponseSchema)
 async def upload_files(files: List[UploadFile] = File(...)):
     presigned_posts = []
-    print('A')
+
     for file in files:
         uuid4_value = uuid.uuid4()
         s3_filename = f"{uuid4_value}_{file.filename}"
@@ -138,7 +130,6 @@ async def upload_files(files: List[UploadFile] = File(...)):
         return {'image_list': final_result}
     except ClientError as e:
         logging.error(e)
-        print('F')
         return False
 
 def create_presigned_post(file_name: str):
