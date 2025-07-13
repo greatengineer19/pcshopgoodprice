@@ -11,6 +11,131 @@ import importlib
 from pathlib import Path
 from src.tests.factories import BaseFactory
 from src.api.dependencies import get_db
+from src.tests.factories.component_factory import ComponentFactory
+from src.tests.factories.component_category_factory import ComponentCategoryFactory
+from src.tests.factories.computer_component_sell_price_setting_factory import ComputerComponentSellPriceSettingFactory
+from src.tests.factories.computer_component_review_factory import ComputerComponentReviewFactory
+from src.tests.factories.user_factory import UserFactory
+from src.schemas import DayTypeEnum
+
+@pytest.fixture
+def user_sean_ali():
+    return UserFactory(fullname="Sean Ali")
+
+@pytest.fixture
+def user_n3():
+    return UserFactory(fullname="N3")
+
+@pytest.fixture
+def user_jason():
+    return UserFactory(fullname="Jason")
+
+@pytest.fixture
+def component_category_fan():
+    return ComponentCategoryFactory(
+        name="FAN",
+        status=0
+    )
+
+@pytest.fixture
+def component_category_peripherals():
+    return ComponentCategoryFactory(
+        name="Peripherals",
+        status=0
+    )
+
+@pytest.fixture
+def component_liquid_cooling_fan_1(component_category_fan):
+    return ComponentFactory(
+        name="CPU Liquid Cooling RGB",
+        product_code="cpu_liquid_cooling_1",
+        component_category_id=component_category_fan.id,
+        status=0
+    )
+
+@pytest.fixture
+def component_keyboard_logitech(component_category_peripherals):
+    return ComponentFactory(
+        name="Logitech G515 Lightspeed",
+        product_code="g515_lightspeed",
+        component_category_id=component_category_peripherals.id,
+        status=0
+    )
+
+@pytest.fixture
+def review_component_keyboard_logitech(component_keyboard_logitech, user_sean_ali):
+    return ComputerComponentReviewFactory(
+        user_id=user_sean_ali.id,
+        component_id=component_keyboard_logitech.id,
+        user_fullname=user_sean_ali.fullname,
+        rating=5,
+        comments="Good product, great service, but please improve courier tracking accuracy."
+    )
+
+@pytest.fixture
+def review_component_liquid_fan(component_liquid_cooling_fan_1, user_jason):
+    return ComputerComponentReviewFactory(
+        user_id=user_jason.id,
+        component_id=component_liquid_cooling_fan_1.id,
+        user_fullname=user_jason.fullname,
+        rating=4,
+        comments="My first time buying from them, and I'm impressed. Product arrived early, seal intact, and it works great."
+    )
+
+
+@pytest.fixture
+def sell_price_on_wednesday_of_keyboard_logitech(component_keyboard_logitech):
+    return ComputerComponentSellPriceSettingFactory(
+        component_id=component_keyboard_logitech.id,
+        day_type=DayTypeEnum(3).value,
+        active=True,
+        price_per_unit=1600000
+    )
+
+@pytest.fixture
+def sell_price_on_thursday_of_keyboard_logitech(component_keyboard_logitech):
+    return ComputerComponentSellPriceSettingFactory(
+        component_id=component_keyboard_logitech.id,
+        day_type=DayTypeEnum(4).value,
+        active=True,
+        price_per_unit=1660000
+    )
+
+@pytest.fixture
+def sell_price_default_of_keyboard_logitech(component_keyboard_logitech):
+    return ComputerComponentSellPriceSettingFactory(
+        component_id=component_keyboard_logitech.id,
+        day_type=DayTypeEnum(0).value,
+        active=True,
+        price_per_unit=1550000
+    )
+
+@pytest.fixture
+def sell_price_on_wednesday_of_liquid_fan(component_liquid_cooling_fan_1):
+    return ComputerComponentSellPriceSettingFactory(
+        component_id=component_liquid_cooling_fan_1.id,
+        day_type=DayTypeEnum(3).value,
+        active=True,
+        price_per_unit=235000
+    )
+
+@pytest.fixture
+def sell_price_on_thursday_of_liquid_fan(component_liquid_cooling_fan_1):
+    return ComputerComponentSellPriceSettingFactory(
+        component_id=component_liquid_cooling_fan_1.id,
+        day_type=DayTypeEnum(4).value,
+        active=True,
+        price_per_unit=245000
+    )
+
+@pytest.fixture
+def sell_price_default_of_liquid_fan(component_liquid_cooling_fan_1):
+    return ComputerComponentSellPriceSettingFactory(
+        component_id=component_liquid_cooling_fan_1.id,
+        day_type=DayTypeEnum(0).value,
+        active=True,
+        price_per_unit=200000
+    )
 
 @pytest.fixture(scope="module")
 def engine():

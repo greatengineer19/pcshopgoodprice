@@ -19,11 +19,13 @@ export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: 
 
     if (filters) {
         const query_params = {
-            component_category_ids: filters.categories?.length ? filters.categories.join(',') : '',
+            component_category_ids: filters.categories?.length ? filters.categories.map(c => c.id).join(',') : '',
             start_price: filters.priceRange ? String(filters.priceRange[0]) : '',
             end_price: filters.priceRange ? String(filters.priceRange[1]) : '',
-            minRating: filters.ratings ? String(filters.ratings) : ''
+            min_rating: filters.ratings ? String(filters.ratings) : ''
         }
+        console.log("bentuk c")
+        console.log(query_params)
 
         queryString = '?' + new URLSearchParams(query_params).toString();
     }
@@ -89,6 +91,7 @@ export const fetchProductCategories = async (): Promise<ProductCategory[]> => {
 
 // Fetch product brands
 export const fetchProductBrands = async (): Promise<ProductBrand[]> => {
+    return [];
     const response = await fetch('http://localhost:8080/api/product-brands');
 
     if (!response.ok) {

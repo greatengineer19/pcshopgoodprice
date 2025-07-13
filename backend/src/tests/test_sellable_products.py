@@ -1,44 +1,10 @@
-from src.models import (
-    ComputerComponentCategory,
-    ComputerComponent,
-    User,
-    ComputerComponentSellPriceSetting,
-    ComputerComponentReview
-    )
-from src.schemas import (
-    ComputerComponentAsResponse,
-    ComputerComponentAsParams,
-    ComputerComponentSellPriceSettingAsParams,
-    DayTypeEnum
-)
 import pytest
-from sqlalchemy import select, desc, func
-from sqlalchemy.orm import joinedload
 from src.tests.factories.component_factory import ComponentFactory
 from src.tests.factories.component_category_factory import ComponentCategoryFactory
 from src.tests.factories.computer_component_review_factory import ComputerComponentReviewFactory
 from src.tests.factories.computer_component_sell_price_setting_factory import ComputerComponentSellPriceSettingFactory
 from src.tests.factories.user_factory import UserFactory
-from decimal import Decimal
-from fastapi import HTTPException
-from src.tests.conftest import ( client, db_session, setup_factories )
-
-@pytest.fixture
-def component_category_fan():
-    return ComponentCategoryFactory(
-        name="FAN",
-        status=0
-    )
-
-@pytest.fixture
-def component_liquid_cooling_fan_1(component_category_fan):
-    return ComponentFactory(
-        name="CPU Liquid Cooling RGB",
-        product_code="cpu_liquid_cooling_1",
-        price=1,
-        component_category_id=component_category_fan.id,
-        status=0
-    )
+from src.tests.conftest import ( client, db_session, setup_factories, component_category_fan )
 
 @pytest.fixture
 def user_sean_ali():
@@ -64,14 +30,12 @@ def test_index(client, db_session, component_category_fan, user_sean_ali):
     blue_fan = ComponentFactory(
         name="CPU Fan Blue",
         product_code="cpu_fan_blue",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
     red_fan = ComponentFactory(
         name="CPU Fan Red",
         product_code="cpu_fan_red",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -116,14 +80,12 @@ def test_index(client, db_session, component_category_fan, user_sean_ali):
                         'created_at': blue_fan.created_at.isoformat(),
                         'description': None,
                         'id': blue_fan.id,
-                        'images': None,
+                        'images': [],
                         'name': 'CPU Fan Blue',
                         'sell_price': 999.0,
-                        'price': 1.0,
                         'product_code': 'cpu_fan_blue',
                         'rating': 4.33,
                         'status': 0,
-                        'stock': 0,
                         'updated_at': blue_fan.updated_at.isoformat()
                     },
                     {
@@ -142,14 +104,12 @@ def test_index(client, db_session, component_category_fan, user_sean_ali):
                         'created_at': red_fan.created_at.isoformat(),
                         'description': None,
                         'id': red_fan.id,
-                        'images': None,
+                        'images': [],
                         'name': 'CPU Fan Red',
                         'sell_price': 999.0,
-                        'price': 1.0,
                         'product_code': 'cpu_fan_red',
                         'rating': 4.33,
                         'status': 0,
-                        'stock': 0,
                         'updated_at': red_fan.updated_at.isoformat()
                     }
                 ],
@@ -164,14 +124,12 @@ def test_index_min_rating_beyond_4(client, db_session, component_category_fan, u
     blue_fan = ComponentFactory(
         name="CPU Fan Blue",
         product_code="cpu_fan_blue",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
     red_fan = ComponentFactory(
         name="CPU Fan Red",
         product_code="cpu_fan_red",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -223,14 +181,12 @@ def test_index_min_rating_beyond_4(client, db_session, component_category_fan, u
                         'created_at': blue_fan.created_at.isoformat(),
                         'description': None,
                         'id': blue_fan.id,
-                        'images': None,
+                        'images': [],
                         'name': 'CPU Fan Blue',
                         'sell_price': 999.0,
-                        'price': 1.0,
                         'product_code': 'cpu_fan_blue',
                         'rating': 4.33,
                         'status': 0,
-                        'stock': 0,
                         'updated_at': blue_fan.updated_at.isoformat()
                     }
                 ],
@@ -245,14 +201,12 @@ def test_index_component_category_ids(client, db_session, component_category_fan
     blue_fan = ComponentFactory(
         name="CPU Fan Blue",
         product_code="cpu_fan_blue",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
     red_fan = ComponentFactory(
         name="CPU Fan Red",
         product_code="cpu_fan_red",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -291,14 +245,12 @@ def test_index_min_price(client, db_session, component_category_fan, user_sean_a
     blue_fan = ComponentFactory(
         name="CPU Fan Blue",
         product_code="cpu_fan_blue",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
     red_fan = ComponentFactory(
         name="CPU Fan Red",
         product_code="cpu_fan_red",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -353,14 +305,12 @@ def test_index_min_price(client, db_session, component_category_fan, user_sean_a
                 'created_at': red_fan.created_at.isoformat(),
                 'description': None,
                 'id': red_fan.id,
-                'images': None,
+                'images': [],
                 'name': red_fan.name,
-                'price': 1.0,
                 'product_code': 'cpu_fan_red',
                 'rating': 2.33,
                 'sell_price': 700.0,
                 'status': 0,
-                'stock': 0,
                 'updated_at': red_fan.updated_at.isoformat()}],
                 'name': 'FAN'}
             }

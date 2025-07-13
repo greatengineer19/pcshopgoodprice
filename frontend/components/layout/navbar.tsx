@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { CartLine } from "@/types/cart"
 import { GetUserResponseAPI, User, UserRole } from "@/types/user"
 import { useUser } from "@/hooks/use-user"
+import { redirect } from 'next/navigation'
 
 export function Navbar() {
     const SECRET_KEY_NAME = 'secret_key';
@@ -57,8 +58,12 @@ export function Navbar() {
         const userRole: UserRole = responseUser.role.toLowerCase() as UserRole;
         setUser(responseUser)
         setRole(userRole)
-    }
 
+        if (userRole == "buyer") {
+            redirect('/shop')
+        }
+    }
+    
     return (
         <div className="border-b">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">

@@ -10,14 +10,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import type { ProductBrand } from "@/types/product"
 import type { ProductCategory } from "@/types/computer-component-category"
 import { cn } from "@/lib/utils"
+import { useEffect } from "react"
 
 interface ProductFiltersProps {
     allCategories: ProductCategory[]
     allBrands: ProductBrand[]
     defaultMinPrice: number
     defaultMaxPrice: number
-    selectedCategories: string[]
-    setSelectedCategories: (categories: string[]) => void
+    selectedCategories: ProductCategory[]
+    setSelectedCategories: (categories: ProductCategory[]) => void
     selectedBrands: string[]
     setSelectedBrands: (brands: string[]) => void
     selectedPriceRange: [number, number]
@@ -44,8 +45,9 @@ export function ProductFilters({
 }: ProductFiltersProps) {
     const [priceInputMin, setPriceInputMin] = useState(selectedPriceRange[0].toString())
     const [priceInputMax, setPriceInputMax] = useState(selectedPriceRange[1].toString())
+    const [resetFlag, setResetFlag] = useState(false);
 
-    const handleCategoryChange = (category: string) => {
+    const handleCategoryChange = (category: ProductCategory) => {
         setSelectedCategories(
             selectedCategories.includes(category)
                 ? selectedCategories.filter((c) => c !== category)
@@ -85,8 +87,15 @@ export function ProductFilters({
         setPriceInputMin(defaultMinPrice.toString())
         setPriceInputMax(defaultMaxPrice.toString())
         setMinRating(0)
-        applyFilters()
+        setResetFlag(true);
     }
+
+    useEffect(() => {
+        if (resetFlag) {
+            applyFilters();
+            setResetFlag(false); // reset the flag
+        }
+    }, [resetFlag]);
 
     return (
         <div className="space-y-6">
@@ -107,8 +116,8 @@ export function ProductFilters({
                                     <div key={category.id} className="flex items-center space-x-2">
                                         <Checkbox 
                                             id={`category-${category.id}`}
-                                            checked={selectedCategories.includes(category.name)}
-                                            onCheckedChange={() => handleCategoryChange(category.name)}
+                                            checked={selectedCategories.includes(category)}
+                                            onCheckedChange={() => handleCategoryChange(category)}
                                         />
                                         <label
                                             htmlFor={`category-${category.id}`} className="text-sm cursor-pointer flex-1"
@@ -141,36 +150,44 @@ export function ProductFilters({
                             />
                         </div>
 
-                        <div className="flex items-center space-x-2">
-                            <Input 
-                                type="number"
-                                value={priceInputMin}
-                                onChange={(e) => {
-                                    setPriceInputMin(e.target.value)
-                                    handlePriceInputChange(e.target.value, priceInputMax)
-                                }}
-                                className="h-8"
-                                min={defaultMinPrice}
-                                max={defaultMaxPrice}
-                            />
-                            <span>to</span>
-                            <Input 
-                                type="number"
-                                value={priceInputMax}
-                                onChange={(e) => {
-                                    setPriceInputMax(e.target.value)
-                                    handlePriceInputChange(priceInputMin, e.target.value)
-                                }}
-                                className="h-8"
-                                min={defaultMinPrice}
-                                max={defaultMaxPrice}
-                            />
+                        <div className="items-center space-x-2">
+                            <span className="ml-2">Min price</span>
+                            <div className="max-w-[100%]">
+                                <Input 
+                                    type="number"
+                                    value={priceInputMin}
+                                    onChange={(e) => {
+                                        setPriceInputMin(e.target.value)
+                                        handlePriceInputChange(e.target.value, priceInputMax)
+                                    }}
+                                    className="h-8"
+                                    min={defaultMinPrice}
+                                    max={defaultMaxPrice}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="items-center space-x-2 mt-3">
+                            <span className="ml-2">Max price</span>
+                            <div className="max-w-[100%]">
+                                <Input 
+                                    type="number"
+                                    value={priceInputMax}
+                                    onChange={(e) => {
+                                        setPriceInputMax(e.target.value)
+                                        handlePriceInputChange(priceInputMin, e.target.value)
+                                    }}
+                                    className="h-8"
+                                    min={defaultMinPrice}
+                                    max={defaultMaxPrice}
+                                />
+                            </div>
                         </div>
                     </AccordionContent>
                 </AccordionItem>
 
                 {/* Brands */}
-                <AccordionItem value="brands">
+                {/* <AccordionItem value="brands">
                     <AccordionTrigger>Brands</AccordionTrigger>
                     <AccordionContent>
                         <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
@@ -190,7 +207,7 @@ export function ProductFilters({
                             }
                         </div>
                     </AccordionContent>
-                </AccordionItem>
+                </AccordionItem> */}
 
                 {/* Ratings */}
                 <AccordionItem value="rating">

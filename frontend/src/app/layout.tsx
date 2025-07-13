@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hassle Free Computers Shop",
-  description: "Hassle free purchase, wait the delivery on your doorstep!"
+  title: "PC Shop Good Price",
+  description: "Shop PC with good price, wait the delivery on your doorstep!"
 };
 
 export default function RootLayout({

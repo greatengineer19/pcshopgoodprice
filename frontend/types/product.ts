@@ -1,3 +1,5 @@
+import type { ProductCategory } from "./computer-component-category";
+
 export interface ProductBase {
     name: string;
     product_code: string;
@@ -90,7 +92,7 @@ export interface ProductBrand {
 }
 
 export interface ProductFilter {
-    categories: string[] | null
+    categories: ProductCategory[] | null
     ratings: number | null
     priceRange: number[] | null
 }

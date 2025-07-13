@@ -13,14 +13,14 @@ export default function ShopContent() {
     const [groupedProducts, setGroupedProducts] = useState<ShopContentDictionary>({})
 
     const [allCategories, setAllCategories] = useState<ProductCategory[]>([])
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+    const [selectedCategories, setSelectedCategories] = useState<ProductCategory[]>([])
 
     const [brands, setBrands] = useState<ProductBrand[]>([])
     const [selectedBrands, setSelectedBrands] = useState<string[]>([])
 
     const defaultMinPrice = 0
-    const defaultMaxPrice = 1000000
-    const [selectedPriceRange, setSelectedPriceRange] = useState<[number, number]>([0, 5000])
+    const defaultMaxPrice = 100000000
+    const [selectedPriceRange, setSelectedPriceRange] = useState<[number, number]>([0, 150000000])
 
     const [isLoading, setIsLoading] = useState(true)
     const [minRating, setMinRating] = useState(0)
@@ -36,13 +36,13 @@ export default function ShopContent() {
             setIsLoading(true)
 
             try {
-                const [categoriesData, brandsData] = await Promise.all([
+                const [categoriesData] = await Promise.all([
                     fetchProductCategories(),
-                    fetchProductBrands()
+                    // fetchProductBrands()
                 ])
 
                 setAllCategories(categoriesData)
-                setBrands(brandsData)
+                // setBrands(brandsData)
 
                 const fetchedProducts = await fetchProducts()
                 const productsData = fetchedProducts.result
@@ -64,10 +64,10 @@ export default function ShopContent() {
             const filters = {
                 categories: selectedCategories,
                 priceRange: selectedPriceRange,
-                brands: selectedBrands,
-                ratings: minRating,
+                ratings: minRating
             }
-
+            console.log("check filters")
+            console.log(filters)
             const fetchedProducts = await fetchProducts(filters)
             const productsData = fetchedProducts.result
             transformResponseProducts(productsData)
@@ -80,7 +80,7 @@ export default function ShopContent() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">Sellable Products</h1>
+            <h1 className="text-3xl font-bold mb-8">Hi shoppers, shop with us today.</h1>
             <div className="flex flex-col md:flex-row gap-8">
                 <div className="w-full md:w-1/4 lg:w-1/5">
                     <ProductFilters 

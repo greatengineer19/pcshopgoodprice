@@ -29,13 +29,13 @@ export function ShopContentProductCard({ product }: ProductCardProps) {
     return (
         <Link href={`/shop/product/${product_slug}`}>
             <div 
-                className="group border rounded-lg overflow-hidden transition-all duration-300 hover:shadow-md"
+                className="group relative border rounded-lg overflow-hidden transition-all duration-300 hover:shadow-md"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
                 {/* Discount badge */}
                 {
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
+                    <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
                         33% OFF
                     </div>
                 }
@@ -46,6 +46,9 @@ export function ShopContentProductCard({ product }: ProductCardProps) {
                         src={product.images ? product.images[0] : "/placeholder.svg?height=300&width=300"}
                         alt={product.name}
                         fill
+                        sizes="(max-width: 768px) 100vw,
+                               (max-width: 1200px) 50vw,
+                               33vw"
                         className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
                     />
 
@@ -93,11 +96,11 @@ export function ShopContentProductCard({ product }: ProductCardProps) {
 
                     {/* Price */}
                     <div className="flex items-center">
-                        <span className="font-bold text-base">IDR {(product.sell_price).toFixed(2)}</span>
+                        <span className="font-bold text-base">Rp {(product.sell_price).toLocaleString()}</span>
                         {
                             product.sell_price && (
                                 <span className="text-gray-500 text-sm line-through ml-2">
-                                    IDR {product.sell_price.toFixed(2)}
+                                    Rp {(Math.round(( product.sell_price / (1 - 0.33)) / 1000) * 1000).toLocaleString()}
                                 </span>
                             )
                         }

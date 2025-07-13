@@ -16,10 +16,9 @@ from sqlalchemy import select, desc, func
 from sqlalchemy.orm import joinedload
 from src.tests.factories.component_factory import ComponentFactory
 from src.tests.factories.component_category_factory import ComponentCategoryFactory
-from src.tests.factories.user_factory import UserFactory
 from decimal import Decimal
 from fastapi import HTTPException
-from src.tests.conftest import ( client, db_session, setup_factories )
+from src.tests.conftest import ( client, db_session, setup_factories, user_jason, user_n3, user_sean_ali )
 
 @pytest.fixture
 def component_category_fan():
@@ -37,18 +36,6 @@ def component_liquid_cooling_fan_1(component_category_fan):
         component_category_id=component_category_fan.id,
         status=0
     )
-
-@pytest.fixture
-def user_sean_ali():
-    return UserFactory(fullname="Sean Ali")
-
-@pytest.fixture
-def user_n3():
-    return UserFactory(fullname="N3")
-
-@pytest.fixture
-def user_jason():
-    return UserFactory(fullname="Jason")
 
 def test_empty_index(client):
     response = client.get("/api/computer-components")
