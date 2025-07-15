@@ -1,12 +1,6 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
-from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import (
-        select,
-        func,
-        delete,
-        text,
         and_,
-        or_
 )
 from src.schemas import (
     CartLinesResponse,
@@ -20,18 +14,13 @@ from src.models import (
     PaymentMethod
 )
 import logging
-from src.api.s3_dependencies import ( bucket_name, s3_client )
 from sqlalchemy.orm import joinedload, Session
 from src.api.dependencies import get_db
-from src.data.review_schema import component_reviews_hash_map
-import random
 from datetime import datetime
-from sqlalchemy.sql.expression import case
 from utils.auth import get_current_user
+from src.computer_components.service import Service
 
-router = APIRouter(
-    prefix='/api/cart'
-)
+router = APIRouter(prefix='/api/cart', tags=['Cart'])
   
 @router.get("", response_model=CartLinesResponse)
 def index(
@@ -40,50 +29,37 @@ def index(
     ):
     try:
         cart_lines = (
-            db.query(
-                CartLine.id,
-                CartLine.status,
-                CartLine.customer_id,
-                CartLine.component_id,
-                ComputerComponent.name.label('component_name'),
-                User.fullname.label('customer_name'),
-                CartLine.quantity,
-                CartLine.created_at,
-                CartLine.updated_at
-              )
-              .join(CartLine.component)
-              .join(CartLine.customer)
+            db.query(CartLine)
               .filter(CartLine.customer_id == user.id)
               .order_by(CartLine.id)
+              .options(joinedload(CartLine.component).subqueryload(ComputerComponent.computer_component_sell_price_settings)) # Eagerly load price settings
               .all()
         )
 
-        if cart_lines is None:
+        if not cart_lines:
             return { 'cart': [] }
-        
-        components = (
-            db.query(ComputerComponent)
-            .options(joinedload(ComputerComponent.computer_component_sell_price_settings))
-            .filter(ComputerComponent.id.in_([p.component_id for p in cart_lines]))
-        )
-        components_dict = { component.id: component for component in components}
-        weekday = datetime.now().isoweekday() or 7  # Returns 1-7 (Mon-Sun)
+
+        result = []
+        service = Service()
 
         for cart_line in cart_lines:
-            component = components_dict[cart_line.component_id]
-            price_settings = component.computer_component_sell_price_settings
+            component = cart_line.component
+            price = service.select_price(component)
 
-            default_price = next((sps.price_per_unit for sps in price_settings if sps.day_type == 0), 0)
-            price = next(
-                (sps.price_per_unit for sps in price_settings 
-                if sps.day_type == weekday and sps.status == 0),
-                default_price
-            )
+            result.append({
+                'sell_price': price,
+                'id': cart_line.id,
+                'customer_id': cart_line.customer_id,
+                'component_id': cart_line.component_id,
+                'component_name': cart_line.component.name,
+                'customer_name': user.fullname,
+                'quantity': cart_line.quantity,
+                'created_at': cart_line.created_at,
+                'updated_at': cart_line.updated_at,
+                'status': cart_line.status
+            })
 
-            cart_line.sell_price = price
-
-
-        return { 'cart': cart_lines }
+        return { 'cart': result }
     except Exception as e:
         logging.error(f"An error occurred in index: {e}")
         raise HTTPException(status_code=500, detail=str(e))

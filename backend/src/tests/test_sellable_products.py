@@ -158,7 +158,6 @@ def test_index_min_rating_beyond_4(client, db_session, component_category_fan, u
             price_per_unit=999
         )
 
-
     response = client.get(f"/api/sellable-products?min_rating=4")
     response_body = response.json()
     assert response_body == {

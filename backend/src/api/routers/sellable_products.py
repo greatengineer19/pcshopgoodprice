@@ -3,7 +3,8 @@ from typing import List, Optional
 from sqlalchemy import (func)
 from src.schemas import (
     SellableProductsAsListResponse,
-    SellableProductResponse
+    SellableProductResponse,
+    OneSellableProductResponse
 )
 from src.models import (
     ComputerComponent,
@@ -15,6 +16,7 @@ from src.sellable_products.injected_component_ids_and_rating_per_categories_serv
 from src.sellable_products.filter_service import FilterService
 from src.sellable_products.ratings_in_component_ids_service import RatingsInComponentIdsService
 from src.sellable_products.sell_price_and_ratings_finder_service import SellPriceAndRatingsFinderService
+from src.api.s3_dependencies import ( bucket_name, s3_client )
 
 router = APIRouter(prefix='/api/sellable-products', tags=["Sellable Products"])
 
@@ -59,14 +61,14 @@ def index(
     finally:
         db.close()
 
-@router.get("/{slug}", response_model=SellableProductResponse)
-def show_by_slug(slug: str, db: Session = Depends(get_db)):
+@router.get("/{product_code}", response_model=OneSellableProductResponse)
+def show_by_product_code(product_code: str, db: Session = Depends(get_db)):
     try:
-        product_name = slug.replace('_', ' ')
         computer_component = (
             db.query(ComputerComponent)
-            .options(joinedload(ComputerComponent.computer_component_sell_price_settings))
-            .filter(func.lower(ComputerComponent.name) == func.lower(product_name))
+            .options(joinedload(ComputerComponent.computer_component_sell_price_settings),
+                     joinedload(ComputerComponent.computer_component_reviews))
+            .filter(func.lower(ComputerComponent.product_code) == func.lower(product_code))
             .first()
         )
 
@@ -79,6 +81,15 @@ def show_by_slug(slug: str, db: Session = Depends(get_db)):
 
         sell_price_and_ratings_service = SellPriceAndRatingsFinderService(db=db, ratings=ratings, component=computer_component)
         computer_component = sell_price_and_ratings_service.call()
+        images = []
+        if computer_component.images:
+            presigned_url = s3_client().generate_presigned_url(
+                'get_object',
+                Params={'Bucket': bucket_name(), 'Key': computer_component.images[0]},
+                ExpiresIn=3600
+            )
+            images = [presigned_url]
+        computer_component.images = images
 
         return computer_component
     finally:

@@ -25,14 +25,14 @@ export function Navbar() {
     const REFRESH_KEY_NAME = 'refresh_key';
     const [language, setLanguage] = useState<"English" | "Indonesia">("English")
     const {
-        role, setRole, setUser
+        user, role, setRole, setUser
     } = useUser()
     const [cartItemCount, setCartItemCount] = useState(0)
 
     // Load cart item count
     useEffect(() => {
         const loadCartCount = async () => {
-            if (role === "buyer") {
+            if (user && role === "buyer") {
                 try {
                     const cartLines: CartLine[] = await fetchCart()
                     setCartItemCount(cartLines.length)
@@ -49,7 +49,6 @@ export function Navbar() {
         let requestRole = role === "seller" ? "buyer" : "seller"
 
         const response: GetUserResponseAPI = await fetchUser(requestRole)
-        
         const responseUser = response.user;
 
         localStorage.setItem(SECRET_KEY_NAME, response.access_token);
@@ -61,6 +60,8 @@ export function Navbar() {
 
         if (userRole == "buyer") {
             redirect('/shop')
+        } else {
+            redirect('/computer_components')
         }
     }
     
@@ -213,6 +214,7 @@ export function Navbar() {
                         <button 
                             className="flex items-center space-x-1 text-sm"
                             onClick={() => setLanguage(language === "English" ? "Indonesia" : "English")}
+                            disabled={true}
                         >
                             <Globe className="h-4 w-4"/>
                             <span>{language}</span>
@@ -222,14 +224,7 @@ export function Navbar() {
 
                     {/* User Greeting */}
                     <button onClick={toggleRole} className="text-sm hover:underline cursor-pointer">
-                        Hello { role === "buyer" ? "Buyer" : "Seller" }
-                    </button>
-
-                    {/* Mode Switch */}
-                    <button className="flex items-center justify-center rounded-full p-1 hover:bg-gray-100"
-                        onClick={toggleRole}
-                        title={`Switch to ${role === "seller" ? "Buyer" : "Seller"} Mode`}>
-                        <SwitchCamera className="h-5 w-5" />
+                        Switch to { role === "buyer" ? "Seller" : "Buyer" }
                     </button>
 
                     {/* Buyer-specific icons */}

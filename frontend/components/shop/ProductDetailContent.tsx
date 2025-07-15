@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import type { ShopContentProduct } from "@/types/product"
+import type { ShopContentProduct, ComputerComponentReview } from "@/types/product"
 
 export default function ProductDetailContent() {
     const { slug } = useParams()
@@ -21,12 +21,14 @@ export default function ProductDetailContent() {
     const [isAddingToCart, setIsAddingToCart] = useState(false)
     const [quantity, setQuantity] = useState(1)
     const [selectedImage, setSelectedImage] = useState(0)
+    const [notFound, setNotFound] = useState(false)
 
     useEffect(() => {
         const loadProduct = async () => {
             setIsLoading(true)
 
             try {
+                console.log("y")
                 const productData = await fetchProductBySlug(slug as string)
                 setProduct(productData)
 
@@ -34,6 +36,7 @@ export default function ProductDetailContent() {
                     setSelectedImage(0)
                 }
             } catch (error) {
+                setNotFound(true)
                 console.error("Failed to load product:", error)
             } finally {
                 setIsLoading(false)
@@ -44,6 +47,20 @@ export default function ProductDetailContent() {
             loadProduct()
         }
     }, [slug])
+
+    if (notFound) {
+        return <div style={{ position: 'relative', width: '100%', height: '800px' }}>
+             <Image 
+                src={"/data_not_found.png"}
+                alt={"not found"}
+                fill
+                sizes="(max-width: 768px) 100vw,
+                            (max-width: 1200px) 50vw,
+                            33vw"
+                className="object-contain p-6"
+            />
+        </div>
+    }
 
     const handleQuantityChange = (value: number) => {
         if (value >= 1) {
@@ -73,7 +90,7 @@ export default function ProductDetailContent() {
         setIsAddingToCart(true)
         try {
             await addToCart(product.id, 1)
-            router.push("cart")
+            router.push("/cart")
         } catch (error) {
             toast.error("Failed to process your order")
             console.error("Failed to buy now:", error)
@@ -102,8 +119,6 @@ export default function ProductDetailContent() {
             </div>
         )
     }
-
-    const sell_price_before_discount = product.sell_price / (0.67) // finding original price after 33% discount
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -175,26 +190,27 @@ export default function ProductDetailContent() {
 
                         <div className="flex items-center mb-4">
                             <span className="text-2xl font-bold">
-                                IDR {(product.sell_price).toFixed(2)}
+                                Rp {(product.sell_price).toLocaleString()}
                             </span>
-                            <span className="text-gray-500 text-lg line-through ml-3">IDR {sell_price_before_discount.toFixed(2)}</span>
+                            <span className="text-gray-500 text-lg line-through ml-3">Rp {(Math.round(( product.sell_price / (1 - 0.33)) / 1000) * 1000).toLocaleString()}</span>
                         </div>
 
+                        <span className="text-sm font-medium mr-4">Description:</span>
                         <p className="text-gray-600 mb-6">{product.description}</p>
                         <div className="flex items-center mb-6">
                             <span className="text-sm font-medium mr-4">Availability:</span>
                             {
                                 1 == 1 ? (
-                                    <span className="text-green-600">In Stock (10 available)</span>
+                                    <span className="text-green-600">In stock (10 available)</span>
                                 ) : (
-                                    <span className="text-red-600">Out of Stock</span>
+                                    <span className="text-red-600">Out of stock</span>
                                 )
                             }
                         </div>
 
                         <div className="flex items-center mb-6">
                             <span className="text-sm font-medium mr-4">Brand:</span>
-                            <span>-</span>
+                            <span>Available soon</span>
                         </div>
                     </div>
 
@@ -253,21 +269,21 @@ export default function ProductDetailContent() {
                 </TabsList>
                 <TabsContent value="specifications" className="pt-6">
                     {
-                        product.description ? (
+                        product.description && product.description.length > 10 ? (
                             <p className="text-muted-foreground">{product.description}</p>
                         ) : (
-                            <p className="text-muted-foreground">No specifications avaialble for this product.</p>
+                            <p className="text-muted-foreground">No specifications available yet for this product.</p>
                         )
                     }
                 </TabsContent>
                 <TabsContent value="reviews" className="pt-6">
-                    { false ? (
+                    { product.computer_component_reviews ? (
                         <div className="space-y-6">
-                            {product?.reviews.map((review: any) => (
+                            {product.computer_component_reviews.map((review: ComputerComponentReview) => (
                                 <div key={review.id} className="border-b pb-4">
                                     <div className="flex justify-between mb-2">
                                         <div>
-                                            <span className="font-medium">{review.userName}</span>
+                                            <span className="font-medium">{review.user_fullname}</span>
                                             <div className="flex mt-1">
                                                 {[1,2,3,4,5].map((star) => (
                                                     <Star 
@@ -280,9 +296,9 @@ export default function ProductDetailContent() {
                                                 ))}
                                             </div>
                                         </div>
-                                        <span className="text-sm text-gray-500">{new Date(review.date).toLocaleDateString()}</span>
+                                        <span className="text-sm text-gray-500">{new Date(review.created_at).toLocaleDateString()}</span>
                                     </div>
-                                    <p className="text-gray-600">{review.comment}</p>
+                                    <p className="text-gray-600">{review.comments}</p>
                                 </div>
                             ))}
                         </div>

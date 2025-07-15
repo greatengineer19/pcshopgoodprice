@@ -29,7 +29,6 @@ def component_gpu_4060(component_category_gpu):
     return ComponentFactory(
         name="Zotac RTX 4060",
         product_code="rtx_4060",
-        price=7000000,
         component_category_id=component_category_gpu.id,
         status=0
     )
@@ -39,7 +38,6 @@ def component_gpu_4070(component_category_gpu):
     return ComponentFactory(
         name="Zotac RTX 4070",
         product_code="rtx_4070",
-        price=7000000,
         component_category_id=component_category_gpu.id,
         status=0
     )
@@ -96,6 +94,7 @@ def test_index_with_2_cart_lines(client, db_session, user_sean_ali, cart_line_gp
                 'id': gpu_4060.id,
                 'quantity': '1.000000',
                 'status': 0,
+                'sell_price': '0',
                 'updated_at': gpu_4060.updated_at.isoformat()
             },
             {
@@ -107,6 +106,7 @@ def test_index_with_2_cart_lines(client, db_session, user_sean_ali, cart_line_gp
                 'id': gpu_4070.id,
                 'quantity': '1.000000',
                 'status': 0,
+                'sell_price': '0',
                 'updated_at': gpu_4070.updated_at.isoformat()
             }
         ]

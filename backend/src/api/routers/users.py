@@ -21,10 +21,11 @@ def user_by_role(
     ):
     try:
         role = 0 if role == "seller" else 1
+        user_name = 'super_buyer' if role == 1 else "admin_seller"
     
         user = (
             db.query(User)
-              .filter(User.role == role)
+              .filter(and_(User.role == role, User.username == user_name))
               .first()
         )
 

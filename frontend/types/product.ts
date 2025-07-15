@@ -52,6 +52,16 @@ export interface ComputerComponentSellPriceSetting {
     active: boolean;
 }
 
+export interface ComputerComponentReview {
+    id: number;
+    component_id: number;
+    rating: number;
+    user_fullname: string;
+    user_id: number;
+    comments: string;
+    created_at: string;
+}
+
 export interface ShopContentProduct {
     rating: number;
     count_review_given: number;
@@ -60,6 +70,7 @@ export interface ShopContentProduct {
     component_category_id: number;
     component_category_name: string | null;
     computer_component_sell_price_settings: ComputerComponentSellPriceSetting[];
+    computer_component_reviews?: ComputerComponentReview[];
     images: string[] | null;
     created_at: string;
     updated_at: string;

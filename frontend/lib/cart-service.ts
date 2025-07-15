@@ -1,11 +1,7 @@
 import type { CartLine, PaymentMethod } from "@/types/cart"
-import { fetchProductBySlug } from "./product-service"
-import { handleApiError } from "@/utils/api/error-handlers"
-import { toast } from "sonner"
 import { useToastError } from "@/hooks/use-toast-error"
 import { useToastSuccess } from "@/hooks/use-toast-success"
 
-const { showErrorToast } = useToastError()
 const { showSuccessToast } = useToastSuccess()
 const SECRET_KEY_NAME = 'secret_key';
 
@@ -44,7 +40,7 @@ export const fetchCart = async (): Promise<CartLine[]> => {
     }
 
     const responseData = await response.json();
-    const cartLines: CartLine[] = responseData.cart_lines;
+    const cartLines: CartLine[] = responseData.cart;
 
     return cartLines
 }

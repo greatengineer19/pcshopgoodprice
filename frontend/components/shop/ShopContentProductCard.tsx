@@ -24,10 +24,10 @@ export function ShopContentProductCard({ product }: ProductCardProps) {
             .toLowerCase();
     }
 
-    const product_slug = toSnakeCase(product.name)
+    const product_code = product.product_code.toLowerCase()
 
     return (
-        <Link href={`/shop/product/${product_slug}`}>
+        <Link href={`/shop/product/${product_code}`}>
             <div 
                 className="group relative border rounded-lg overflow-hidden transition-all duration-300 hover:shadow-md"
                 onMouseEnter={() => setIsHovered(true)}

@@ -30,6 +30,8 @@ class User(Base):
     hashed_password = Column(String)
     refresh_token = Column(String, unique=True, nullable=True)
     refresh_token_expiry_at = Column(DateTime, server_default=func.now(), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     cart_lines: Mapped["CartLine"] = relationship(
         back_populates="customer"
@@ -48,6 +50,8 @@ class PaymentMethod(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
 class ComputerComponentReview(Base):
     __tablename__ = "computer_component_reviews"
@@ -66,6 +70,8 @@ class ComputerComponentReview(Base):
     user_fullname: Mapped[str] = mapped_column(String, nullable=False)
     rating: Mapped[int] = mapped_column(Integer, server_default="0")
     comments: Mapped[str] = mapped_column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     component: Mapped['ComputerComponent'] = relationship(
         "ComputerComponent", back_populates="computer_component_reviews"
@@ -85,6 +91,8 @@ class ComputerComponentSellPriceSetting(Base):
         Numeric(20, 6), nullable=False, default=Decimal("0.0")
     )
     active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     component: Mapped['ComputerComponent'] = relationship(
         "ComputerComponent", back_populates="computer_component_sell_price_settings"

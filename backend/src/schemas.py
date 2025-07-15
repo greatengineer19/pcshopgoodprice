@@ -75,6 +75,19 @@ class SellableProductResponse(ComputerComponentAsResponse):
     count_review_given: int
     sell_price: float
 
+class ComputerComponentReview(BaseModel):
+    id: int
+    user_id: int
+    component_id: int
+    user_fullname: str
+    rating: int
+    comments: str
+    created_at: Union[str, datetime]
+    updated_at: Union[str, datetime]
+
+class OneSellableProductResponse(SellableProductResponse):
+    computer_component_reviews: List[ComputerComponentReview]
+
 class SellableProductsInCategory(BaseModel):
     name: str
     components: List[SellableProductResponse]

@@ -56,7 +56,7 @@ export const fetchProductBySlug = async (slug: string): Promise<ShopContentProdu
     if (typeof window !== "undefined") {
         token = localStorage.getItem(SECRET_KEY_NAME);
     }
-    let response = await fetch("http://localhost:8080/api/sellable-products" + slug, {
+    let response = await fetch("http://localhost:8080/api/sellable-products/" + slug, {
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
@@ -64,8 +64,7 @@ export const fetchProductBySlug = async (slug: string): Promise<ShopContentProdu
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to fetch products");
+        throw new Error("Failed to fetch products");
     }
     
     const responseData = await response.json();
