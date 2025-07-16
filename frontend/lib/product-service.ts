@@ -24,8 +24,6 @@ export const fetchProducts = async (filters?: ProductFilter): Promise<{ result: 
             end_price: filters.priceRange ? String(filters.priceRange[1]) : '',
             min_rating: filters.ratings ? String(filters.ratings) : ''
         }
-        console.log("bentuk c")
-        console.log(query_params)
 
         queryString = '?' + new URLSearchParams(query_params).toString();
     }

@@ -29,53 +29,37 @@ export default function CartPage() {
     const [subtotal, setSubtotal] = useState<number>(0)
     const { user } = useUser()
 
-    if (user == undefined) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-                    <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
-                    <h1 className="text-3xl font-bold mb-4">Your Shopping Cart</h1>
-                    <p className="text-muted-foreground mb-8 max-w-md">
-                        Your shopping cart is currently empty. Browse our products to add items to your cart.
-                    </p>
-                    <Link href="/shop">
-                        <Button className="flex items-center gap-2">Continue Shopping</Button>
-                    </Link>
-                </div>
-            </div>
-        )
-    } 
-
     // Load cart data
     useEffect(() => {
         const loadCart = async () => {
             setIsLoading(true)
+
             try {
                 const cartData = await fetchCart()
                 setCartLines(cartData)
 
-                let subtotalCalculator = 0
-                cartLines?.forEach(cartLine => {
-                    subtotalCalculator += cartLine.sell_price * cartLine.quantity;
+                let subtotalCalculator = 0;
+                console.log(cartData);
+                cartData.forEach(cartLine => {
+                    subtotalCalculator += Number(cartLine.sell_price) * Number(cartLine.quantity);
                 });
                 setSubtotal(subtotalCalculator)
             } catch (error) {
                 console.error("Failed to load cart:", error)
                 toast.error("Failed to load your cart")
-            } finally {
-                setIsLoading(false)
             }
         }
 
         const fetchPaymentMethods = async () => {
             const methods = await listPaymentMethods();
             setPaymentMethods(methods);
-            const defaultMethod = methods.find(item => item.name == "Virtual Account");
+            const defaultMethod = methods.find(item => item.name == "BBB Virtual Account");
             setSelectedPaymentMethod(defaultMethod);
         }
 
         loadCart()
         fetchPaymentMethods()
+        setIsLoading(false)
     }, [])
 
     // Handle item deletion
@@ -123,7 +107,7 @@ export default function CartPage() {
 
             // Show success message
             toast.success("Sales Quote placed successfully!")
-            router.push("/sales-quotes")
+            router.push("/order")
         } catch (error) {
             console.error("Failed to process order:", error)
             toast.error("Failed to process your order")
@@ -183,7 +167,7 @@ export default function CartPage() {
 
                             {/* Draft Orders Section */}
                             <div>
-                                <h2 className="text-xl font-semibold mb-4">Draft Orders</h2>
+                                <h2 className="text-xl font-semibold mb-4">Cart Details</h2>
                                 <Card>
                                     <CardContent className="pt-6">
                                         {
@@ -199,7 +183,7 @@ export default function CartPage() {
                                                     {/* Product Image */}
                                                     <div className="relative h-20 w-20 flex-shrink-0 border rounded-md overflow-hidden">
                                                         <Image 
-                                                            src={"/placeholder.svg"}
+                                                            src={cartLine.images ? cartLine.images[0] : "/placeholder.svg"}
                                                             alt={cartLine.component_name}
                                                             fill
                                                             className="object-contain p-1"
@@ -210,13 +194,13 @@ export default function CartPage() {
                                                     <div className="flex-1 min-w-0">
                                                         <h3 className="font-medium text-sm line-clamp-2">{cartLine.component_name}</h3>
                                                         <p className="text-sm text-muted-foreground mt-1">
-                                                            ${cartLine.sell_price.toFixed(2)} x {cartLine.quantity}
+                                                            Rp {Number(cartLine.sell_price).toLocaleString()} x {Number(cartLine.quantity).toFixed(0)} pcs
                                                         </p>
                                                     </div>
 
                                                     {/* Price and Delete */}
                                                     <div className="flex flex-col items-end space-y-2">
-                                                        <span className="font-semibold">IDR {(cartLine.quantity * cartLine.sell_price).toFixed(2)}</span>
+                                                        <span className="font-semibold">Rp {Number(cartLine.quantity * cartLine.sell_price).toLocaleString()}</span>
                                                         <Button 
                                                             variant="ghost"
                                                             size="sm"
@@ -227,35 +211,35 @@ export default function CartPage() {
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </div>
-
-                                                    {/* Cart Summary */}
-                                                    <div className="mt-4 space-y-2">
-                                                        <div className="flex justify-between">
-                                                            <span className="text-muted-foreground">Subtotal</span>
-                                                            <span>IDR {subtotal.toFixed(2)}</span>
-                                                        </div>
-                                                        <div className="flex justify-between">
-                                                            <span className="text-muted-foreground">Tax</span>
-                                                            <span>IDR 0</span>
-                                                        </div>
-                                                        <div className="flex justify-between">
-                                                            <span className="text-muted-foreground">
-                                                                Shipping
-                                                            </span>
-                                                            <span>IDR 0</span>
-                                                        </div>
-                                                        {
-                                                            1 == 1 && (
-                                                                <div className="flex justify-between text-green-600">
-                                                                    <span>Discount</span>
-                                                                    <span>-IDR 0</span>
-                                                                </div>
-                                                            )
-                                                        }
-                                                    </div>
                                                 </div>
                                             ))
                                         }
+
+                                        {/* Cart Summary */}
+                                        <div className="mt-4 space-y-2">
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Subtotal</span>
+                                                <span>Rp {Number(subtotal).toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Tax</span>
+                                                <span className="italic-text">Free of charge</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">
+                                                    Shipping
+                                                </span>
+                                                <span>Free of charge</span>
+                                            </div>
+                                            {
+                                                1 == 1 && (
+                                                    <div className="flex justify-between">
+                                                        <span>Discount</span>
+                                                        <span>Rp -0</span>
+                                                    </div>
+                                                )
+                                            }
+                                        </div>
                                     </CardContent>
                                 </Card>
                             </div>
@@ -274,7 +258,6 @@ export default function CartPage() {
                                                 const selected = paymentMethods.find(method => method.name === value);
                                                 setSelectedPaymentMethod(selected);
                                             }}
-                                            className="space-y-3"
                                         >
                                             {
                                                 paymentMethods.map((method) => (
@@ -282,18 +265,18 @@ export default function CartPage() {
                                                         key={method.id}
                                                         className="flex items-center space-x-2 border rounded-md p-3"
                                                     >
-                                                    <RadioGroupItem
-                                                        value={method.name}
-                                                        id={String(method.id)}
-                                                        disabled={method.name !== "Virtual Account"}
-                                                    />
-                                                    <Label htmlFor={String(method.id)} className="flex-1 cursor-pointer">
-                                                        <div className="font-medium">{method.name}</div>
-                                                        <div className="text-sm text-muted-foreground">
-                                                        Pay using {method.name}
-                                                        </div>
-                                                    </Label>
-                                                </div>
+                                                        <RadioGroupItem
+                                                            value={method.name}
+                                                            id={String(method.id)}
+                                                            disabled={method.name !== "Virtual Account"}
+                                                        />
+                                                        <Label
+                                                            htmlFor={String(method.id)}
+                                                            className="flex-1 cursor-pointer" // Added flex flex-col here
+                                                        >
+                                                            <div className="font-medium">{method.name}</div>
+                                                        </Label>
+                                                    </div>
                                             ))}
                                         </RadioGroup>
 
@@ -303,7 +286,7 @@ export default function CartPage() {
                                         {/* Total Amount */}
                                         <div className="flex justify-between items-center mb-6">
                                             <span className="text-lg font-medium">Total Amount</span>
-                                            <span className="text-xl font-bold">IDR {subtotal.toFixed(2)}</span>
+                                            <span className="text-xl font-bold">Rp {subtotal.toLocaleString()}</span>
                                         </div>
 
                                         {/* Checkout Button */}

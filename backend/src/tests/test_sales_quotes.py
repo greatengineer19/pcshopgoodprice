@@ -10,7 +10,11 @@ from src.tests.factories.sales_quote_line_factory import SalesQuoteLineFactory
 from src.tests.factories.payment_method_factory import PaymentMethodFactory
 from decimal import Decimal
 from fastapi import HTTPException
-from src.tests.conftest import ( client, db_session, setup_factories )
+from src.tests.conftest import (
+    client, db_session, setup_factories,
+    user_sean_ali,
+    component_category_gpu
+    )
 from utils.auth import create_access_token, create_refresh_token, decodeJWT, get_current_user
 from src.models import (
     CartLine,
@@ -19,22 +23,10 @@ from src.models import (
 )
 
 @pytest.fixture
-def user_sean_ali():
-    return UserFactory(fullname="Sean Ali")
-
-@pytest.fixture
-def component_category_gpu():
-    return ComponentCategoryFactory(
-        name="GPU",
-        status=0
-    )
-
-@pytest.fixture
 def component_gpu_4060(component_category_gpu, db_session):
     component_gpu = ComponentFactory(
         name="Zotac RTX 4060",
         product_code="rtx_4060",
-        price=7000000,
         component_category_id=component_category_gpu.id,
         status=0
     )
@@ -56,7 +48,6 @@ def component_gpu_4070(component_category_gpu, db_session):
     component_gpu = ComponentFactory(
         name="Zotac RTX 4070",
         product_code="rtx_4070",
-        price=7000000,
         component_category_id=component_category_gpu.id,
         status=0
     )
@@ -86,12 +77,6 @@ def cart_line_gpu_4070_sean_ali(user_sean_ali, component_gpu_4070):
         customer_id=user_sean_ali.id,
         component_id=component_gpu_4070.id,
         quantity=1
-    )
-
-@pytest.fixture
-def payment_method_bank_transfer():
-    return PaymentMethodFactory(
-        name="BBB Bank Transfer"
     )
 
 @pytest.fixture
@@ -127,6 +112,7 @@ def sales_quote(user_sean_ali,
 
 def test_create_existing_sales_quote(client, db_session, user_sean_ali, sales_quote):
     db_session.commit()
+
     qline1 = sales_quote.sales_quote_lines[0]
     qline2 = sales_quote.sales_quote_lines[1]
     param = {
@@ -154,7 +140,7 @@ def test_create_existing_sales_quote(client, db_session, user_sean_ali, sales_qu
         "Authorization": f"Bearer {token}"
     }
     sales_quote
-    response = client.post("/api/sales-quote", headers=headers, json=param)
+    response = client.post("/api/sales-quotes", headers=headers, json=param)
     assert response.status_code == 200
 
     response_body = response.json()
@@ -167,13 +153,14 @@ def test_show(client, user_sean_ali, db_session, sales_quote):
         "Authorization": f"Bearer {token}"
     }
     sales_quote_id = sales_quote.id
-    response = client.get("/api/sales-quote", headers=headers)
+    response = client.get(f"/api/sales-quotes/{sales_quote_id}", headers=headers)
     assert response.status_code == 200
 
     response_body = response.json()
     sales_quote = db_session.query(SalesQuote).filter(SalesQuote.id == sales_quote_id).first()
     qline1 = sales_quote.sales_quote_lines[0]
     qline2 = sales_quote.sales_quote_lines[1]
+
     assert response_body == {
         'created_at': sales_quote.created_at.isoformat(),
         'credit_card_bank_name': None,
@@ -241,7 +228,7 @@ def test_create_new_sales_quote(client,
     headers = {
         "Authorization": f"Bearer {token}"
     }
-    response = client.post("/api/sales-quote", headers=headers, json=param)
+    response = client.post("/api/sales-quotes", headers=headers, json=param)
     assert response.status_code == 200
 
     response_body = response.json()
@@ -282,3 +269,70 @@ def test_create_new_sales_quote(client,
         'updated_at': sales_quote.updated_at.isoformat(),
         'virtual_account_no': None
     }
+
+def test_index(client, user_sean_ali, db_session, sales_quote):
+    db_session.commit()
+    token = create_access_token(user_sean_ali.id, 30)
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    sales_quote_id = sales_quote.id
+    response = client.get(f"/api/sales-quotes", headers=headers)
+    assert response.status_code == 200
+
+    response_body = response.json()
+    sales_quote = db_session.query(SalesQuote).filter(SalesQuote.id == sales_quote_id).first()
+    qline1 = sales_quote.sales_quote_lines[0]
+    qline2 = sales_quote.sales_quote_lines[1]
+
+    assert response_body == {
+        'sales_quotes': [
+            {
+                'created_at': sales_quote.created_at.isoformat(),
+                'credit_card_bank_name': None,
+                'credit_card_customer_address': None,
+                'credit_card_customer_name': None,
+                'customer_id': user_sean_ali.id,
+                'customer_name': 'Sean Ali',
+                'id': sales_quote.id,
+                'paylater_account_reference': None,
+                'payment_method_id': sales_quote.payment_method_id,
+                'payment_method_name': 'BBB Bank Transfer',
+                'sales_quote_lines': [{'component_id': qline1.component_id,
+                                        'created_at': qline1.created_at.isoformat(),
+                                        'id': qline1.id,
+                                        'price_per_unit': '12000000.000000',
+                                        'quantity': '1.000000',
+                                        'sales_quote_id': sales_quote.id,
+                                        'total_line_amount': '12000000.000000',
+                                        'updated_at': qline1.updated_at.isoformat()},
+                                    {'component_id': qline2.component_id,
+                                        'created_at': qline2.created_at.isoformat(),
+                                        'id': qline2.id,
+                                        'price_per_unit': '10000000.000000',
+                                        'quantity': '1.000000',
+                                        'sales_quote_id': sales_quote.id,
+                                        'total_line_amount': '10000000.000000',
+                                        'updated_at': qline2.updated_at.isoformat()}],
+                'sales_quote_no': sales_quote.sales_quote_no,
+                'shipping_address': 'Batam, 29461, Kepulauan Riau, Indonesia. 081890989098',
+                'sum_total_line_amounts': '0.000000',
+                'total_payable_amount': '0.000000',
+                'updated_at': sales_quote.updated_at.isoformat(),
+                'virtual_account_no': None
+            }
+        ]
+    }
+
+def test_destroy(client, user_sean_ali, db_session, sales_quote):
+    db_session.commit()
+    token = create_access_token(user_sean_ali.id, 30)
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    sales_quote_id = sales_quote.id
+    response = client.delete(f"/api/sales-quotes/{sales_quote_id}", headers=headers)
+
+    assert response.status_code == 204
+    sales_quote = db_session.query(SalesQuote).filter(SalesQuote.id == sales_quote_id).first()
+    assert sales_quote is None

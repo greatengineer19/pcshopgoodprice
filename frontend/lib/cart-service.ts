@@ -1,5 +1,4 @@
 import type { CartLine, PaymentMethod } from "@/types/cart"
-import { useToastError } from "@/hooks/use-toast-error"
 import { useToastSuccess } from "@/hooks/use-toast-success"
 
 const { showSuccessToast } = useToastSuccess()

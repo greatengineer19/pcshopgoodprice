@@ -366,6 +366,7 @@ class CartLineResponse(BaseModel):
     component_id: int
     customer_name: str
     component_name: str
+    images: Optional[List[str]] = None
     quantity: Decimal
     sell_price: Decimal
     created_at: datetime
@@ -445,7 +446,7 @@ class SalesInvoiceLineAsResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-class SalesInvoiceResponse(BaseModel):
+class SalesInvoiceResponse(SalesQuoteBase):
     id: int
     status: str
     sales_invoice_no: str
@@ -456,11 +457,19 @@ class SalesInvoiceResponse(BaseModel):
     updated_at: datetime
     sales_invoice_lines: List[SalesInvoiceLineAsResponse]
 
+class SalesInvoiceList(BaseModel):
+    sales_invoices: List[SalesInvoiceResponse]
+
 class SalesPaymentParam(BaseModel):
     id: int
 
 class SalesDeliveryCreateParam(BaseModel):
     id: int
+
+class SalesInvoiceStatusEnum(int, Enum):
+    PENDING = 0
+    COMPLETED = 1
+    VOID = 2
 
 class SalesDeliveryStatusEnum(int, Enum):
     PROCESSING = 0

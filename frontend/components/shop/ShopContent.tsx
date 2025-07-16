@@ -66,8 +66,7 @@ export default function ShopContent() {
                 priceRange: selectedPriceRange,
                 ratings: minRating
             }
-            console.log("check filters")
-            console.log(filters)
+
             const fetchedProducts = await fetchProducts(filters)
             const productsData = fetchedProducts.result
             transformResponseProducts(productsData)

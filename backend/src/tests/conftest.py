@@ -16,6 +16,7 @@ from src.tests.factories.component_category_factory import ComponentCategoryFact
 from src.tests.factories.computer_component_sell_price_setting_factory import ComputerComponentSellPriceSettingFactory
 from src.tests.factories.computer_component_review_factory import ComputerComponentReviewFactory
 from src.tests.factories.user_factory import UserFactory
+from src.tests.factories.payment_method_factory import PaymentMethodFactory
 from src.schemas import DayTypeEnum
 
 @pytest.fixture
@@ -29,6 +30,19 @@ def user_n3():
 @pytest.fixture
 def user_jason():
     return UserFactory(fullname="Jason")
+
+@pytest.fixture
+def payment_method_bank_transfer():
+    return PaymentMethodFactory(
+        name="BBB Bank Transfer"
+    )
+
+@pytest.fixture
+def component_category_gpu():
+    return ComponentCategoryFactory(
+        name="GPU",
+        status=0
+    )
 
 @pytest.fixture
 def component_category_fan():

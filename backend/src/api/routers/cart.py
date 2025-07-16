@@ -19,6 +19,7 @@ from src.api.dependencies import get_db
 from datetime import datetime
 from utils.auth import get_current_user
 from src.computer_components.service import Service
+from src.api.s3_dependencies import ( bucket_name, s3_client )
 
 router = APIRouter(prefix='/api/cart', tags=['Cart'])
   
@@ -46,6 +47,15 @@ def index(
             component = cart_line.component
             price = service.select_price(component)
 
+            images = []
+            if component.images:
+                presigned_url = s3_client().generate_presigned_url(
+                    'get_object',
+                    Params={'Bucket': bucket_name(), 'Key': component.images[0]},
+                    ExpiresIn=3600
+                )
+                images = [presigned_url]
+
             result.append({
                 'sell_price': price,
                 'id': cart_line.id,
@@ -54,6 +64,7 @@ def index(
                 'component_name': cart_line.component.name,
                 'customer_name': user.fullname,
                 'quantity': cart_line.quantity,
+                'images': images,
                 'created_at': cart_line.created_at,
                 'updated_at': cart_line.updated_at,
                 'status': cart_line.status

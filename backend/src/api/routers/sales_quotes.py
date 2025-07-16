@@ -1,14 +1,6 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
-from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import (
-        select,
-        func,
-        delete,
         desc,
-        text,
-        and_,
-        event,
-        or_
 )
 from src.schemas import (
     SalesQuoteCreateParam,
@@ -16,53 +8,17 @@ from src.schemas import (
     SalesQuoteList
 )
 from src.models import (
-    ComputerComponent,
     SalesQuote,
     SalesQuoteLine,
-    ComputerComponentSellPriceSetting,
-    User,
-    CartLine
+    User
 )
-import logging
 from sqlalchemy.orm import joinedload, Session
 from src.api.dependencies import get_db
-from datetime import datetime
 from utils.auth import get_current_user
-import re
+from src.sales_quotes.show_service import ShowService
+from src.sales_quotes.build_service import BuildService
 
-router = APIRouter(
-    prefix='/api/sales-quotes'
-)
-
-@event.listens_for(Session, "before_flush")
-def check_change_object(session: Session, flush_context, instances):
-    for obj in session.new.union(session.dirty):
-        if isinstance(obj, SalesQuote) and not obj.sales_quote_no:
-            result = session.execute(text(
-                "SELECT sales_quote_no " \
-                "FROM sales_quotes " \
-                "ORDER BY id DESC LIMIT 1 " \
-                "FOR UPDATE"
-            )).first()
-
-            if result and result[0]:
-                match = re.search(r"HSF-QUOT-(\d+)", result[0])
-                if match:
-                    last_number = int(match.group(1))
-                    next_number = last_number + 1
-                else:
-                    next_number = 1
-            else:
-                next_number = 1
-            
-            obj.sales_quote_no = f"HSF-QUOT-{next_number:05d}"
-            if obj.sales_quote_lines:
-                obj.sum_total_line_amounts = sum(quote_line.total_line_amount for quote_line in obj.sales_quote_lines)
-                obj.total_payable_amount = obj.sum_total_line_amounts
-        elif isinstance(obj, SalesQuote):
-            if obj.sales_quote_lines:
-                obj.sum_total_line_amounts = sum(quote_line.total_line_amount for quote_line in obj.sales_quote_lines)
-                obj.total_payable_amount = obj.sum_total_line_amounts
+router = APIRouter(prefix='/api/sales-quotes', tags=["Sales Quotes"])
 
 @router.get("", response_model=SalesQuoteList)
 def index(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -93,76 +49,20 @@ def create(
         db: Session = Depends(get_db)
     ):
     try:
-        existing = (
-            db.query(SalesQuote)
-            .options(joinedload(SalesQuote.sales_quote_lines))
-            .filter(SalesQuote.customer_id == user.id)
-            .order_by(desc(SalesQuote.id))
-            .first()
-        )
+        show_service = ShowService(db, None, user.id)
+        existing = show_service.call()
         if existing:
             return existing
 
-        sales_quote = SalesQuote(
-            customer_id=param.customer_id,
-            customer_name=param.customer_name,
-            shipping_address=param.shipping_address,
-            payment_method_id=param.payment_method_id,
-            payment_method_name=param.payment_method_name,
-            virtual_account_no=param.virtual_account_no,
-            paylater_account_reference=param.paylater_account_reference,
-            credit_card_customer_name=param.credit_card_customer_name,
-            credit_card_customer_address=param.credit_card_customer_address,
-            credit_card_bank_name=param.credit_card_bank_name
-        )
-
-        cart_lines = (
-            db
-            .query(CartLine)
-            .filter(and_(CartLine.customer_id == user.id))
-            .order_by(CartLine.id)
-            .all()
-        )
-
-        components = (
-            db.query(ComputerComponent)
-            .options(joinedload(ComputerComponent.computer_component_sell_price_settings))
-            .filter(ComputerComponent.id.in_([p.component_id for p in cart_lines]))
-        )
-        components_dict = { component.id: component for component in components}
-        weekday = datetime.now().isoweekday() or 7  # Returns 1-7 (Mon-Sun)
-
-        for cart_line in cart_lines:
-            component = components_dict[cart_line.component_id]
-            price_settings = component.computer_component_sell_price_settings
-
-            default_price = next((sps.price_per_unit for sps in price_settings if sps.day_type == 0), 0)
-            price = next(
-                (sps.price_per_unit for sps in price_settings 
-                if sps.day_type == weekday and sps.status == 0),
-                default_price
-            )
-
-            quote_line = SalesQuoteLine(
-                component_id=cart_line.component_id,
-                quantity=cart_line.quantity,
-                price_per_unit=price,
-                total_line_amount= price * cart_line.quantity
-            )
-            sales_quote.sales_quote_lines.append(quote_line)
-
-        delete_q = CartLine.__table__.delete().where(CartLine.id.in_([cart_line.id for cart_line in cart_lines]))
-        db.execute(delete_q)
-        
+        build_service = BuildService(db, param, user)
+        sales_quote, delete_cart_query = build_service.build()
+    
+        db.execute(delete_cart_query)    
         db.add(sales_quote)
         db.commit()
 
-        sales_quote = (
-            db.query(SalesQuote)
-            .options(joinedload(SalesQuote.sales_quote_lines))
-            .filter(SalesQuote.id == sales_quote.id)
-            .first()
-        )
+        show_service = ShowService(db, sales_quote.id, None)
+        sales_quote = show_service.call()
 
         return sales_quote
     finally:
@@ -171,13 +71,8 @@ def create(
 @router.get("/{id}", response_model=SalesQuoteResponse)
 def show(id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        sales_quote = (
-            db.query(SalesQuote)
-            .options(joinedload(SalesQuote.sales_quote_lines))
-            .filter(and_(SalesQuote.customer_id == user.id, SalesQuote.id == id))
-            .order_by(desc(SalesQuote.id))
-            .first()
-        )
+        show_service = ShowService(db, id, user.id)
+        sales_quote = show_service.call()
 
         return sales_quote
     finally:

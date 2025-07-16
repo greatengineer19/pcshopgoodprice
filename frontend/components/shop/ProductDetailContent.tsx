@@ -28,7 +28,6 @@ export default function ProductDetailContent() {
             setIsLoading(true)
 
             try {
-                console.log("y")
                 const productData = await fetchProductBySlug(slug as string)
                 setProduct(productData)
 
