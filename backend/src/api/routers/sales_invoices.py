@@ -74,7 +74,7 @@ def show(id: int, user: User = Depends(get_current_user), db: Session = Depends(
     finally:
         db.close()
 
-@router.patch("/{id}", response_model=SalesInvoiceResponse, status_code=200)
+@router.patch("/{id}/void", response_model=SalesInvoiceResponse, status_code=200)
 def void(id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
         sales_invoice = (db.query(SalesInvoice).filter(and_(SalesInvoice.id == id, SalesInvoice.customer_id == user.id)).first())

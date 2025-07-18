@@ -9,11 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { fetchSalesQuotes, cancelSalesQuote } from "@/lib/sales-quote-service"
+import { fetchSalesQuotes, destroySalesQuote } from "@/lib/sales-quote-service"
 import type { FetchedSalesQuote } from "@/types/sales-quote"
 
-// actual usage is SalesQuoteContent
-export default function OrderContent() {
+// actual usage is SalesQuotesContent, SalesInvoicesContent, SalesDeliveriesContent
+export default function OrdersContent() {
     const [salesQuotes, setSalesQuotes] = useState<FetchedSalesQuote[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [expandedOrder, setExpandedOrder] = useState<number | null>(null)
@@ -30,12 +30,39 @@ export default function OrderContent() {
             } catch (error) {
                 console.error("Failed to Sales Quotes:", error)
                 toast.error("Failed to load your Sales Quotes")
-            } finally {
-                setIsLoading(false)
+            }
+        }
+
+        const loadSalesInvoices = async () => {
+            setIsLoading(true)
+
+            try {
+                const salesInvoicesData = await fetchSalesInvoices()
+
+                setSalesInvoices(salesInvoicesData)
+            } catch (error) {
+                console.error("Failed to Sales Invoices:", error)
+                toast.error("Failed to load your Sales Invoices")
+            }
+        }
+
+        const loadSalesDeliveries = async () => {
+            setIsLoading(true)
+
+            try {
+                const salesInvoicesData = await fetchSalesDeliveries()
+
+                setSalesDeliveries(salesInvoicesData)
+            } catch (error) {
+                console.error("Failed to Sales Deliveries:", error)
+                toast.error("Failed to load your Sales Deliveries")
             }
         }
 
         loadSalesQuotes()
+        loadSalesInvoices()
+        loadSalesDeliveries()
+        setIsLoading(false)
     }, [])
 
     // Load shipping updates when an order is expanded
@@ -53,7 +80,7 @@ export default function OrderContent() {
         setIsCancelling(orderId)
 
         try {
-            const updatedOrder = await cancelSalesQuote(orderId)
+            const updatedOrder = await destroySalesQuote(orderId)
 
             // Update the order in the list
             setSalesQuotes((prev) => prev.map((order) => (order.id === orderId ? updatedOrder : order)))

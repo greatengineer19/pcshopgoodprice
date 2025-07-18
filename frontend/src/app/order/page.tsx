@@ -1,5 +1,5 @@
-import OrderContent from "@/components/order/OrderContent"
+import OrdersContent from "@/components/order/OrdersContent"
 
 export default function OrderPage() {
-    return <OrderContent />
+    return <OrdersContent />
 }

@@ -326,7 +326,7 @@ def test_void(client, user_sean_ali, db_session, sales_invoice):
         "Authorization": f"Bearer {token}"
     }
     sales_invoice_id = sales_invoice.id
-    response = client.patch(f"/api/sales-invoices/{sales_invoice_id}", headers=headers)
+    response = client.patch(f"/api/sales-invoices/{sales_invoice_id}/void", headers=headers)
     assert response.status_code == 200
     
     response_body = response.json()
