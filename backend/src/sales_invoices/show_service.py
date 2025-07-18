@@ -1,4 +1,4 @@
-from src.models import ( SalesInvoice )
+from src.models import ( SalesDelivery, SalesInvoice )
 from sqlalchemy.orm import joinedload, Session
 from src.schemas import ( SalesInvoiceStatusEnum )
 from typing import Optional

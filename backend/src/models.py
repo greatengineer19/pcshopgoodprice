@@ -546,6 +546,7 @@ class SalesInvoice(Base):
         back_populates="sales_invoice",
         cascade="all, delete-orphan"
     )
+    sales_delivery: Mapped["SalesDelivery"] = relationship(back_populates="sales_invoice")
 
 class SalesInvoiceLine(Base):
     __tablename__ = "sales_invoice_lines"
@@ -598,6 +599,7 @@ class SalesDelivery(Base):
         back_populates="sales_delivery",
         cascade="all, delete-orphan"
     )
+    sales_invoice: Mapped["SalesInvoice"] = relationship()
 
 class SalesDeliveryLine(Base):
     __tablename__ = "sales_delivery_lines"

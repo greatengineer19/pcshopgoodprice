@@ -480,6 +480,7 @@ class SalesDeliveryLineAsResponse(BaseModel):
     id: int
     sales_delivery_id: int
     component_id: int
+    component_name: str
     quantity: Decimal
     created_at: datetime
     updated_at: datetime
@@ -487,6 +488,9 @@ class SalesDeliveryLineAsResponse(BaseModel):
 class SalesDeliveryResponse(BaseModel):
     id: int
     status: str
+    customer_id: int
+    customer_name: str
+    shipping_address: str
     sales_invoice_id: int
     sales_delivery_no: str
     created_at: datetime
@@ -505,6 +509,9 @@ class SalesDeliveryResponse(BaseModel):
             except ValueError:
                 values.status = f"UNKNOWN({status})"
         return values
+    
+class SalesDeliveryList(BaseModel):
+    sales_deliveries: List[SalesDeliveryResponse]
     
 class PaymentMethodReponse(BaseModel):
     id: int

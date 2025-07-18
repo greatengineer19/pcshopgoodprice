@@ -25,23 +25,36 @@ from src.api.routers.sales_payment import (
     bank_transfer,
     virtual_account
 )
+from contextlib import asynccontextmanager
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import datetime
+import os
+from src.api.dependencies import get_db
+from sqlalchemy.orm import Session
+from fastapi import Depends
+from src.sales_deliveries.create_service import CreateService as SalesDeliveryCreateService
 
-app = FastAPI()
+scheduler = AsyncIOScheduler()
 
-origins = [
-    'http://localhost',
-    "http://localhost:3000",
-    'localhost',
-    "http://frontend:3000"
-]
+def create_sales_delivery_every_thirty_seconds(db: Session = Depends(get_db)):
+    create_service = SalesDeliveryCreateService(db)
+    create_service.call()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds
+    if os.environ.get('WEB_ENVIRONMENT'): # adding os environ to prevent EVENT LOOP error in each test call
+        scheduler.start()
+
+    yield
+
+    if os.environ.get('WEB_ENVIRONMENT'):
+        scheduler.shutdown() # Shut down on application exit
+
+app = FastAPI(lifespan=lifespan) # add lifespan to fastapi initialization
+
+origins = ['http://localhost', "http://localhost:3000", 'localhost', "http://frontend:3000"]
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 app.include_router(computer_components.router)
 app.include_router(purchase_invoices.router)

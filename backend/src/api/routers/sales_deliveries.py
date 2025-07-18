@@ -1,125 +1,56 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, Response
-from typing import List, Optional
-from sqlalchemy import (
-        select,
-        func,
-        delete,
-        desc,
-        text,
-        and_,
-        event,
-        or_
-)
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import (desc)
 from src.schemas import (
-    SalesDeliveryCreateParam,
+    SalesDeliveryList,
     SalesDeliveryStatusEnum,
     SalesDeliveryResponse
 )
 from src.models import (
     SalesDelivery,
-    SalesDeliveryLine,
     SalesInvoice,
-    SalesInvoiceLine,
-    User,
-    PaymentMethod
+    SalesDeliveryLine,
+    User
 )
-import logging
-from src.api.s3_dependencies import ( bucket_name, s3_client )
 from sqlalchemy.orm import joinedload, Session
 from src.api.dependencies import get_db
-from datetime import datetime
 from utils.auth import get_current_user
-import re
-from fastapi.encoders import jsonable_encoder
+from src.sales_deliveries.query_show_service import QueryShowService
+from src.sales_deliveries.show_service import ShowService
+from src.sales_deliveries.create_inventory_service import CreateInventoryService
 
-router = APIRouter(
-    prefix='/api/sales-deliveries'
-)
+router = APIRouter(prefix='/api/sales-deliveries', tags=["Sales Deliveries"])
 
-@event.listens_for(Session, "before_flush")
-def check_change_object(session: Session, flush_context, instances):
-    for obj in session.new.union(session.dirty):
-        if isinstance(obj, SalesDelivery) and not obj.sales_delivery_no:
-            result = session.execute(text(
-                "SELECT sales_delivery_no " \
-                "FROM sales_deliveries " \
-                "ORDER BY id DESC LIMIT 1 " \
-                "FOR UPDATE"
-            )).first()
-
-            if result and result[0]:
-                match = re.search(r"HSF-OBD-(\d+)", result[0])
-                if match:
-                    last_number = int(match.group(1))
-                    next_number = last_number + 1
-                else:
-                    next_number = 1
-            else:
-                next_number = 1
-            
-            obj.sales_delivery_no = f"HSF-OBD-{next_number:05d}"
-
-@router.post("", status_code=201)
-def create(
-        param: SalesDeliveryCreateParam,
-        response: Response,
-        user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
-    ):
+@router.get("", response_model=SalesDeliveryList, status_code=200)
+def index(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        exist = (
+        sales_deliveries = (
             db.query(SalesDelivery)
-            .filter(and_(SalesDelivery.status != 2, SalesDelivery.sales_invoice_id == param.id))
-            .first()
+              .join(SalesDelivery.sales_invoice)
+              .options(joinedload(SalesDelivery.sales_invoice))
+              .options(joinedload(SalesDelivery.sales_delivery_lines).subqueryload(SalesDeliveryLine.component))
+              .filter(SalesInvoice.customer_id == user.id)
+              .order_by(desc(SalesDelivery.id)).all()
         )
 
-        if exist:
-            return 'sales delivery is exist'
+        if sales_deliveries is None:
+            return { 'sales_deliveries': [] }
+        
+        for sales_delivery in sales_deliveries:
+            show_service = ShowService(db=db, sales_delivery=sales_delivery)
+            sales_delivery = show_service.call()
 
-        sales_invoice = (
-            db.query(SalesInvoice)
-            .options(joinedload(SalesInvoice.sales_invoice_lines))
-            .filter(SalesInvoice.id == param.id)
-            .first()
-        )
-
-        sales_delivery = SalesDelivery(
-                status=0,
-                sales_invoice_id=param.id
-            )
-
-        delivery_lines = []
-        for invoice_line in sales_invoice.sales_invoice_lines:
-            delivery_line = SalesDeliveryLine(
-                component_id=invoice_line.component_id,
-                quantity=invoice_line.quantity
-            )
-            delivery_lines.append(delivery_line)
-
-        sales_delivery.sales_delivery_lines = delivery_lines
-        db.add(sales_delivery)
-        db.commit()
-
-        return 'sales delivery created'
-    except Exception as e:
-        db.rollback()
-        logging.error(f"An error occured: {e}")
-        raise
+        return { 'sales_deliveries': sales_deliveries }
     finally:
         db.close()
 
 @router.get("/{id}", response_model=SalesDeliveryResponse)
 def show(id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        sales_delivery = (
-            db.query(SalesDelivery)
-            .options(joinedload(SalesDelivery.sales_delivery_lines))
-            .filter(SalesDelivery.id == id)
-            .first()
-        )
+        show_service = QueryShowService(db=db, sales_delivery_id=id, user_id=user.id)
+        sales_delivery = show_service.call()
 
         if sales_delivery is None:
-            raise HTTPException(status_code=404, detail="Data not found")
+            raise HTTPException(status_code=404, detail="Sales Delivery not found")
 
         return sales_delivery
     finally:
@@ -128,21 +59,22 @@ def show(id: int, user: User = Depends(get_current_user), db: Session = Depends(
 @router.patch("/{id}/fully_delivered", response_model=SalesDeliveryResponse)
 def fully_delivered(id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        sales_delivery = db.query(SalesDelivery).filter(SalesDelivery.id == id).first()
+        show_service = QueryShowService(db=db, sales_delivery_id=id, user_id=user.id)
+        sales_delivery = show_service.call()
 
         if sales_delivery is None:
-            raise HTTPException(status_code=404, detail="Data not found")
+            raise HTTPException(status_code=404, detail="Sales Delivery not found")
         
-        sales_delivery.status = 1
+        sales_delivery.status = SalesDeliveryStatusEnum(1).value
+        inventory_service = CreateInventoryService(db=db, sales_delivery=sales_delivery)
+        inventories = inventory_service.call()
+
         db.add(sales_delivery)
+        db.add_all(inventories)
         db.commit()
 
-        sales_delivery = (
-            db.query(SalesDelivery)
-            .options(joinedload(SalesDelivery.sales_delivery_lines))
-            .filter(SalesDelivery.id == id)
-            .first()
-        )
+        show_service = QueryShowService(db=db, sales_delivery_id=id, user_id=user.id)
+        sales_delivery = show_service.call()
 
         return sales_delivery
     finally:
@@ -151,21 +83,18 @@ def fully_delivered(id: int, user: User = Depends(get_current_user), db: Session
 @router.patch("/{id}/void", response_model=SalesDeliveryResponse)
 def void(id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        sales_delivery = db.query(SalesDelivery).filter(SalesDelivery.id == id).first()
+        show_service = QueryShowService(db=db, sales_delivery_id=id, user_id=user.id)
+        sales_delivery = show_service.call()
 
         if sales_delivery is None:
-            raise HTTPException(status_code=404, detail="Data not found")
+            raise HTTPException(status_code=404, detail="Sales Delivery not found")
         
-        sales_delivery.status = 2
+        sales_delivery.status = SalesDeliveryStatusEnum(2).value
         db.add(sales_delivery)
         db.commit()
 
-        sales_delivery = (
-            db.query(SalesDelivery)
-            .options(joinedload(SalesDelivery.sales_delivery_lines))
-            .filter(SalesDelivery.id == id)
-            .first()
-        )
+        show_service = QueryShowService(db=db, sales_delivery_id=id, user_id=user.id)
+        sales_delivery = show_service.call()
 
         return sales_delivery
     finally:
