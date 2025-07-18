@@ -436,6 +436,11 @@ class SalesQuoteModelForListResponse(SalesQuoteResponse):
 class SalesQuoteList(BaseModel):
     sales_quotes: List[SalesQuoteResponse]
 
+class SalesInvoiceCreateParam(BaseModel):
+    id: Optional[None]
+    sales_quote_id: int
+    sales_quote_no: str
+
 class SalesInvoiceLineAsResponse(BaseModel):
     id: int
     sales_invoice_id: int

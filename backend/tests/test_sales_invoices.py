@@ -213,7 +213,12 @@ def test_create(client, user_sean_ali, db_session, sales_quote):
         "Authorization": f"Bearer {token}"
     }
     sales_quote_id = sales_quote.id
-    response = client.post(f"/api/sales-invoices?sales_quote_id={sales_quote_id}&sales_quote_no={sales_quote.sales_quote_no}", headers=headers)
+    params = {
+        'id': None,
+        'sales_quote_id': sales_quote_id,
+        'sales_quote_no': sales_quote.sales_quote_no,
+    }
+    response = client.post(f"/api/sales-invoices", headers=headers, json = params)
     assert response.status_code == 201
 
     response_body = response.json()

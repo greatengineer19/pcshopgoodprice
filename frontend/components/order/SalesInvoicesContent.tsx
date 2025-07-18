@@ -13,9 +13,8 @@ import { voidSalesInvoice } from "@/lib/sales-invoice-service"
 interface SalesInvoiceProps {
     salesInvoices: SalesInvoice[],
     expandedOrderId: number | null,
-    handleToggleExpand: (orderId: number) => void,
-    isCancelling: number | null,
-    setIsCancelling: (id: number | null) => void
+    expandedResourceType: string | null,
+    handleToggleExpand: (orderId: number, resourceType: string) => void
 }
 
 // actual usage is SalesInvoicesContent
@@ -23,25 +22,10 @@ export default function SalesInvoicesContent(
         {
             salesInvoices,
             expandedOrderId,
-            handleToggleExpand,
-            isCancelling,
-            setIsCancelling
+            expandedResourceType,
+            handleToggleExpand
         }: SalesInvoiceProps
     ) {
-
-    // Handle order cancellation
-    const handleVoidSalesInvoice = async (orderId: number) => {
-        setIsCancelling(orderId)
-
-        try {
-            await voidSalesInvoice(orderId)
-            toast.success("Sales quote cancelled successfully")
-            window.location.reload()
-        } catch (error) {
-            console.error("Failed to cancel sales invoice:", error)
-            toast.error("Failed to cancel sales invoice")
-        }
-    }
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -65,15 +49,19 @@ export default function SalesInvoicesContent(
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                 <div>
                                     <CardTitle className="text-lg">Sales Invoice #{salesInvoice.sales_invoice_no}</CardTitle>
-                                    <CardDescription>Placed on {new Date(salesInvoice.created_at).toLocaleDateString()}</CardDescription>
+                                    <CardDescription>Placed on {new Date(salesInvoice.created_at).toLocaleDateString("en-GB", {
+                                        day: "numeric",
+                                        month: "short", // "Jul" format
+                                        year: "numeric",
+                                        })}</CardDescription>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Badge className={`${getStatusColor(salesInvoice.status)} text-white`}>
                                         {salesInvoice.status}
                                     </Badge>
-                                    <Button variant="outline" size="sm" onClick={() => handleToggleExpand(salesInvoice.id)}>
+                                    <Button variant="outline" size="sm" onClick={() => handleToggleExpand(salesInvoice.id, "SalesInvoice")}>
                                         {
-                                            expandedOrderId === salesInvoice.id ? (
+                                            (expandedOrderId === salesInvoice.id && expandedResourceType == "SalesInvoice") ? (
                                                 <>
                                                     Hide details <ChevronUp className="ml-1 h-4 w-4" />
                                                 </>
@@ -102,9 +90,12 @@ export default function SalesInvoicesContent(
                                                         style={{ zIndex: 3 - index }}
                                                     >
                                                         <Image 
-                                                            src={"/placeholder.svg"}
+                                                            src={item.images ? item.images[0] : "/placeholder.svg?height=300&width=300"}
                                                             alt={item.component_name}
                                                             fill
+                                                            sizes="(max-width: 768px) 100vw,
+                                                                (max-width: 1200px) 50vw,
+                                                                33vw"
                                                             className="object-contain p-1"
                                                         />
                                                     </div>
@@ -122,32 +113,15 @@ export default function SalesInvoicesContent(
                                             <p className="font-medium">
                                                 {salesInvoice.sales_invoice_lines.length} {salesInvoice.sales_invoice_lines.length === 1 ? "item" : "items"}
                                             </p>
-                                            <p className="text-sm text-muted-foreground">Total: Rp {salesInvoice.sum_total_line_amounts.toLocaleString()}</p>
+                                            <p className="text-sm text-muted-foreground">Total: Rp {Number(salesInvoice.sum_total_line_amounts).toLocaleString()}</p>
                                         </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        {
-                                            (
-                                                <Button 
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => handleVoidSalesInvoice(salesInvoice.id)}
-                                                    disabled={isCancelling === salesInvoice.id}
-                                                >
-                                                    {
-                                                        isCancelling === salesInvoice.id ? "Cancelling..." : "Void"
-                                                    }
-                                                </Button>
-                                            )
-                                        }
                                     </div>
                                 </div>
                             </div>
 
                             {/* Expanded Order Details */}
                             {
-                                expandedOrderId === salesInvoice.id && (
+                                (expandedOrderId === salesInvoice.id && expandedResourceType == "SalesInvoice") && (
                                     <div className="p-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             {/* Left Column - Quoted Items */}
@@ -159,9 +133,12 @@ export default function SalesInvoicesContent(
                                                             <div key={item.id} className="flex gap-4">
                                                                 <div className="relative h-16 w-16 border rounded-md overflow-hidden flex-shrink-0">
                                                                     <Image 
-                                                                        src={"/placeholder.svg"}
+                                                                        src={item.images ? item.images[0] : "/placeholder.svg?height=300&width=300"}
                                                                         alt={item.component_name}
                                                                         fill
+                                                                        sizes="(max-width: 768px) 100vw,
+                                                                            (max-width: 1200px) 50vw,
+                                                                            33vw"
                                                                         className="object-contain p-1"
                                                                     />
                                                                 </div>
@@ -169,9 +146,9 @@ export default function SalesInvoicesContent(
                                                                     <div className="flex-1 min-w-0">
                                                                         <h4 className="font-medium text-sm line-clamp-1">{item.component_name}</h4>
                                                                         <p className="text-sm text-muted-foreground">
-                                                                            Rp {item.price_per_unit.toLocaleString()} x {item.quantity}
+                                                                            Rp {Number(item.price_per_unit).toLocaleString()} x {item.quantity}
                                                                         </p>
-                                                                        <p className="font-medium mt-1">Rp {item.total_line_amount.toLocaleString()}</p>
+                                                                        <p className="font-medium mt-1">Rp {Number(item.total_line_amount).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -185,7 +162,7 @@ export default function SalesInvoicesContent(
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between">
                                                         <span className="text-muted-foreground">Subtotal</span>
-                                                        <span>Rp {salesInvoice.sum_total_line_amounts.toLocaleString()}</span>
+                                                        <span>Rp {Number(salesInvoice.sum_total_line_amounts).toLocaleString()}</span>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-muted-foreground">Tax</span>
@@ -205,7 +182,7 @@ export default function SalesInvoicesContent(
 
                                                     <div className="flex justify-between font-bold">
                                                         <span>Total</span>
-                                                        <span>Rp {salesInvoice.total_payable_amount.toLocaleString()}</span>
+                                                        <span>Rp {Number(salesInvoice.total_payable_amount).toLocaleString()}</span>
                                                     </div>
                                                 </div>
                                             </div>

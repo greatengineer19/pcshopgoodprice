@@ -22,66 +22,46 @@ export default function OrdersContent() {
     const [salesDeliveries, setSalesDeliveries] = useState<SalesDelivery[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null)
-    const [isCancelling, setIsCancelling] = useState<number | null>(null)
+    const [expandedResourceType, setExpandedResourceType] = useState<string | null>(null)
+    const [isAccepting, setIsAccepting] = useState<string | null>(null)
+    const [isCancelling, setIsCancelling] = useState<string | null>(null)
 
     // Load Sales Quotes
     useEffect(() => {
-        const loadSalesQuotes = async () => {
+        const loadAllData = async () => {
             setIsLoading(true)
+
             try {
-                const salesQuotesData = await fetchSalesQuotes()
+                const [salesQuotesData, salesInvoicesData, salesDeliveriesData ]= await Promise.all([fetchSalesQuotes(), fetchSalesInvoices(), fetchSalesDeliveries()]);
 
                 setSalesQuotes(salesQuotesData)
-            } catch (error) {
-                console.error("Failed to Sales Quotes:", error)
-                toast.error("Failed to load your Sales Quotes")
-            }
-        }
-
-        const loadSalesInvoices = async () => {
-            setIsLoading(true)
-
-            try {
-                const salesInvoicesData = await fetchSalesInvoices()
-
+                setSalesDeliveries(salesDeliveriesData)
                 setSalesInvoices(salesInvoicesData)
             } catch (error) {
-                console.error("Failed to Sales Invoices:", error)
-                toast.error("Failed to load your Sales Invoices")
+                console.error("Failed to load sales data:", error)
+                toast.error("Failed to load sales data")
+            } finally {
+                setIsLoading(false)
             }
         }
 
-        const loadSalesDeliveries = async () => {
-            setIsLoading(true)
-
-            try {
-                const salesInvoicesData = await fetchSalesDeliveries()
-
-                setSalesDeliveries(salesInvoicesData)
-            } catch (error) {
-                console.error("Failed to Sales Deliveries:", error)
-                toast.error("Failed to load your Sales Deliveries")
-            }
-        }
-
-        loadSalesQuotes()
-        loadSalesInvoices()
-        loadSalesDeliveries()
-        setIsLoading(false)
+        loadAllData()
     }, [])
 
     // Load shipping updates when an order is expanded
-    const handleToggleExpand = (orderId: number) => {
-        if (expandedOrderId === orderId) {
+    const handleToggleExpand = (orderId: number, resourceType: string) => {
+        if (expandedOrderId === orderId && expandedResourceType == resourceType) {
             setExpandedOrderId(null)
+            setExpandedResourceType(null)
             return
         }
 
         setExpandedOrderId(orderId)
+        setExpandedResourceType(resourceType)
     }
 
     // Empty orders view
-    if (!isLoading && salesQuotes.length === 0) {
+    if (!isLoading && (salesQuotes.length === 0 && salesDeliveries.length === 0 && salesInvoices.length === 0)) {
         return (
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
@@ -98,6 +78,7 @@ export default function OrdersContent() {
         )
     }
 
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">Your Orders</h1>
@@ -112,21 +93,26 @@ export default function OrdersContent() {
                         <SalesDeliveriesContent 
                             salesDeliveries={salesDeliveries}
                             expandedOrderId={expandedOrderId}
+                            expandedResourceType={expandedResourceType}
                             handleToggleExpand={handleToggleExpand}
+                            isAccepting={isAccepting}
+                            setIsAccepting={setIsAccepting}
                             isCancelling={isCancelling}
                             setIsCancelling={setIsCancelling}
                         />
                         <SalesInvoicesContent 
                             salesInvoices={salesInvoices}
                             expandedOrderId={expandedOrderId}
+                            expandedResourceType={expandedResourceType}
                             handleToggleExpand={handleToggleExpand}
-                            isCancelling={isCancelling}
-                            setIsCancelling={setIsCancelling}
                         />
                         <SalesQuotesContent 
                             salesQuotes={salesQuotes}
                             expandedOrderId={expandedOrderId}
+                            expandedResourceType={expandedResourceType}
                             handleToggleExpand={handleToggleExpand}
+                            isAccepting={isAccepting}
+                            setIsAccepting={setIsAccepting}
                             isCancelling={isCancelling}
                             setIsCancelling={setIsCancelling}
                         />

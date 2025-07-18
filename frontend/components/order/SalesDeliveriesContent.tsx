@@ -8,14 +8,17 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import type { SalesDelivery } from "@/types/sales-delivery"
-import { voidSalesDelivery } from "@/lib/sales-delivery-service"
+import { voidSalesDelivery, fullyDelivered } from "@/lib/sales-delivery-service"
 
 interface SalesDeliveryProps {
     salesDeliveries: SalesDelivery[],
     expandedOrderId: number | null,
-    handleToggleExpand: (orderId: number) => void,
-    isCancelling: number | null,
-    setIsCancelling: (id: number | null) => void
+    expandedResourceType: string | null,
+    handleToggleExpand: (orderId: number, resourceType: string) => void,
+    isCancelling: string | null,
+    setIsCancelling: (id: string | null) => void,
+    isAccepting: string | null,
+    setIsAccepting: (id: string | null) => void
 }
 
 // actual usage is SalesDeliveriesContent
@@ -24,14 +27,30 @@ export default function SalesDeliveriesContent(
             salesDeliveries,
             expandedOrderId,
             handleToggleExpand,
+            expandedResourceType,
             isCancelling,
-            setIsCancelling
+            setIsCancelling,
+            isAccepting,
+            setIsAccepting
         }: SalesDeliveryProps
     ) {
 
+    const handleFullReceived = async (orderId: number, salesQuoteNo: string) => {
+            setIsAccepting(salesQuoteNo)
+    
+            try {
+                await fullyDelivered(orderId)
+                toast.success("Sales invoice created successfully")
+                window.location.reload()
+            } catch (error) {
+                console.error("Failed to create sales invoice:", error)
+                toast.error("Failed to create sales invoice")
+            }
+        }
+
     // Handle order cancellation
-    const handleVoidSalesDelivery = async (orderId: number) => {
-        setIsCancelling(orderId)
+    const handleVoidSalesDelivery = async (orderId: number, salesDeliveryNo: string) => {
+        setIsCancelling(salesDeliveryNo)
 
         try {
             await voidSalesDelivery(orderId)
@@ -65,15 +84,19 @@ export default function SalesDeliveriesContent(
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                 <div>
                                     <CardTitle className="text-lg">Sales Delivery #{salesDelivery.sales_delivery_no}</CardTitle>
-                                    <CardDescription>Placed on {new Date(salesDelivery.created_at).toLocaleDateString()}</CardDescription>
+                                    <CardDescription>Placed on {new Date(salesDelivery.created_at).toLocaleDateString("en-GB", {
+                                        day: "numeric",
+                                        month: "short", // "Jul" format
+                                        year: "numeric",
+                                        })}</CardDescription>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Badge className={`${getStatusColor(salesDelivery.status)} text-white`}>
                                         {salesDelivery.status}
                                     </Badge>
-                                    <Button variant="outline" size="sm" onClick={() => handleToggleExpand(salesDelivery.id)}>
+                                    <Button variant="outline" size="sm" onClick={() => handleToggleExpand(salesDelivery.id, "SalesDelivery")}>
                                         {
-                                            expandedOrderId === salesDelivery.id ? (
+                                            (expandedOrderId === salesDelivery.id && expandedResourceType == "SalesDelivery") ? (
                                                 <>
                                                     Hide details <ChevronUp className="ml-1 h-4 w-4" />
                                                 </>
@@ -102,9 +125,12 @@ export default function SalesDeliveriesContent(
                                                         style={{ zIndex: 3 - index }}
                                                     >
                                                         <Image 
-                                                            src={"/placeholder.svg"}
+                                                            src={item.images ? item.images[0] : "/placeholder.svg?height=300&width=300"}
                                                             alt={item.component_name}
                                                             fill
+                                                            sizes="(max-width: 768px) 100vw,
+                                                                (max-width: 1200px) 50vw,
+                                                                33vw"
                                                             className="object-contain p-1"
                                                         />
                                                     </div>
@@ -124,29 +150,55 @@ export default function SalesDeliveriesContent(
                                             </p>
                                         </div>
                                     </div>
+                                    {/* handleFullReceived */}
 
-                                    <div className="flex items-center gap-3">
-                                        {
-                                            (
-                                                <Button 
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => handleVoidSalesDelivery(salesDelivery.id)}
-                                                    disabled={isCancelling === salesDelivery.id}
-                                                >
-                                                    {
-                                                        isCancelling === salesDelivery.id ? "Cancelling..." : "Void Sales Delivery"
-                                                    }
-                                                </Button>
-                                            )
-                                        }
-                                    </div>
+                                    {
+                                        (salesDelivery.status == "PROCESSING") && (
+                                            <div className="flex items-center gap-3">
+                                                {
+                                                    (
+                                                        <Button 
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleFullReceived(salesDelivery.id, salesDelivery.sales_delivery_no)}
+                                                            disabled={isAccepting === salesDelivery.sales_delivery_no}
+                                                        >
+                                                            {
+                                                                isAccepting === salesDelivery.sales_delivery_no ? "Processing receive..." : "Fully Received"
+                                                            }
+                                                        </Button>
+                                                    )
+                                                }
+                                            </div>
+                                        )
+                                    }
+
+                                    {
+                                        (salesDelivery.status == "PROCESSING") && (
+                                            <div className="flex items-center gap-3">
+                                                {
+                                                    (
+                                                        <Button 
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            onClick={() => handleVoidSalesDelivery(salesDelivery.id, salesDelivery.sales_delivery_no)}
+                                                            disabled={isCancelling === salesDelivery.sales_delivery_no}
+                                                        >
+                                                            {
+                                                                isCancelling === salesDelivery.sales_delivery_no ? "Cancelling..." : "Void Sales Delivery"
+                                                            }
+                                                        </Button>
+                                                    )
+                                                }
+                                            </div>
+                                        )
+                                    }
                                 </div>
                             </div>
 
                             {/* Expanded Order Details */}
                             {
-                                expandedOrderId === salesDelivery.id && (
+                                (expandedOrderId === salesDelivery.id && expandedResourceType == "SalesDelivery") && (
                                     <div className="p-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             {/* Left Column - Quoted Items */}
@@ -158,9 +210,12 @@ export default function SalesDeliveriesContent(
                                                             <div key={item.id} className="flex gap-4">
                                                                 <div className="relative h-16 w-16 border rounded-md overflow-hidden flex-shrink-0">
                                                                     <Image 
-                                                                        src={"/placeholder.svg"}
+                                                                        src={item.images ? item.images[0] : "/placeholder.svg?height=300&width=300"}
                                                                         alt={item.component_name}
                                                                         fill
+                                                                        sizes="(max-width: 768px) 100vw,
+                                                                            (max-width: 1200px) 50vw,
+                                                                            33vw"
                                                                         className="object-contain p-1"
                                                                     />
                                                                 </div>

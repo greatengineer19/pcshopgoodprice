@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import ( desc, and_, func )
-from src.schemas import ( SalesInvoiceResponse, SalesInvoiceList, SalesInvoiceStatusEnum, SalesDeliveryStatusEnum )
+from src.schemas import ( SalesInvoiceResponse, SalesInvoiceList, SalesInvoiceStatusEnum, SalesDeliveryStatusEnum, SalesInvoiceCreateParam )
 from src.models import ( SalesInvoice, SalesInvoiceLine, User, SalesQuote, SalesQuoteLine, SalesDelivery )
 from sqlalchemy.orm import joinedload, Session
 from src.api.dependencies import get_db
@@ -37,12 +37,14 @@ def index(user: User = Depends(get_current_user), db: Session = Depends(get_db))
 
 @router.post("", response_model=SalesInvoiceResponse, status_code=201)
 def create(
-        sales_quote_id: int,
-        sales_quote_no: str,
+        params: SalesInvoiceCreateParam,
         user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
     ):
     try:
+        sales_quote_no = params.sales_quote_no
+        sales_quote_id = params.sales_quote_id
+
         show_service = ShowService(db=db, sales_quote_no=sales_quote_no, sales_invoice_id=None, user_id=user.id)
         existing = show_service.call()
         if existing:
@@ -82,7 +84,14 @@ def show(id: int, user: User = Depends(get_current_user), db: Session = Depends(
 @router.patch("/{id}/void", response_model=SalesInvoiceResponse, status_code=200)
 def void(id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        sales_invoice = (db.query(SalesInvoice).filter(and_(SalesInvoice.id == id, SalesInvoice.customer_id == user.id)).first())
+        sales_invoice = (
+                db.query(SalesInvoice)
+                .filter(and_(
+                    SalesInvoice.id == id,
+                    SalesInvoice.customer_id == user.id,
+                    SalesInvoice.status == SalesInvoiceStatusEnum(0).value))
+                .first()
+            )
 
         if not sales_invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")

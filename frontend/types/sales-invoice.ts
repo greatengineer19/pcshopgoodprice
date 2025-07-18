@@ -11,6 +11,7 @@ export interface SalesInvoiceLine {
     component_name: string
     quantity: number
     price_per_unit: number
+    images: string[] | null
     total_line_amount: number
     created_at: string
     updated_at: string

@@ -20,7 +20,7 @@ from sqlalchemy.orm import (
     object_session,
     joinedload
 )
-from src.sales_deliveries.create_service import CreateService
+from src.api.api import create_sales_delivery_every_thirty_seconds
 
 @pytest.fixture
 def component_gpu_4060(component_category_gpu, db_session):
@@ -131,8 +131,7 @@ def test_create(db_session,
         sales_invoice,
         sales_invoice_2
     ):
-    service = CreateService(db=db_session)
-    response = service.call()
+    response = create_sales_delivery_every_thirty_seconds(db=db_session)
 
     assert response is None
 

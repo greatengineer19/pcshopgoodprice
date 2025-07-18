@@ -4,6 +4,7 @@ export interface SalesDeliveryLine {
     component_id: number
     component_name: string
     quantity: number
+    images: string[] | null
     created_at: string
     updated_at: string
 }

@@ -21,6 +21,7 @@ export interface SalesQuoteLine {
     component_id: number
     component_name: string
     quantity: number
+    images: string[] | null
     price_per_unit: number
     total_line_amount: number
     created_at: string

@@ -39,7 +39,7 @@ export default function CartPage() {
                 setCartLines(cartData)
 
                 let subtotalCalculator = 0;
-                console.log(cartData);
+
                 cartData.forEach(cartLine => {
                     subtotalCalculator += Number(cartLine.sell_price) * Number(cartLine.quantity);
                 });
@@ -90,6 +90,11 @@ export default function CartPage() {
             return
         }
 
+        if (!user) {
+            toast.error("User is not present")
+            return
+        }
+
         setIsProcessing(true)
 
         try {
@@ -107,7 +112,7 @@ export default function CartPage() {
 
             // Show success message
             toast.success("Sales Quote placed successfully!")
-            router.push("/order")
+            router.push("/orders")
         } catch (error) {
             console.error("Failed to process order:", error)
             toast.error("Failed to process your order")

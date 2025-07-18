@@ -9,13 +9,17 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import type { SalesQuote } from "@/types/sales-quote"
 import { destroySalesQuote } from "@/lib/sales-quote-service"
+import { createSalesInvoice } from "@/lib/sales-invoice-service"
 
 interface SalesQuotesProps {
     salesQuotes: SalesQuote[],
     expandedOrderId: number | null,
-    handleToggleExpand: (orderId: number) => void,
-    isCancelling: number | null,
-    setIsCancelling: (id: number | null) => void
+    expandedResourceType: string | null,
+    handleToggleExpand: (orderId: number, resourceType: string) => void,
+    isCancelling: string | null,
+    setIsCancelling: (id: string | null) => void,
+    isAccepting: string | null,
+    setIsAccepting: (id: string | null) => void
 }
 
 // actual usage is SalesQuotesContent
@@ -23,15 +27,31 @@ export default function SalesQuotesContent(
         {
             salesQuotes,
             expandedOrderId,
+            expandedResourceType,
             handleToggleExpand,
             isCancelling,
-            setIsCancelling
+            setIsCancelling,
+            isAccepting,
+            setIsAccepting
         }: SalesQuotesProps
     ) {
 
+    const handlePaid = async (orderId: number, salesQuoteNo: string) => {
+        setIsAccepting(salesQuoteNo)
+
+        try {
+            await createSalesInvoice(orderId, salesQuoteNo)
+            toast.success("Sales invoice created successfully")
+            window.location.reload()
+        } catch (error) {
+            console.error("Failed to create sales invoice:", error)
+            toast.error("Failed to create sales invoice")
+        }
+    }
+
     // Handle order cancellation
-    const handleDestroySalesQuote = async (orderId: number) => {
-        setIsCancelling(orderId)
+    const handleDestroySalesQuote = async (orderId: number, salesQuoteNo: string) => {
+        setIsCancelling(salesQuoteNo)
 
         try {
             await destroySalesQuote(orderId)
@@ -52,15 +72,19 @@ export default function SalesQuotesContent(
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                 <div>
                                     <CardTitle className="text-lg">Sales Quote #{salesQuote.sales_quote_no}</CardTitle>
-                                    <CardDescription>Placed on {new Date(salesQuote.created_at).toLocaleDateString()}</CardDescription>
+                                    <CardDescription>Placed on {new Date(salesQuote.created_at).toLocaleDateString("en-GB", {
+                                        day: "numeric",
+                                        month: "short", // "Jul" format
+                                        year: "numeric",
+                                        })}</CardDescription>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Badge className="bg-yellow-500 text-white">
                                         PENDING
                                     </Badge>
-                                    <Button variant="outline" size="sm" onClick={() => handleToggleExpand(salesQuote.id)}>
+                                    <Button variant="outline" size="sm" onClick={() => handleToggleExpand(salesQuote.id, "SalesQuote")}>
                                         {
-                                            expandedOrderId === salesQuote.id ? (
+                                            (expandedOrderId === salesQuote.id && expandedResourceType == "SalesQuote") ? (
                                                 <>
                                                     Hide details <ChevronUp className="ml-1 h-4 w-4" />
                                                 </>
@@ -89,9 +113,12 @@ export default function SalesQuotesContent(
                                                         style={{ zIndex: 3 - index }}
                                                     >
                                                         <Image 
-                                                            src={"/placeholder.svg"}
+                                                            src={item.images ? item.images[0] : "/placeholder.svg?height=300&width=300"}
                                                             alt={item.component_name}
                                                             fill
+                                                            sizes="(max-width: 768px) 100vw,
+                                                                (max-width: 1200px) 50vw,
+                                                                33vw"
                                                             className="object-contain p-1"
                                                         />
                                                     </div>
@@ -109,21 +136,37 @@ export default function SalesQuotesContent(
                                             <p className="font-medium">
                                                 {salesQuote.sales_quote_lines.length} {salesQuote.sales_quote_lines.length === 1 ? "item" : "items"}
                                             </p>
-                                            <p className="text-sm text-muted-foreground">Total: Rp {salesQuote.sum_total_line_amounts.toLocaleString()}</p>
+                                            <p className="text-sm text-muted-foreground">Total Rp {Number(salesQuote.sum_total_line_amounts).toLocaleString()}</p>
                                         </div>
                                     </div>
-
+                                    
                                     <div className="flex items-center gap-3">
+                                        {
+                                            (
+                                                <Button 
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="px-8"
+                                                    onClick={() => handlePaid(salesQuote.id, salesQuote.sales_quote_no)}
+                                                    disabled={isAccepting === salesQuote.sales_quote_no}
+                                                >
+                                                    {
+                                                        isAccepting === salesQuote.sales_quote_no ? "Processing payment..." : "Paid quotation"
+                                                    }
+                                                </Button>
+                                            )
+                                        }
                                         {
                                             (
                                                 <Button 
                                                     variant="destructive"
                                                     size="sm"
-                                                    onClick={() => handleDestroySalesQuote(salesQuote.id)}
-                                                    disabled={isCancelling === salesQuote.id}
+                                                    className="px-4"
+                                                    onClick={() => handleDestroySalesQuote(salesQuote.id, salesQuote.sales_quote_no)}
+                                                    disabled={isCancelling === salesQuote.sales_quote_no}
                                                 >
                                                     {
-                                                        isCancelling === salesQuote.id ? "Cancelling..." : "Cancel Order"
+                                                        isCancelling === salesQuote.sales_quote_no ? "Cancelling..." : "Cancel Order"
                                                     }
                                                 </Button>
                                             )
@@ -134,7 +177,7 @@ export default function SalesQuotesContent(
 
                             {/* Expanded Order Details */}
                             {
-                                expandedOrderId === salesQuote.id && (
+                                (expandedOrderId === salesQuote.id && expandedResourceType == "SalesQuote") && (
                                     <div className="p-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             {/* Left Column - Quoted Items */}
@@ -146,9 +189,12 @@ export default function SalesQuotesContent(
                                                             <div key={item.id} className="flex gap-4">
                                                                 <div className="relative h-16 w-16 border rounded-md overflow-hidden flex-shrink-0">
                                                                     <Image 
-                                                                        src={"/placeholder.svg"}
+                                                                        src={item.images ? item.images[0] : "/placeholder.svg?height=300&width=300"}
                                                                         alt={item.component_name}
                                                                         fill
+                                                                        sizes="(max-width: 768px) 100vw,
+                                                                            (max-width: 1200px) 50vw,
+                                                                            33vw"
                                                                         className="object-contain p-1"
                                                                     />
                                                                 </div>
@@ -156,9 +202,9 @@ export default function SalesQuotesContent(
                                                                     <div className="flex-1 min-w-0">
                                                                         <h4 className="font-medium text-sm line-clamp-1">{item.component_name}</h4>
                                                                         <p className="text-sm text-muted-foreground">
-                                                                            Rp {item.price_per_unit.toLocaleString()} x {item.quantity}
+                                                                            Rp {Number(item.price_per_unit).toLocaleString()} x {Number(item.quantity)}
                                                                         </p>
-                                                                        <p className="font-medium mt-1">Rp {item.total_line_amount.toLocaleString()}</p>
+                                                                        <p className="font-medium mt-1">Rp {Number(item.total_line_amount).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -172,7 +218,7 @@ export default function SalesQuotesContent(
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between">
                                                         <span className="text-muted-foreground">Subtotal</span>
-                                                        <span>Rp {salesQuote.sum_total_line_amounts.toLocaleString()}</span>
+                                                        <span>Rp {Number(salesQuote.sum_total_line_amounts).toLocaleString()}</span>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-muted-foreground">Tax</span>
@@ -192,7 +238,7 @@ export default function SalesQuotesContent(
 
                                                     <div className="flex justify-between font-bold">
                                                         <span>Total</span>
-                                                        <span>Rp {salesQuote.total_payable_amount.toLocaleString()}</span>
+                                                        <span>Rp {Number(salesQuote.total_payable_amount).toLocaleString()}</span>
                                                     </div>
                                                 </div>
                                             </div>
