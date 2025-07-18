@@ -109,7 +109,7 @@ export function PurchaseInvoiceList({
                                             })()}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            IDR {Number(invoice.sum_total_line_amounts).toLocaleString()}
+                                            Rp {Number(invoice.sum_total_line_amounts).toLocaleString()}
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center">
