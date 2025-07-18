@@ -406,6 +406,7 @@ class SalesQuoteLineAsResponse(BaseModel):
     quantity: Decimal
     price_per_unit: Decimal
     total_line_amount: Decimal
+    images: Optional[List[str]] = None
     created_at: datetime
     updated_at: datetime
 
@@ -443,6 +444,7 @@ class SalesInvoiceLineAsResponse(BaseModel):
     quantity: Decimal
     price_per_unit: Decimal
     total_line_amount: Decimal
+    images: Optional[List[str]] = None
     created_at: datetime
     updated_at: datetime
 
@@ -482,6 +484,7 @@ class SalesDeliveryLineAsResponse(BaseModel):
     component_id: int
     component_name: str
     quantity: Decimal
+    images: Optional[List[str]] = None
     created_at: datetime
     updated_at: datetime
 

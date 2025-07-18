@@ -2,25 +2,9 @@ from src.models import (
     ComputerComponentCategory,
     ComputerComponent,
     User,
-    ComputerComponentSellPriceSetting,
-    ComputerComponentReview
+    ComputerComponentSellPriceSetting
     )
-from src.schemas import (
-    ComputerComponentAsResponse,
-    ComputerComponentAsParams,
-    ComputerComponentSellPriceSettingAsParams,
-    DayTypeEnum
-)
-import pytest
 from sqlalchemy import select, desc, func
-from sqlalchemy.orm import joinedload
-from tests.factories.component_factory import ComponentFactory
-from tests.factories.component_category_factory import ComponentCategoryFactory
-from tests.factories.computer_component_review_factory import ComputerComponentReviewFactory
-from tests.factories.computer_component_sell_price_setting_factory import ComputerComponentSellPriceSettingFactory
-from tests.factories.user_factory import UserFactory
-from decimal import Decimal
-from fastapi import HTTPException
 from tests.conftest import ( client, db_session, setup_factories )
 
 

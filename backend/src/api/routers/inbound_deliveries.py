@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from sqlalchemy import ( event, desc, text, delete )
+from sqlalchemy import ( and_, event, desc, text, delete )
 from src.schemas import (
     InboundDeliveryAsParams,
     InboundDeliveryAsResponse,
@@ -172,7 +172,7 @@ def destroy(id: int, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail="Data not found")
         
         db.delete(inbound_delivery)
-        stmt = delete(Inventory).where(Inventory.resource_id == id)
+        stmt = delete(Inventory).where(and_(Inventory.resource_id == id, Inventory.resource_type == "InboundDelivery"))
         db.execute(stmt)
         db.commit()
 

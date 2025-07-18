@@ -17,6 +17,7 @@ from utils.auth import get_current_user
 from src.sales_deliveries.query_show_service import QueryShowService
 from src.sales_deliveries.show_service import ShowService
 from src.sales_deliveries.create_inventory_service import CreateInventoryService
+from src.sales_deliveries.void_service import VoidService
 
 router = APIRouter(prefix='/api/sales-deliveries', tags=["Sales Deliveries"])
 
@@ -89,8 +90,12 @@ def void(id: int, user: User = Depends(get_current_user), db: Session = Depends(
         if sales_delivery is None:
             raise HTTPException(status_code=404, detail="Sales Delivery not found")
         
-        sales_delivery.status = SalesDeliveryStatusEnum(2).value
+        void_service = VoidService(db=db, sales_delivery=sales_delivery)
+        sales_delivery, sales_invoice, statement_delete_inventory = void_service.call()
+        
+        db.execute(statement_delete_inventory)
         db.add(sales_delivery)
+        db.add(sales_invoice)
         db.commit()
 
         show_service = QueryShowService(db=db, sales_delivery_id=id, user_id=user.id)

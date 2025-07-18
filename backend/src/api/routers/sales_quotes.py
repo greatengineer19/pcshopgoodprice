@@ -17,6 +17,7 @@ from src.api.dependencies import get_db
 from utils.auth import get_current_user
 from src.sales_quotes.show_service import ShowService
 from src.sales_quotes.build_service import BuildService
+from src.computer_components.image_service import ImageService
 
 router = APIRouter(prefix='/api/sales-quotes', tags=["Sales Quotes"])
 
@@ -34,9 +35,11 @@ def index(user: User = Depends(get_current_user), db: Session = Depends(get_db))
         if sales_quotes is None:
             return { 'sales_quotes': [] }
         
+        image_service = ImageService()
         for sales_quote in sales_quotes:
             for quote_line in sales_quote.sales_quote_lines:
                 quote_line.component_name = quote_line.component.name
+                quote_line.images = image_service.presigned_url_generator(quote_line.component)
 
         return { 'sales_quotes': sales_quotes }
     finally:

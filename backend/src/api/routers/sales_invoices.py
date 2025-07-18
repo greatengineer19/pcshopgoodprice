@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import ( desc, and_ )
-from src.schemas import ( SalesInvoiceResponse, SalesInvoiceList, SalesInvoiceStatusEnum )
-from src.models import ( SalesInvoice, User, SalesQuote, SalesQuoteLine )
+from sqlalchemy import ( desc, and_, func )
+from src.schemas import ( SalesInvoiceResponse, SalesInvoiceList, SalesInvoiceStatusEnum, SalesDeliveryStatusEnum )
+from src.models import ( SalesInvoice, SalesInvoiceLine, User, SalesQuote, SalesQuoteLine, SalesDelivery )
 from sqlalchemy.orm import joinedload, Session
 from src.api.dependencies import get_db
 from utils.auth import get_current_user
 from src.sales_invoices.show_service import ShowService
 from src.sales_invoices.build_service import BuildService
+from src.computer_components.image_service import ImageService
 
 router = APIRouter(prefix='/api/sales-invoices', tags=["Sales Invoices"])
 
@@ -15,7 +16,7 @@ def index(user: User = Depends(get_current_user), db: Session = Depends(get_db))
     try:
         sales_invoices = (
             db.query(SalesInvoice)
-              .options(joinedload(SalesInvoice.sales_invoice_lines))
+              .options(joinedload(SalesInvoice.sales_invoice_lines).subqueryload(SalesInvoiceLine.component))
               .filter(SalesInvoice.customer_id == user.id)
               .order_by(desc(SalesInvoice.id)).all()
         )
@@ -23,8 +24,12 @@ def index(user: User = Depends(get_current_user), db: Session = Depends(get_db))
         if sales_invoices is None:
             return { 'sales_invoices': [] }
         
+        image_service = ImageService()
         for sales_invoice in sales_invoices:
             sales_invoice.status = SalesInvoiceStatusEnum(sales_invoice.status).name
+
+            for invoice_line in sales_invoice.sales_invoice_lines:
+                invoice_line.images = image_service.presigned_url_generator(invoice_line.component)
 
         return { 'sales_invoices': sales_invoices }
     finally:
@@ -81,6 +86,10 @@ def void(id: int, user: User = Depends(get_current_user), db: Session = Depends(
 
         if not sales_invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
+        
+        count_ids = db.query(func.count(SalesDelivery.id)).filter(and_(SalesDelivery.id == sales_invoice.id, SalesDelivery.status != SalesDeliveryStatusEnum(2).value)).scalar()
+        if count_ids > 0:
+            raise HTTPException(status_code=422, detail="Invoice have sales delivery, unable to void")
 
         sales_invoice.status = SalesInvoiceStatusEnum(2).value
 

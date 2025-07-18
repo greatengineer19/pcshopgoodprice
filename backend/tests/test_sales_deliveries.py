@@ -20,9 +20,10 @@ from tests.conftest import (
 from utils.auth import ( create_access_token, create_refresh_token, decodeJWT, get_current_user )
 from src.models import (
     ComputerComponentSellPriceSetting,
-    Inventory
+    Inventory,
+    SalesInvoice
 )
-from src.schemas import SalesDeliveryStatusEnum
+from src.schemas import ( SalesDeliveryStatusEnum, SalesInvoiceStatusEnum )
 
 @pytest.fixture
 def component_gpu_4060(component_category_gpu, db_session):
@@ -188,6 +189,7 @@ def test_index(client, db_session, user_sean_ali, sales_delivery, sales_delivery
                                             'created_at': sales_delivery.created_at.isoformat(),
                                             'id': sales_delivery_2.sales_delivery_lines[0].id,
                                             'quantity': '1.000000',
+                                            'images': [],
                                             'sales_delivery_id': sales_delivery_2.id,
                                             'updated_at': sales_delivery.created_at.isoformat()}],
                 'sales_delivery_no': sales_delivery_2.sales_delivery_no,
@@ -207,6 +209,7 @@ def test_index(client, db_session, user_sean_ali, sales_delivery, sales_delivery
                                                         '4070',
                                         'created_at': sales_delivery.created_at.isoformat(),
                                         'id': sales_delivery.sales_delivery_lines[0].id,
+                                        'images': [],
                                         'quantity': '1.000000',
                                         'sales_delivery_id': sales_delivery.id,
                                         'updated_at': sales_delivery.created_at.isoformat()}],
@@ -245,6 +248,7 @@ def test_show(client, db_session, user_sean_ali, sales_delivery):
                                 'created_at': sales_delivery.created_at.isoformat(),
                                 'id': sales_delivery.sales_delivery_lines[0].id,
                                 'quantity': '1.000000',
+                                'images': [],
                                 'sales_delivery_id': sales_delivery.id,
                                 'updated_at': sales_delivery.created_at.isoformat()}],
         'sales_delivery_no': sales_delivery.sales_delivery_no,
@@ -268,6 +272,9 @@ def test_void(client, db_session, user_sean_ali, sales_delivery):
     db_session.refresh(sales_delivery)
 
     assert sales_delivery.status == SalesDeliveryStatusEnum(2).value
+
+    sales_invoice = db_session.query(SalesInvoice).filter(SalesInvoice.id == sales_delivery.id).first()
+    assert sales_invoice.status == SalesInvoiceStatusEnum(0).value
 
 def test_fully_delivered(client, db_session, user_sean_ali, sales_delivery):
     db_session.commit()
