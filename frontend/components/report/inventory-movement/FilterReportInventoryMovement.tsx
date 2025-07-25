@@ -87,7 +87,7 @@ export function FilterReportInventoryMovement({ filters, onFilterChange, onApply
                                         onValueChange={(value) => onFilterChange({ transactionType: value})}
                                     >
                                         <SelectTrigger id="status" className="w-full">
-                                            <SelectValue placeholder="Select status" />
+                                            <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {

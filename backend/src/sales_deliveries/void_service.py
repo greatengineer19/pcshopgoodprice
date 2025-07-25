@@ -12,7 +12,7 @@ class VoidService:
     def call(self):
         self.sales_delivery.status = SalesDeliveryStatusEnum(2).value
         statement_delete_inventory = delete(Inventory).where(and_(Inventory.resource_id == self.sales_delivery.id, Inventory.resource_type == "SalesDelivery"))
-        sales_invoice = self.db.query(SalesInvoice).filter(SalesInvoice.id == self.sales_delivery.id).first()
+        sales_invoice = self.db.query(SalesInvoice).filter(SalesInvoice.id == self.sales_delivery.sales_invoice_id).first()
         sales_invoice.status = SalesInvoiceStatusEnum(0).value
 
         return self.sales_delivery, sales_invoice, statement_delete_inventory

@@ -153,31 +153,27 @@ export default function SalesDeliveriesContent(
                                     {/* handleFullReceived */}
 
                                     {
-                                        (salesDelivery.status == "PROCESSING") && (
+                                         (
                                             <div className="flex items-center gap-3">
                                                 {
-                                                    (
-                                                        <Button 
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleFullReceived(salesDelivery.id, salesDelivery.sales_delivery_no)}
-                                                            disabled={isAccepting === salesDelivery.sales_delivery_no}
-                                                        >
-                                                            {
-                                                                isAccepting === salesDelivery.sales_delivery_no ? "Processing receive..." : "Fully Received"
-                                                            }
-                                                        </Button>
+                                                    (salesDelivery.status == "PROCESSING") && (
+                                                        (
+                                                            <Button 
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="px-8"
+                                                                onClick={() => handleFullReceived(salesDelivery.id, salesDelivery.sales_delivery_no)}
+                                                                disabled={isAccepting === salesDelivery.sales_delivery_no}
+                                                            >
+                                                                {
+                                                                    isAccepting === salesDelivery.sales_delivery_no ? "Processing receive..." : "Fully Received"
+                                                                }
+                                                            </Button>
+                                                        )
                                                     )
                                                 }
-                                            </div>
-                                        )
-                                    }
-
-                                    {
-                                        (salesDelivery.status == "PROCESSING") && (
-                                            <div className="flex items-center gap-3">
                                                 {
-                                                    (
+                                                    (salesDelivery.status == "PROCESSING") && (
                                                         <Button 
                                                             variant="destructive"
                                                             size="sm"
@@ -185,7 +181,7 @@ export default function SalesDeliveriesContent(
                                                             disabled={isCancelling === salesDelivery.sales_delivery_no}
                                                         >
                                                             {
-                                                                isCancelling === salesDelivery.sales_delivery_no ? "Cancelling..." : "Void Sales Delivery"
+                                                                isCancelling === salesDelivery.sales_delivery_no ? "Cancelling..." : "Void Delivery"
                                                             }
                                                         </Button>
                                                     )
@@ -203,7 +199,7 @@ export default function SalesDeliveriesContent(
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             {/* Left Column - Quoted Items */}
                                             <div>
-                                                <h3 className="font-semibold text-lg mb-4">Requested Items</h3>
+                                                <h3 className="font-semibold text-lg mb-4">Items Delivered</h3>
                                                 <div className="space-y-4">
                                                     {
                                                         salesDelivery.sales_delivery_lines.map((item) => (
@@ -239,11 +235,11 @@ export default function SalesDeliveriesContent(
                                                     <p>{salesDelivery.shipping_address}</p>
                                                 </div>
 
-                                                {/* Payment Information */}
-                                                <h3 className="font-semibold text-lg mb-4">Payment Information</h3>
+                                                {/* Delivery Information */}
+                                                <h3 className="font-semibold text-lg mb-4">Delivery Information</h3>
                                                 <div className="bg-muted/50 p-4 rounded-md mb-6">
                                                     <div className="flex justify-between">
-                                                        <span>Status</span>
+                                                        <span>Delivery Status</span>
                                                         <Badge className={`${getStatusColor(salesDelivery.status)} text-white`}>
                                                             {salesDelivery.status}
                                                         </Badge>

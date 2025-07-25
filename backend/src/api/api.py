@@ -36,7 +36,7 @@ from src.sales_deliveries.create_service import CreateService as SalesDeliveryCr
 
 scheduler = AsyncIOScheduler()
 
-def create_sales_delivery_every_thirty_seconds(db: Session = Depends(get_db)):
+def create_sales_delivery_every_thirty_seconds(db: Session = next(get_db())):
     create_service = SalesDeliveryCreateService(db)
     create_service.call()
 

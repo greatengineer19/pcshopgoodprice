@@ -25,5 +25,6 @@ class ShowService:
 
         for quote_line in query.sales_quote_lines:
             quote_line.images = image_service.presigned_url_generator(quote_line.component)
+            quote_line.component_name = quote_line.component.name
 
         return query

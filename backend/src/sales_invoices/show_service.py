@@ -14,19 +14,26 @@ class ShowService:
     def call(self):
         query = self.db.query(SalesInvoice).options(joinedload(SalesInvoice.sales_invoice_lines).subqueryload(SalesInvoiceLine.component))
 
+        image_service = ImageService()
         if self.sales_quote_no:
             check = query.filter(SalesInvoice.sales_quote_no == self.sales_quote_no).first()
-            return check
+            if check:
+                for invoice_line in check.sales_invoice_lines:
+                    invoice_line.images = image_service.presigned_url_generator(invoice_line.component)
+
+                check.status = SalesInvoiceStatusEnum(check.status).name
+                return check
+            return
 
         if self.sales_invoice_id:
             query = query.filter(SalesInvoice.id == self.sales_invoice_id)
         if self.user_id:
             query = query.filter(SalesInvoice.customer_id == self.user_id)
         query = query.first()
-        image_service = ImageService()
 
         for invoice_line in query.sales_invoice_lines:
             invoice_line.images = image_service.presigned_url_generator(invoice_line.component)
 
         query.status = SalesInvoiceStatusEnum(query.status).name
+
         return query

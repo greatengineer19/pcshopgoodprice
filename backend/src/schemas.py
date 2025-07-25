@@ -403,6 +403,7 @@ class SalesQuoteLineAsResponse(BaseModel):
     id: int
     sales_quote_id: int
     component_id: int
+    component_name: str
     quantity: Decimal
     price_per_unit: Decimal
     total_line_amount: Decimal

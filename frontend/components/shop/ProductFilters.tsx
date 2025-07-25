@@ -123,9 +123,6 @@ export function ProductFilters({
                                             htmlFor={`category-${category.id}`} className="text-sm cursor-pointer flex-1"
                                         >
                                             {category.name}
-                                            <span className="text-xs text-gray-500 ml-1 italic">
-                                                Available
-                                            </span>
                                         </label>
                                     </div>
                                 ))

@@ -394,6 +394,21 @@ class Inventory(Base):
         return None
     
     @property
+    def transaction_no(self):
+        if self.resource_type == 'InboundDelivery':
+            return object_session(self).get(InboundDelivery, self.resource_id).inbound_delivery_no
+        elif self.resource_type == 'SalesDelivery':
+            return object_session(self).get(SalesDelivery, self.resource_id).sales_delivery_no
+        
+        return None
+    
+    @property
+    def received_by(self):
+        if self.resource_type == 'InboundDelivery':
+            return object_session(self).get(InboundDelivery, self.resource_id).received_by
+        return ""
+
+    @property
     def resource_line(self):
         if self.resource_line_type == 'InboundDeliveryLine':
             return object_session(self).get(InboundDeliveryLine, self.resource_line_id)

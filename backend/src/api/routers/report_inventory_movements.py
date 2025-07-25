@@ -70,7 +70,7 @@ def generate_headers():
     text_headers = [
         'Component Category', 'Component', 'Stock Date', 'Created At',
         'Transaction Type', 'Trx No.',  'Received By', 'Created By',
-        'In Stock', 'Out Stock', 'Final Moving Stock', 'Buy Price'        
+        'In Stock', 'Out Stock', 'Final Moving Stock', 'Buy Price / Unit'        
     ]
     service = HeaderGeneratorService()
 
