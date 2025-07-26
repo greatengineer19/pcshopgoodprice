@@ -63,17 +63,17 @@ def create_access_token(subject: Union[str, Any], expires_delta: Optional[int] =
     expires_delta = datetime.utcnow() + timedelta(minutes=additional_time)
 
     to_encode = { "exp": expires_delta, "sub": str(subject) }
-    encoded_jwt = jwt.encode(to_encode, setting.secret_key, setting.algorithm)
+    encoded_jwt = jwt.encode(to_encode, setting.JWT_SECRET_KEY, setting.JWT_ALGORITHM)
     return encoded_jwt
 
 def create_refresh_token(subject: Union[str, Any], expires_at: int) -> str:
     to_encode = { "exp": expires_at, "sub": str(subject) }
-    encoded_jwt = jwt.encode(to_encode, setting.refresh_secret_key, setting.algorithm)
+    encoded_jwt = jwt.encode(to_encode, setting.JWT_REFRESH_KEY, setting.JWT_ALGORITHM)
     return encoded_jwt
 
 def decodeJWT(jwtoken: str):
     try:
-        payload = jwt.decode(jwtoken, setting.secret_key, setting.algorithm)
+        payload = jwt.decode(jwtoken, setting.JWT_SECRET_KEY, setting.JWT_ALGORITHM)
         return payload
     except InvalidTokenError:
         return None
