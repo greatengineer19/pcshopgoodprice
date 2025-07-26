@@ -8,7 +8,7 @@ services:
       - "8080:8080"
     environment:
       - DEBUG=False  # Disable debug mode in production
-      - WEB_ENVIRONMENT=production
+      - WEB_ENVIRONMENT=${DB_HOST}
     command: python main.py
     restart: unless-stopped
     env_file:
