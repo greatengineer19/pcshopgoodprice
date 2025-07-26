@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     DB_PRODUCTION_HOST: str
     DB_PRODUCTION_PORT: str
     DB_PRODUCTION_DATABASE: str
+    AWS_IPV4_PUBLIC_ADDRESS: str
 
     class Config:
         env_file = Path(Path(__file__).resolve().parent) / ".env"
