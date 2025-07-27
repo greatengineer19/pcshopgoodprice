@@ -44,6 +44,5 @@
 /backend/.env.local
 
 # temporary disable because credentials is here
-/backend/src/database.py 
 /local.docker-compose.yml
 .env
