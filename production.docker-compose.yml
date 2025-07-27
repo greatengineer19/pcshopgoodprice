@@ -14,6 +14,8 @@ services:
       - ./backend/.env
     volumes:
       - static_volume:/app/static
+    networks:
+      - app-network
   
   nginx:
     image: nginx:alpine
@@ -24,6 +26,12 @@ services:
       - static_volume:/app/static:ro
     depends_on:
       - backend
+    networks:
+      - app-network
 
 volumes:
   static_volume:
+
+networks:
+  app-network:  # Create a dedicated network
+    driver: bridge
