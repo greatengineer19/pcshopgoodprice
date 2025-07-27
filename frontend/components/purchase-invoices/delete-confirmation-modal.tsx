@@ -43,7 +43,7 @@ export function DeleteConfirmationModal({
 
         try {
             const response = await fetch(
-                "http://localhost:8080/api/purchase-invoices/" + invoice.id,
+                "http://localhost:8000/api/purchase-invoices/" + invoice.id,
                 {
                     method: 'DELETE',
                     headers: {

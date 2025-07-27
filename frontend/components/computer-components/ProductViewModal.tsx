@@ -160,7 +160,7 @@ export function ProductViewModal(
                 computer_component_sell_price_settings_attributes: tempSellPrices
             };
     
-            const response = await fetch("http://localhost:8080/api/computer-components/" + onEditProduct.id, {
+            const response = await fetch("http://localhost:8000/api/computer-components/" + onEditProduct.id, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

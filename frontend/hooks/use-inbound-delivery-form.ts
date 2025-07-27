@@ -28,7 +28,7 @@ export function useInboundDeliveryForm() {
             setIsLoadingInvoices(true)
 
             try {
-                const response = await fetch('http://localhost:8080/api/inbound-deliveries/deliverable-purchase-invoices')
+                const response = await fetch('http://localhost:8000/api/inbound-deliveries/deliverable-purchase-invoices')
 
                 if (!response.ok) {
                     await handleApiError(response, showErrorToast);

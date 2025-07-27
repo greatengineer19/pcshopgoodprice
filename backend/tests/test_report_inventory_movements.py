@@ -277,7 +277,7 @@ def test_index(client, db_session, inbound_delivery_1, inventories_from_inbound_
     assert response.status_code == 200
     inventory = db_session.query(Inventory).first()
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:8080/api/report/inventory-movement?page=2',
+            'pagination': {'next_page_url': 'http://localhost:8000/api/report/inventory-movement?page=2',
                            'prev_page_url': None},
             'total_item': 2},
             'report_body':  [

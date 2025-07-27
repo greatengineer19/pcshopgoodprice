@@ -28,7 +28,7 @@ export default function PurchaseIndex() {
 
     const openEditPurchaseModal = useCallback(async (invoice:
         PurchaseInvoice) => {
-            const response = await fetch(`http://localhost:8080/api/purchase-invoices/${invoice.id}`, {
+            const response = await fetch(`http://localhost:8000/api/purchase-invoices/${invoice.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export default function PurchaseIndex() {
 
     const openPurchaseViewModal = useCallback(async (invoice: PurchaseInvoice) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/purchase-invoices/${invoice.id}`, {
+            const response = await fetch(`http://localhost:8000/api/purchase-invoices/${invoice.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default function PurchaseIndex() {
     }, []);
 
     const openDeleteDialog = useCallback(async (invoice: PurchaseInvoice) => {
-        const response = await fetch(`http://localhost:8080/api/purchase-invoices/${invoice.id}`, {
+        const response = await fetch(`http://localhost:8000/api/purchase-invoices/${invoice.id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

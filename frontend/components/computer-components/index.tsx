@@ -60,7 +60,7 @@ export default function ComponentComputerComponentsIndex() {
 				const formData = new FormData();
 				formData.append('file', file);
 	
-				const response = await fetch('http://localhost:8080/api/upload_url', {
+				const response = await fetch('http://localhost:8000/api/upload_url', {
 					method: 'POST',
 					body: formData,
 				});

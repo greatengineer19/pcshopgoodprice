@@ -15,7 +15,7 @@ export const voidSalesDelivery = async (id: number): Promise<any> => {
         }
 
         const response = await fetch(
-            "http://localhost:8080/api/sales-deliveries/" + id  + "/void",
+            "http://localhost:8000/api/sales-deliveries/" + id  + "/void",
             {
                 method: 'PATCH',
                 headers: {
@@ -44,7 +44,7 @@ export const fullyDelivered = async (id: number): Promise<any> => {
         }
 
         const response = await fetch(
-            "http://localhost:8080/api/sales-deliveries/" + id  + "/fully_delivered",
+            "http://localhost:8000/api/sales-deliveries/" + id  + "/fully_delivered",
             {
                 method: 'PATCH',
                 headers: {
@@ -72,7 +72,7 @@ export const fetchSalesDeliveries = async (): Promise<SalesDelivery[]> => {
         token = localStorage.getItem(SECRET_KEY_NAME);
     }
 
-    const response = await fetch('http://localhost:8080/api/sales-deliveries', {
+    const response = await fetch('http://localhost:8000/api/sales-deliveries', {
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`

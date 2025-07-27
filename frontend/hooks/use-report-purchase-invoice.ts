@@ -55,7 +55,7 @@ export function useReportPurchaseInvoice() {
             }
 
             const queryString = '?' + new URLSearchParams(query_params).toString();
-            const response = await fetch("http://localhost:8080/api/report/purchase-invoice" + queryString)
+            const response = await fetch("http://localhost:8000/api/report/purchase-invoice" + queryString)
 
             if (!response.ok) {
                 await handleApiError(response, showErrorToast);

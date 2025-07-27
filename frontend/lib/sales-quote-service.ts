@@ -38,7 +38,7 @@ export const createSalesQuote = async (
         cart_lines: cartLines
     }
 
-    const response = await fetch('http://localhost:8080/api/sales-quotes', {
+    const response = await fetch('http://localhost:8000/api/sales-quotes', {
         method: 'POST',
         body: JSON.stringify(salesQuoteParam),
         headers: {
@@ -63,7 +63,7 @@ export const destroySalesQuote = async (id: number): Promise<any> => {
         }
 
         const response = await fetch(
-            "http://localhost:8080/api/sales-quotes/" + id,
+            "http://localhost:8000/api/sales-quotes/" + id,
             {
                 method: 'DELETE',
                 headers: {
@@ -91,7 +91,7 @@ export const fetchSalesQuotes = async (): Promise<SalesQuote[]> => {
         token = localStorage.getItem(SECRET_KEY_NAME);
     }
 
-    const response = await fetch('http://localhost:8080/api/sales-quotes', {
+    const response = await fetch('http://localhost:8000/api/sales-quotes', {
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`

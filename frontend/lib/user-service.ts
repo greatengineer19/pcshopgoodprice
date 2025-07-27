@@ -7,7 +7,7 @@ export const fetchUser = async (requestRole: string, token: string): Promise<Get
         queryString = '?' + new URLSearchParams(query_params).toString();
     }
 
-    const response = await fetch('http://localhost:8080/api/user' + queryString, {
+    const response = await fetch('http://localhost:8000/api/user' + queryString, {
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
@@ -28,7 +28,7 @@ export const fetchUser = async (requestRole: string, token: string): Promise<Get
 }
 
 export const fetchUserDefault = async (): Promise<GetUserResponseAPI> => {
-    const response = await fetch('http://localhost:8080/api/user/show-default', {
+    const response = await fetch('http://localhost:8000/api/user/show-default', {
         headers: {
             "Content-Type": "application/json"
         }

@@ -24,7 +24,7 @@ export default function InboundDeliveriesContent() {
 
     const handleView = useCallback(async (inboundDelivery: InboundDelivery) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/inbound-deliveries/${inboundDelivery.id}`, {
+            const response = await fetch(`http://localhost:8000/api/inbound-deliveries/${inboundDelivery.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -45,7 +45,7 @@ export default function InboundDeliveriesContent() {
     }, [showErrorToast]);
 
     const handleDelete = useCallback(async (inboundDelivery: InboundDelivery) => {
-        const response = await fetch(`http://localhost:8080/api/inbound-deliveries/${inboundDelivery.id}`, {
+        const response = await fetch(`http://localhost:8000/api/inbound-deliveries/${inboundDelivery.id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
