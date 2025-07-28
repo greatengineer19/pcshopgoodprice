@@ -87,7 +87,7 @@ export function InboundDeliveryForm({
                     imageFormData.append('files', file);
                 });
                 
-                const response_upload_images = await fetch('http://localhost:8000/api/multi_upload_url', {
+                const response_upload_images = await fetch('http://localhost:80/api/multi_upload_url', {
                     method: 'POST',
                     body: imageFormData,
                 });
@@ -106,7 +106,7 @@ export function InboundDeliveryForm({
                 }));
             }
 
-            const response = await fetch("http://localhost:8000/api/inbound-deliveries", {
+            const response = await fetch("http://localhost:80/api/inbound-deliveries", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

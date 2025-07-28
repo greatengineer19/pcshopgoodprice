@@ -12,7 +12,7 @@ export function useProducts() {
     useEffect(() => {
 		const fetchProducts = async () => {
 			try {
-				const response = await fetch('http://localhost:8000/api/computer-components');
+				const response = await fetch('http://localhost:80/api/computer-components');
 				
 				if (!response.ok) {
 					await handleApiError(response, showErrorToast);

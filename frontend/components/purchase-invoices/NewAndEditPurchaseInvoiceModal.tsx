@@ -107,7 +107,7 @@ export function NewAndEditPurchaseInvoiceModal({
                 )
             }
 
-            const response = await fetch("http://localhost:8000/api/purchase-invoices", {
+            const response = await fetch("http://localhost:80/api/purchase-invoices", {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ export function NewAndEditPurchaseInvoiceModal({
                 ]
             }
 
-            const response = await fetch("http://localhost:8000/api/purchase-invoices/" + id, {
+            const response = await fetch("http://localhost:80/api/purchase-invoices/" + id, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

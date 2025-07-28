@@ -12,7 +12,7 @@ export function useComponentCategories() {
     useEffect(() => {
         const loadComponentCategories = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/computer-component-categories')
+                const response = await fetch('http://localhost:80/api/computer-component-categories')
 
                 if (!response.ok) {
                     await handleApiError(response, showErrorToast);

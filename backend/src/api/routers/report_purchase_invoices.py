@@ -59,7 +59,7 @@ def index(
             page=page,
             item_per_page=item_per_page,
             total_item=total_item,
-            endpoint="http://localhost:8000/api/report/purchase-invoice"
+            endpoint="http://localhost:80/api/report/purchase-invoice"
         )
 
         return {

@@ -121,7 +121,7 @@ export function NewProductModal({
             computer_component_sell_price_settings_attributes: computer_component_sell_price_settings_attributes
           };
       
-          const response = await fetch("http://localhost:8000/api/computer-components", {
+          const response = await fetch("http://localhost:80/api/computer-components", {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

@@ -10,7 +10,7 @@ export default function Page() {
 	const [data, setData] = useState<BackendMessage | null>(null);
 
 	useEffect(() => {
-		fetch('http://localhost:8000/api/first-time-seeds')
+		fetch('http://localhost:80/api/first-time-seeds')
 			.then((res) => res.json())
 			.then((data) => setData(data))
 			.catch((err) => console.error(err));

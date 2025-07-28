@@ -6,7 +6,7 @@ const SECRET_KEY_NAME = 'secret_key';
 
 // Payment methods
 export const listPaymentMethods = async (): Promise<PaymentMethod[]> => {
-    const response = await fetch('http://localhost:8000/api/cart/payment-methods');
+    const response = await fetch('http://localhost:80/api/cart/payment-methods');
     
     if (!response.ok) {
         const errorText = await response.text();
@@ -26,7 +26,7 @@ export const fetchCart = async (): Promise<CartLine[]> => {
         token = localStorage.getItem(SECRET_KEY_NAME);
     }
 
-    const response = await fetch('http://localhost:8000/api/cart', {
+    const response = await fetch('http://localhost:80/api/cart', {
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
@@ -57,7 +57,7 @@ export const addToCart = async (productId: number, quantity: number): Promise<st
         quantity: quantity
     };
     
-    const response = await fetch("http://localhost:8000/api/cart/add-item", {
+    const response = await fetch("http://localhost:80/api/cart/add-item", {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export const removeFromCart = async (itemId: number): Promise<string> => {
     }
 
     const response = await fetch(
-        "http://localhost:8000/api/cart/remove-item/" + itemId,
+        "http://localhost:80/api/cart/remove-item/" + itemId,
         {
             method: 'DELETE',
             headers: {

@@ -54,7 +54,7 @@ export function useReportInventoryMovement() {
             }
 
             const queryString = '?' + new URLSearchParams(query_params).toString();
-            const response = await fetch("http://localhost:8000/api/report/inventory-movement" + queryString)
+            const response = await fetch("http://localhost:80/api/report/inventory-movement" + queryString)
 
             if (!response.ok) {
                 await handleApiError(response, showErrorToast);
