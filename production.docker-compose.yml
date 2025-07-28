@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   backend:
-    build: ./backend
+    build: .
     ports:
       - "8000:8000"
     environment:
@@ -11,12 +11,11 @@ services:
     command: python main.py
     restart: unless-stopped
     env_file:
-      - ./backend/.env
+      - .env
     volumes:
       - static_volume:/app/static
     networks:
       - app-network
-  
   nginx:
     image: nginx:alpine
     ports:
