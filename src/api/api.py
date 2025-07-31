@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan) # add lifespan to fastapi initialization
 
-origins = ['http://localhost', "http://localhost:3000", 'localhost', "http://frontend:3000", setting.AWS_IPV4_PUBLIC_ADDRESS]
+origins = ['http://localhost', "https://www.pcshopgoodprice.com", "https://pcshopgoodprice.com", "http://localhost:3000", 'localhost', "http://frontend:3000", setting.AWS_IPV4_PUBLIC_ADDRESS]
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 app.include_router(computer_components.router)
