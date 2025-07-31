@@ -106,3 +106,44 @@ def show_default_user(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
+
+@router.get("/signin-as-superbuyer", response_model=UserAPIResponse)
+def signin_as_superbuyer(db: Session = Depends(get_db)):
+    try:
+        user = (
+            db.query(User)
+            .filter(and_(User.role == 1, User.username == 'super_buyer'))
+            .first()
+        )      
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.utcnow()):
+            expires_at = datetime.utcnow() + timedelta(minutes=3600)
+            new_refresh_token = create_refresh_token(user.id, expires_at)
+            user.refresh_token_expiry_at = expires_at
+            user.refresh_token = new_refresh_token
+            db.add(user)
+            db.commit()
+
+        access_token = create_access_token(user.id, 30)
+        response = {
+            'user': {
+                'id': user.id,
+                'fullname': user.fullname,
+                'role': user.role
+            },
+            'access_token': access_token,
+            'refresh_token': user.refresh_token
+        }
+
+        return response
+    except Exception as e:
+        if e.status_code:
+            raise e
+
+        logging.error(f"An error occurred in index: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
