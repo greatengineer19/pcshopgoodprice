@@ -4,7 +4,7 @@ from src.models import (
 from src.schemas import (
     PurchaseInvoiceLineAsParams,
     PurchaseInvoiceAsParams,
-    StatusEnum
+    PurchaseInvoiceStatusEnum
 )
 import pytest
 from sqlalchemy import select, desc, func
@@ -94,7 +94,7 @@ def purchase_invoice_create_params_1(component_category_fan, component_liquid_co
         expected_delivery_date=None,
         notes=None,
         supplier_name="Enterkomputer Shop",
-        status=StatusEnum.PENDING,
+        status=PurchaseInvoiceStatusEnum.PENDING,
         purchase_invoice_lines_attributes=[
             PurchaseInvoiceLineAsParams(
                 component_id=component_liquid_cooling_fan_1.id,
@@ -131,7 +131,7 @@ def purchase_invoice_update_params_1(
     params = PurchaseInvoiceAsParams(
         id=purchase_invoice_1.id,
         supplier_name="Enterkomputer Shop",
-        status=StatusEnum.PENDING,
+        status=PurchaseInvoiceStatusEnum.PENDING,
         expected_delivery_date=None,
         notes=None,
         invoice_date=purchase_invoice_1.invoice_date.strftime('%Y-%m-%d %H:%M:%S'),

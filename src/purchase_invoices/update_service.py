@@ -1,8 +1,8 @@
 from src.models import ( PurchaseInvoice, InboundDelivery, PurchaseInvoiceLine )
 from sqlalchemy.orm import joinedload, Session
-from sqlalchemy import ( event, desc, text )
+from sqlalchemy import ( event, desc, text, and_ )
 import re
-from src.schemas import ( StatusEnum, PurchaseInvoiceAsParams, PurchaseInvoiceLineAsParams )
+from src.schemas import ( PurchaseInvoiceAsParams, PurchaseInvoiceLineAsParams )
 from src.purchase_invoices.service import ( Service )
 from decimal import Decimal
 from fastapi import HTTPException
@@ -13,7 +13,7 @@ class UpdateService:
 
     def call(self, purchase_invoice_id: int, params: PurchaseInvoiceAsParams):
         db = self.db
-        purchase_invoice = db.query(PurchaseInvoice).filter(PurchaseInvoice.id == purchase_invoice_id).first()
+        purchase_invoice = db.query(PurchaseInvoice).filter(and_(PurchaseInvoice.id == purchase_invoice_id, PurchaseInvoice.status == 0)).first()
 
         if not purchase_invoice:
             raise HTTPException(status_code=404, detail="Purchase invoice not found")

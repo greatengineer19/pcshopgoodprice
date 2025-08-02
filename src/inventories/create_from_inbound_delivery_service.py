@@ -2,7 +2,7 @@ from src.models import ( PurchaseInvoice, InboundDelivery, Inventory )
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
-from src.schemas import ( StatusEnum )
+from src.schemas import ( PurchaseInvoiceStatusEnum )
 
 class CreateFromInboundDeliveryService:
     def __init__(self, db: Session):

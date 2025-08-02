@@ -6,9 +6,8 @@ from src.models import (
 from src.schemas import (
     InboundDeliveryLineAsParams,
     InboundDeliveryAsParams,
-    InboundDeliveryStatusEnum,
     InboundDeliveryAttachmentAsParams,
-    StatusEnum
+    PurchaseInvoiceStatusEnum
 )
 import pytest
 from sqlalchemy import select, desc, func
@@ -493,7 +492,7 @@ def test_create(client, db_session, inbound_delivery_create_params_1):
     assert inventory_1.resource_id is not None
 
     purchase_invoice = db_session.query(PurchaseInvoice).filter(PurchaseInvoice.id == inbound_delivery_1.purchase_invoice_id).first()
-    assert purchase_invoice.status == StatusEnum.COMPLETED
+    assert purchase_invoice.status == PurchaseInvoiceStatusEnum.COMPLETED
 
 def test_destroy(client, db_session, inbound_delivery_1, inventories_from_inbound_d1):
     db_session.commit()
@@ -522,4 +521,4 @@ def test_destroy(client, db_session, inbound_delivery_1, inventories_from_inboun
     assert len(inventories) == 0
 
     purchase_invoice = db_session.query(PurchaseInvoice).filter(PurchaseInvoice.id == purchase_invoice_id).first()
-    assert purchase_invoice.status == StatusEnum.PENDING
+    assert purchase_invoice.status == PurchaseInvoiceStatusEnum.PENDING

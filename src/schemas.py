@@ -109,7 +109,7 @@ class ComputerComponentSellPriceSettingAsParams(BaseModel):
     id: Optional[int] = None
     component_id: Optional[int] = None
     day_type: str
-    price_per_unit: Union[str, int]
+    price_per_unit: Union[str, int, float]
     active: bool = True
 
     @field_validator('day_type')
@@ -127,7 +127,7 @@ class ComputerComponentAsParams(ComputerComponentBase):
     class Config:
         extra = "ignore"
 
-class StatusEnum(int, Enum):
+class PurchaseInvoiceStatusEnum(int, Enum):
     PENDING = 0
     PROCESSING = 1
     COMPLETED = 2

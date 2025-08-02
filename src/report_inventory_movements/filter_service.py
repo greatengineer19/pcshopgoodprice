@@ -2,7 +2,6 @@ from src.models import ( Inventory, ComputerComponent, ComputerComponentCategory
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
-from src.schemas import ( StatusEnum )
 from datetime import datetime
 
 class FilterService:

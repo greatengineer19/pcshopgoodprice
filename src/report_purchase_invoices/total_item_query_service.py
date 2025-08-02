@@ -2,7 +2,7 @@ from src.models import ( PurchaseInvoice, PurchaseInvoiceLine, InboundDelivery, 
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
-from src.schemas import ( StatusEnum )
+from src.schemas import ( PurchaseInvoiceStatusEnum )
 from datetime import datetime
 
 class TotalItemQueryService:

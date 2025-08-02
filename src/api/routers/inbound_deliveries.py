@@ -6,7 +6,7 @@ from src.schemas import (
     InboundDeliveryAsResponse,
     InboundDeliveriesList,
     InboundDeliveryStatusEnum,
-    StatusEnum,
+    PurchaseInvoiceStatusEnum,
     DeliverablePurchaseInvoiceLine,
     DeliverablePurchaseInvoice,
     DeliverablePurchaseInvoicesList
@@ -70,7 +70,7 @@ def deliverable_purchase_invoices(db: Session = Depends(get_db)):
                 joinedload(PurchaseInvoice.purchase_invoice_lines)
                     .subqueryload(PurchaseInvoiceLine.inbound_delivery_lines)
             )
-            .filter(PurchaseInvoice.status == StatusEnum.PENDING)
+            .filter(PurchaseInvoice.status == PurchaseInvoiceStatusEnum.PENDING)
             .order_by(desc(PurchaseInvoice.purchase_invoice_no))
         )
 
@@ -181,7 +181,7 @@ def destroy(id: int, db: Session = Depends(get_db)):
               .filter(PurchaseInvoice.id == purchase_invoice_id).first()
         )
 
-        purchase_invoice.status = StatusEnum.PENDING
+        purchase_invoice.status = PurchaseInvoiceStatusEnum.PENDING
         db.add(purchase_invoice)
         db.commit()
         db.refresh(purchase_invoice)

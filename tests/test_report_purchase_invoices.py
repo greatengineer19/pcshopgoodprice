@@ -7,8 +7,7 @@ from src.schemas import (
     InboundDeliveryLineAsParams,
     InboundDeliveryAsParams,
     InboundDeliveryStatusEnum,
-    InboundDeliveryAttachmentAsParams,
-    StatusEnum
+    InboundDeliveryAttachmentAsParams
 )
 import pytest
 from sqlalchemy import select, desc, func

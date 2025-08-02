@@ -2,7 +2,7 @@ from src.models import ( PurchaseInvoice, InboundDelivery, PurchaseInvoiceLine )
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
-from src.schemas import ( StatusEnum, PurchaseInvoiceAsParams )
+from src.schemas import ( PurchaseInvoiceStatusEnum, PurchaseInvoiceAsParams )
 from src.purchase_invoices.service import ( Service )
 from decimal import Decimal
 
@@ -16,7 +16,7 @@ class BuildService:
             expected_delivery_date=params.expected_delivery_date,
             notes=params.notes,
             supplier_name=params.supplier_name,
-            status=StatusEnum.PENDING
+            status=PurchaseInvoiceStatusEnum.PENDING
         )
 
         purchase_invoice.purchase_invoice_lines = self.build_lines(params)

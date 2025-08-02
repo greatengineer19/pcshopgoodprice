@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import ( List, Optional )
 from sqlalchemy import ( event, desc, text, or_ )
 from src.schemas import (
-    ReportResponse,
-    StatusEnum
+    ReportResponse
 )
 from src.models import (
     PurchaseInvoice,

@@ -1,23 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from sqlalchemy import ( event, desc, text )
+from sqlalchemy import ( event, desc, text, and_ )
 from src.schemas import (
     PurchaseInvoiceAsParams,
     PurchaseInvoiceAsResponse,
     PurchaseInvoicesList,
-    StatusEnum
+    PurchaseInvoiceStatusEnum
 )
 from src.models import (
-    PurchaseInvoice,
-    PurchaseInvoiceLine
+    PurchaseInvoice
 )
-import src.models
 import logging
 from sqlalchemy.orm import joinedload, Session
-from decimal import Decimal
-import re
 from src.api.dependencies import get_db
-from src.purchase_invoices.service import Service
 from src.purchase_invoices.build_service import BuildService
 from src.purchase_invoices.show_service import ShowService
 from src.purchase_invoices.update_service import UpdateService
@@ -35,7 +30,7 @@ def index(db: Session = Depends(get_db)):
         )
         
         for invoice in purchase_invoices:
-            invoice.status = StatusEnum(invoice.status).name.lower()
+            invoice.status = PurchaseInvoiceStatusEnum(invoice.status).name.lower()
             if invoice.expected_delivery_date:
                 invoice.expected_delivery_date = invoice.expected_delivery_date.strftime("%Y-%m-%d %H:%M:%S")
             if invoice.invoice_date:
@@ -106,7 +101,7 @@ def destroy(id: int, db: Session = Depends(get_db)):
     try:
         purchase_invoice = (
             db.query(PurchaseInvoice)
-            .filter(PurchaseInvoice.id == id)
+            .filter(and_(PurchaseInvoice.id == id, PurchaseInvoice.status == 0))
             .first()
         )
 

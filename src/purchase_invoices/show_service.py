@@ -2,9 +2,7 @@ from src.models import ( PurchaseInvoice, InboundDelivery, PurchaseInvoiceLine )
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
-from src.schemas import ( StatusEnum, PurchaseInvoiceAsParams )
-from src.purchase_invoices.service import ( Service )
-from decimal import Decimal
+from src.schemas import ( PurchaseInvoiceStatusEnum )
 from fastapi import HTTPException
 
 class ShowService:
@@ -28,7 +26,7 @@ class ShowService:
             purchase_invoice.expected_delivery_date = purchase_invoice.expected_delivery_date.strftime("%Y-%m-%d %H:%M:%S")
         if purchase_invoice.invoice_date:
             purchase_invoice.invoice_date = purchase_invoice.invoice_date.strftime("%Y-%m-%d %H:%M:%S")
-        purchase_invoice.status = StatusEnum(purchase_invoice.status).name
+        purchase_invoice.status = PurchaseInvoiceStatusEnum(purchase_invoice.status).name
 
         return purchase_invoice
 

@@ -2,7 +2,7 @@ from src.models import ( PurchaseInvoice, InboundDelivery )
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
-from src.schemas import ( StatusEnum )
+from src.schemas import ( PurchaseInvoiceStatusEnum )
 
 class Service:
     def __init__(self, db: Session):
@@ -46,7 +46,7 @@ class Service:
                                     )
 
         if total_unsent_quantity == 0:
-            purchase_invoice.status = StatusEnum.COMPLETED
+            purchase_invoice.status = PurchaseInvoiceStatusEnum.COMPLETED
             db.add(purchase_invoice)
             db.commit()
 
