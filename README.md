@@ -69,29 +69,29 @@ Asked chatGPT for the list of popular frameworks of Python used by tech companie
 ## Product Summary
 ### Login as Buyer
 There are three features that buyer can do:
-- Shop
+- Shop\
 As a buyer, sellable products are listed here with 2 columns per row that's showing the image, name, price after discount and reviews.
 Buyer can filter which products needs to be displayed, clicking on each product to direct user to detailed product page.
 The detail product page will consist of details of specifications, prices, and quantities for user to add to cart or buy directly
-- Cart
+- Cart\
 The cart will list out all items user have added and not yet paid, where user can add or delete quantities, choose payment method to pay the order.
 And fill out address details for delivering the items.
-- Orders
+- Orders\
 Unpaid order, paid invoices, and sales deliveries of the user will be listed with the sequence of Unpaid orders a.k.a Sales Quote, Sales Delivery, and Sales Invoice as the last sequence.
 User can see the details, address, and recipient, and tracking information of the package they've bought, as well as order status and order no.
 
 ### Login as Seller
 Seller, alias Admin have four features:
-- Management of Computer Components
+- Management of Computer Components\
 Seller can add, edit, delete computer components, define price based on day (Monday, Tuesday, ... Sunday).
 Add one image each product, which is mainly needed for a good sales.
-- Purchase Invoice Recording
+- Purchase Invoice Recording\
 Seller can record the purchase they made to the Vendor of the computer components they've listed at their store.
 Purchase Invoice can have invoice date, list of items, and expected inbound delivery date.
-- Inbound Delivery Recording
+- Inbound Delivery Recording\
 Received items will be recorded here. There will be a received quantity, or damaged quantity if the item is not in a good condition.
 Delivery reference, and once it is created the delivery will be assigned status Completed, and will have inventory in_stock.
-- Report Purchase Invoices and Report Stock Movement
+- Report Purchase Invoices and Report Stock Movement\
 All items that have been purchased to the vendor can be tracked in the report purchase invoices.
 There are filters helping the seller to adjust which invoice or product they want to see.
 And the report stock movement to record SalesDelivery and InboundDelivery, mainly to calculate the current stock, the needs to purchase more products,
