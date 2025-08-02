@@ -14,13 +14,13 @@
 ## Tech stacks
 My tech stacks evolves to meet the needs of the product features, and the current tools are:
 ### Backend Stacks
-1. FastAPI
-2. Python
+1. FastAPI (v0.115)
+2. Python (v3.9)
 3. Pytest (Testing framework)
 4. SQL Alchemy (Database toolkit)
 5. Pydantic (API Schema tools)
 6. Apscheduler (Job scheduling tools for FastAPI)
-7. PostgreSQL v17.5
+7. PostgreSQL (v17.5)
 ### Frontend Stacks
 1. NextJS (v15.x)
 2. React (v19.x)
