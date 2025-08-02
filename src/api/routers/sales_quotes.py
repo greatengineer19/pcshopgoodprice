@@ -55,7 +55,7 @@ def create(
         show_service = ShowService(db, None, user.id)
         existing = show_service.call()
         if existing:
-            return existing
+            raise HTTPException(status_code=422, detail="Please pay your current orders before requesting a new one.")
 
         build_service = BuildService(db, param, user)
         sales_quote, delete_cart_query = build_service.build()

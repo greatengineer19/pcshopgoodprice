@@ -32,12 +32,12 @@ class ShowService:
 
         for attachment in inbound_delivery.inbound_delivery_attachments:
             attachment.file_link = self.create_presigned_url(attachment.file_s3_key)
-            attachment.created_at = datetime_parse(attachment.created_at) + timedelta(hours=7)
+            attachment.created_at += timedelta(hours=7)
 
         if inbound_delivery.inbound_delivery_date is not None:
             inbound_delivery.inbound_delivery_date = datetime.strptime(inbound_delivery.inbound_delivery_date, ("%Y-%m-%d %H:%M:%S"))
         inbound_delivery.status = InboundDeliveryStatusEnum(inbound_delivery.status).name
-        inbound_delivery.created_at = datetime_parse(inbound_delivery.created_at) + timedelta(hours=7)
+        inbound_delivery.created_at += timedelta(hours=7)
 
         return inbound_delivery
     

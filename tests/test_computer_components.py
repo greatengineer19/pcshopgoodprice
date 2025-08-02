@@ -32,7 +32,6 @@ def component_liquid_cooling_fan_1(component_category_fan):
     return ComponentFactory(
         name="CPU Liquid Cooling RGB",
         product_code="cpu_liquid_cooling_1",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -50,14 +49,12 @@ def test_index(client, db_session, component_category_fan):
     blue_fan = ComponentFactory(
         name="CPU Fan Blue",
         product_code="cpu_fan_blue",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
     red_fan = ComponentFactory(
         name="CPU Fan Red",
         product_code="cpu_fan_red",
-        price=1,
         component_category_id=component_category_fan.id,
         status=0
     )
@@ -77,10 +74,8 @@ def test_index(client, db_session, component_category_fan):
                 'id': blue_fan.id,
                 'images': [],
                 'name': 'CPU Fan Blue',
-                'price': 1.0,
                 'product_code': 'cpu_fan_blue',
                 'status': 0,
-                'stock': 0,
                 'updated_at': blue_fan.updated_at.strftime("%Y-%m-%d %H:%M:%S")
             },
             {
@@ -92,10 +87,8 @@ def test_index(client, db_session, component_category_fan):
                 'id': red_fan.id,
                 'images': [],
                 'name': 'CPU Fan Red',
-                'price': 1.0,
                 'product_code': 'cpu_fan_red',
                 'status': 0,
-                'stock': 0,
                 'updated_at': red_fan.updated_at.strftime("%Y-%m-%d %H:%M:%S")
             }
         ]
@@ -108,17 +101,15 @@ def test_show(client, db_session, component_liquid_cooling_fan_1):
     response_body = response.json()
     assert response_body == {
         'component_category_id': component_liquid_cooling_fan_1.component_category_id,
-        'component_category_name': None,
+        'component_category_name': 'FAN',
         'computer_component_sell_price_settings': [],
         'created_at': component_liquid_cooling_fan_1.created_at.isoformat(),
         'description': None,
         'id': component_liquid_cooling_fan_1.id,
         'images': None,
         'name': 'CPU Liquid Cooling RGB',
-        'price': 1.0,
         'product_code': 'cpu_liquid_cooling_1',
         'status': 0,
-        'stock': 0,
         'updated_at': component_liquid_cooling_fan_1.updated_at.isoformat()
     }
     
@@ -129,8 +120,6 @@ def test_create_no_category(client, db_session):
         component_category_name='Yikes',
         name="HDMI Cable 2.1b 1 meter",
         product_code="hdmi_cable",
-        price=10,
-        stock=0,
         description=None,
         status=0,
         computer_component_sell_price_settings_attributes=[]
@@ -153,8 +142,6 @@ def test_create(client, db_session, component_category_fan, user_sean_ali, user_
             'component_category_name': dup_category_fan['name'],
             'name':"HDMI Cable 2.1b 1 meter",
             'product_code':"hdmi_cable",
-            'price': 10,
-            'stock': 0,
             'description': None,
             'status': 0,
             'computer_component_sell_price_settings_attributes': [
@@ -254,10 +241,8 @@ def test_create(client, db_session, component_category_fan, user_sean_ali, user_
                 'id': price_settings[7].id,
                 'price_per_unit': '22.000000'}
         ],
-        'price': 10.0,
         'product_code': 'hdmi_cable',
         'status': 0,
-        'stock': 0,
         'updated_at': component_created.updated_at.isoformat()
     }
 
@@ -276,8 +261,6 @@ def test_update_no_category(client, db_session, component_liquid_cooling_fan_1):
             component_category_name='Yikes',
             name="HDMI Cable 2.1b 1 meter",
             product_code="hdmi_cable",
-            price=10,
-            stock=0,
             description=None,
             status=0,
             computer_component_sell_price_settings_attributes=[]
@@ -315,8 +298,6 @@ def test_update(client, db_session, component_liquid_cooling_fan_1, component_ca
         'component_category_name':dup_category_fan['name'],
         'name':"HDMI Cable 2.1b 1 meter",
         'product_code':"hdmi_cable",
-        'price':10,
-        'stock':0,
         'description':None,
         'status':0,
         'computer_component_sell_price_settings_attributes':[

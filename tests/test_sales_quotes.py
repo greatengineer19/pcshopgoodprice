@@ -141,10 +141,10 @@ def test_create_existing_sales_quote(client, db_session, user_sean_ali, sales_qu
     }
     sales_quote
     response = client.post("/api/sales-quotes", headers=headers, json=param)
-    assert response.status_code == 200
+    assert response.status_code == 422
 
     response_body = response.json()
-    assert response_body['id'] == sales_quote.id
+    assert response_body == {'detail': 'Please pay your current orders before requesting a new one.'}
 
 def test_show(client, user_sean_ali, db_session, sales_quote):
     db_session.commit()
@@ -175,6 +175,7 @@ def test_show(client, user_sean_ali, db_session, sales_quote):
         'sales_quote_lines': [{'component_id': qline1.component_id,
                                 'created_at': qline1.created_at.isoformat(),
                                 'id': qline1.id,
+                                'component_name': 'Zotac RTX 4070',
                                 'images': [],
                                 'price_per_unit': '12000000.000000',
                                 'quantity': '1.000000',
@@ -184,6 +185,7 @@ def test_show(client, user_sean_ali, db_session, sales_quote):
                             {'component_id': qline2.component_id,
                                 'created_at': qline2.created_at.isoformat(),
                                 'id': qline2.id,
+                                'component_name': 'Zotac RTX 4060',
                                 'price_per_unit': '10000000.000000',
                                 'quantity': '1.000000',
                                 'images': [],
@@ -249,6 +251,7 @@ def test_create_new_sales_quote(client,
         'payment_method_id': sales_quote.payment_method_id,
         'payment_method_name': 'BBB Bank Transfer',
         'sales_quote_lines': [{'component_id': qline1.component_id,
+                               'component_name': 'Zotac RTX 4060',
                                 'created_at': qline1.created_at.isoformat(),
                                 'id': qline1.id,
                                 'price_per_unit': '10000000.000000',
@@ -258,6 +261,7 @@ def test_create_new_sales_quote(client,
                                 'total_line_amount': '10000000.000000',
                                 'updated_at': qline1.updated_at.isoformat()},
                             {'component_id': qline2.component_id,
+                                'component_name': 'Zotac RTX 4070',
                                 'created_at': qline2.created_at.isoformat(),
                                 'id': qline2.id,
                                 'price_per_unit': '12000000.000000',
@@ -305,6 +309,7 @@ def test_index(client, user_sean_ali, db_session, sales_quote):
                 'sales_quote_lines': [{'component_id': qline1.component_id,
                                         'created_at': qline1.created_at.isoformat(),
                                         'id': qline1.id,
+                                        'component_name': 'Zotac RTX 4070',
                                         'price_per_unit': '12000000.000000',
                                         'quantity': '1.000000',
                                         'sales_quote_id': sales_quote.id,
@@ -314,6 +319,7 @@ def test_index(client, user_sean_ali, db_session, sales_quote):
                                     {'component_id': qline2.component_id,
                                         'created_at': qline2.created_at.isoformat(),
                                         'id': qline2.id,
+                                        'component_name': 'Zotac RTX 4060',
                                         'price_per_unit': '10000000.000000',
                                         'quantity': '1.000000',
                                         'images': [],

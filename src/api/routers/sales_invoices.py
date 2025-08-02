@@ -48,7 +48,6 @@ def create(
         show_service = ShowService(db=db, sales_quote_no=sales_quote_no, sales_invoice_id=None, user_id=user.id)
         existing = show_service.call()
         if existing:
-            print("<<< found???")
             return existing
 
         build_service = BuildService(db, sales_quote_id, user)

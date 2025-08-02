@@ -22,7 +22,7 @@ from tests.factories.component_category_factory import ComponentCategoryFactory
 from tests.factories.inventory_factory import InventoryFactory
 from tests.conftest import ( client, db_session, setup_factories )
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import patch, ANY, MagicMock, AsyncMock
 from src.inbound_deliveries.show_service import ShowService
 
@@ -424,12 +424,12 @@ def test_create(client, db_session, inbound_delivery_create_params_1):
     attachment = inbound_delivery_1.inbound_delivery_attachments[0]
 
     assert response_body == {
-        'created_at': inbound_delivery_1.created_at.isoformat(),
+        'created_at': (inbound_delivery_1.created_at + timedelta(hours=7)).isoformat(),
         'deleted': False,
         'id': inbound_delivery_1.id,
         'inbound_delivery_attachments': [
             {
-                'created_at': attachment.created_at.isoformat(),
+                'created_at': (attachment.created_at + timedelta(hours=7)).isoformat(),
                 'file_link': 'http://test-s3-url.com',
                 'file_s3_key': '12345678123456781234567812345678_test.jpg',
                 'id': attachment.id,

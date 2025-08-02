@@ -21,15 +21,15 @@ from src.schemas import DayTypeEnum
 
 @pytest.fixture
 def user_sean_ali():
-    return UserFactory(fullname="Sean Ali")
+    return UserFactory(fullname="Sean Ali", role=0)
 
 @pytest.fixture
 def user_n3():
-    return UserFactory(fullname="N3")
+    return UserFactory(fullname="N3", role=1)
 
 @pytest.fixture
 def user_jason():
-    return UserFactory(fullname="Jason")
+    return UserFactory(fullname="Jason", role=1)
 
 @pytest.fixture
 def payment_method_bank_transfer():
