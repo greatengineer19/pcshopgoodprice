@@ -63,8 +63,8 @@ This repository is meant for the backend fastapi codes, with the project structu
     - password (Password security and verification using BCrypt)
 
 ## Why FastAPI?
-In February 2025, I visualized my needs for learning AI, or LLM, or Data Science which mainly used Python for the development. Lots of companies are using either Go, Python, Ruby, Java for the backend, and because I want to learn one language that can be used interchangeably for backend and AI development, I choose to learn Python.
-Asked chatGPT for the list of popular frameworks of Python used by tech companies, and chooses FastAPI over Django or Flask because the name 'Fast' in it and less configuration that other frameworks.
+In February 2025, I visualized my needs for learning AI, or LLM, or Data Science which mainly used Python for the development. Lots of companies are using either Go, Python, Ruby, Java for the backend, and because I want to learn one language that can be used interchangeably for backend and AI development, I choose to learn Python.\
+I Asked chatGPT for the list of popular frameworks of Python used by tech companies, and I choose FastAPI over Django or Flask because it has the name 'Fast' in it and less configuration than other frameworks.
 
 ## Product Summary
 ### Login as Buyer
