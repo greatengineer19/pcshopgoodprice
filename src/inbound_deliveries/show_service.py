@@ -4,7 +4,8 @@ from sqlalchemy.orm import joinedload, Session
 from src.schemas import ( InboundDeliveryStatusEnum)
 from decimal import Decimal
 from src.api.s3_dependencies import ( bucket_name, s3_client )
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil.parser import parse as datetime_parse
 
 class ShowService:
     def __init__(self, db: Session):
@@ -31,10 +32,12 @@ class ShowService:
 
         for attachment in inbound_delivery.inbound_delivery_attachments:
             attachment.file_link = self.create_presigned_url(attachment.file_s3_key)
+            attachment.created_at = datetime_parse(attachment.created_at) + timedelta(hours=7)
 
         if inbound_delivery.inbound_delivery_date is not None:
             inbound_delivery.inbound_delivery_date = datetime.strptime(inbound_delivery.inbound_delivery_date, ("%Y-%m-%d %H:%M:%S"))
         inbound_delivery.status = InboundDeliveryStatusEnum(inbound_delivery.status).name
+        inbound_delivery.created_at = datetime_parse(inbound_delivery.created_at) + timedelta(hours=7)
 
         return inbound_delivery
     

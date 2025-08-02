@@ -267,8 +267,8 @@ def test_empty_index(client):
                 {'text': 'Inbound Received Qty'},
                 {'text': 'Inbound Damaged Qty'},
                 {'text': 'Total Amount Received'},
-                {'text': 'Inbound Delivery Dates'},
-                {'text': 'Inbound Delivery No(s)'}
+                {'text': 'Inbound Delivery Date'},
+                {'text': 'Inbound Delivery No'}
             ]
     }
     assert response.status_code == 200
@@ -325,8 +325,8 @@ def test_index(client, db_session, inbound_delivery_1):
                                 {'text': 'Inbound Received Qty'},
                                 {'text': 'Inbound Damaged Qty'},
                                 {'text': 'Total Amount Received'},
-                                {'text': 'Inbound Delivery Dates'},
-                                {'text': 'Inbound Delivery No(s)'}]}
+                                {'text': 'Inbound Delivery Date'},
+                                {'text': 'Inbound Delivery No'}]}
     
 def test_index_filter_start_date(client, db_session, inbound_delivery_1):
     db_session.commit()
@@ -381,8 +381,8 @@ def test_index_filter_start_date(client, db_session, inbound_delivery_1):
                                 {'text': 'Inbound Received Qty'},
                                 {'text': 'Inbound Damaged Qty'},
                                 {'text': 'Total Amount Received'},
-                                {'text': 'Inbound Delivery Dates'},
-                                {'text': 'Inbound Delivery No(s)'}]}
+                                {'text': 'Inbound Delivery Date'},
+                                {'text': 'Inbound Delivery No'}]}
 
 def test_index_filter_end_date(client, db_session, inbound_delivery_1):
     db_session.commit()
@@ -437,8 +437,8 @@ def test_index_filter_end_date(client, db_session, inbound_delivery_1):
                                 {'text': 'Inbound Received Qty'},
                                 {'text': 'Inbound Damaged Qty'},
                                 {'text': 'Total Amount Received'},
-                                {'text': 'Inbound Delivery Dates'},
-                                {'text': 'Inbound Delivery No(s)'}]}
+                                {'text': 'Inbound Delivery Date'},
+                                {'text': 'Inbound Delivery No'}]}
     
 def test_index_filter_status(client, db_session, inbound_delivery_1):
     db_session.commit()
@@ -501,8 +501,8 @@ def test_index_filter_keyword(client, db_session, inbound_delivery_1):
                                 {'text': 'Inbound Received Qty'},
                                 {'text': 'Inbound Damaged Qty'},
                                 {'text': 'Total Amount Received'},
-                                {'text': 'Inbound Delivery Dates'},
-                                {'text': 'Inbound Delivery No(s)'}]}
+                                {'text': 'Inbound Delivery Date'},
+                                {'text': 'Inbound Delivery No'}]}
 
 def test_index_filter_component_name(client, db_session, inbound_delivery_1):
     db_session.commit()
@@ -541,8 +541,8 @@ def test_index_filter_component_name(client, db_session, inbound_delivery_1):
                                 {'text': 'Inbound Received Qty'},
                                 {'text': 'Inbound Damaged Qty'},
                                 {'text': 'Total Amount Received'},
-                                {'text': 'Inbound Delivery Dates'},
-                                {'text': 'Inbound Delivery No(s)'}]}
+                                {'text': 'Inbound Delivery Date'},
+                                {'text': 'Inbound Delivery No'}]}
 
 def test_index_filter_component_category_id(client, db_session, inbound_delivery_1):
     db_session.commit()
@@ -595,8 +595,8 @@ def test_index_filter_component_category_id(client, db_session, inbound_delivery
                                 {'text': 'Inbound Received Qty'},
                                 {'text': 'Inbound Damaged Qty'},
                                 {'text': 'Total Amount Received'},
-                                {'text': 'Inbound Delivery Dates'},
-                                {'text': 'Inbound Delivery No(s)'}]}
+                                {'text': 'Inbound Delivery Date'},
+                                {'text': 'Inbound Delivery No'}]}
     
 def test_index_all_filter_assigned_yet_empty(client, db_session, inbound_delivery_1):
     db_session.commit()
@@ -650,5 +650,5 @@ def test_index_all_filter_assigned_yet_empty(client, db_session, inbound_deliver
                                 {'text': 'Inbound Received Qty'},
                                 {'text': 'Inbound Damaged Qty'},
                                 {'text': 'Total Amount Received'},
-                                {'text': 'Inbound Delivery Dates'},
-                                {'text': 'Inbound Delivery No(s)'}]}
+                                {'text': 'Inbound Delivery Date'},
+                                {'text': 'Inbound Delivery No'}]}

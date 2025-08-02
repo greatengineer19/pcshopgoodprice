@@ -68,8 +68,8 @@ def generate_report(inventories, component_name, component_category_id):
 
 def generate_headers():
     text_headers = [
-        'Component Category', 'Component', 'Stock Date', 'Created At',
-        'Transaction Type', 'Trx No.',  'Received By', 'Created By',
+        'Component Category', 'Component Name', 'Stock Date', 'Created At',
+        'Transaction Type', 'Transaction No.',  'Received By',
         'In Stock', 'Out Stock', 'Final Moving Stock', 'Buy Price / Unit'        
     ]
     service = HeaderGeneratorService()

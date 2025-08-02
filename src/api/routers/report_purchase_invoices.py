@@ -81,7 +81,7 @@ def generate_headers():
         'Purchase Invoice No', 'Invoice Date', 'Supplier Name', 'Status', 'Component Name',
         'Category Name', 'Quantity', 'Price Per Unit', 'Total Price',
         'Inbound Received Qty', 'Inbound Damaged Qty', 'Total Amount Received',
-        'Inbound Delivery Dates', 'Inbound Delivery No(s)'
+        'Inbound Delivery Date', 'Inbound Delivery No'
     ]
 
     service = HeaderGeneratorService()

@@ -15,7 +15,8 @@ class ResponseGeneratorService:
             if current_component_id != inventory.component_id:
                 total_per_component = 0
                 current_component_id = inventory.component_id
-            result.append(self.build_row(inventory=inventory, total_per_component=total_per_component))
+            row, total_per_component = self.build_row(inventory=inventory, total_per_component=total_per_component)
+            result.append(row)
 
         return result
     
@@ -24,7 +25,7 @@ class ResponseGeneratorService:
         out_stock = Decimal(inventory.out_stock or 0).quantize(Decimal('1'), rounding=ROUND_HALF_UP)
         total_per_component = total_per_component + in_stock - out_stock
         final_moving_stock = total_per_component
-
+    
         buy_price = Decimal(inventory.buy_price or 0).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         row_builder = RowBuilder()
@@ -37,7 +38,6 @@ class ResponseGeneratorService:
                 .append_text(inventory.resource_type)
                 .append_text(inventory.transaction_no)
                 .append_text(inventory.received_by)
-                .append_text('Sean Ali')
                 .append_quantity(str(in_stock))
                 .append_quantity(str(out_stock))
                 .append_quantity(str(final_moving_stock.quantize(Decimal('1'), rounding=ROUND_HALF_UP)))
@@ -45,4 +45,4 @@ class ResponseGeneratorService:
                 .build()
         )
 
-        return built_row
+        return built_row, total_per_component
