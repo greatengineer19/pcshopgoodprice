@@ -3,6 +3,7 @@ from sqlalchemy.orm import joinedload, Session
 from sqlalchemy import ( event, desc, text )
 import re
 from src.schemas import ( PurchaseInvoiceStatusEnum )
+import uuid
 
 class Service:
     def __init__(self, db: Session):
@@ -12,24 +13,8 @@ class Service:
         if sales_quote.sales_quote_no is not None:
             return sales_quote
         
-        last_no = self.db.execute(text(
-                "SELECT sales_quote_no " \
-                "FROM sales_quotes " \
-                "ORDER BY id DESC LIMIT 1 " \
-                "FOR UPDATE"
-            )).first()
-        
-        if last_no and last_no[0]:
-            match = re.search(r"HSF-QUOT-(\d+)", last_no[0])
-            if match:
-                last_number = int(match.group(1))
-                next_number = last_number + 1
-            else:
-                next_number = 1
-        else:
-            next_number = 1
-
-        sales_quote.sales_quote_no = f"HSF-QUOT-{next_number:05d}"
+        uuid4_value = uuid.uuid4()
+        sales_quote.sales_quote_no = uuid4_value[:8]
         return sales_quote
     
     def calculate_total_columns(self, sales_quote: SalesQuote):
