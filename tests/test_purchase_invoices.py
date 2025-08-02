@@ -15,7 +15,7 @@ from tests.factories.component_factory import ComponentFactory
 from tests.factories.component_category_factory import ComponentCategoryFactory
 from tests.conftest import ( client, db_session, setup_factories )
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi.encoders import jsonable_encoder
 
 @pytest.fixture
@@ -90,7 +90,7 @@ def purchase_invoice_1(component_category_fan, component_liquid_cooling_fan_1, c
 @pytest.fixture
 def purchase_invoice_create_params_1(component_category_fan, component_liquid_cooling_fan_1, component_fan_1):
     params = PurchaseInvoiceAsParams(
-        invoice_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        invoice_date=datetime.now().strftime("%Y-%m-%d"),
         expected_delivery_date=None,
         notes=None,
         supplier_name="Enterkomputer Shop",
@@ -134,7 +134,7 @@ def purchase_invoice_update_params_1(
         status=PurchaseInvoiceStatusEnum.PENDING,
         expected_delivery_date=None,
         notes=None,
-        invoice_date=purchase_invoice_1.invoice_date.strftime('%Y-%m-%d %H:%M:%S'),
+        invoice_date=purchase_invoice_1.invoice_date.strftime('%Y-%m-%d'),
         purchase_invoice_lines_attributes=[
             PurchaseInvoiceLineAsParams(
                 id=invoice_line.id,
@@ -278,6 +278,39 @@ def test_create(client, db_session, purchase_invoice_create_params_1):
         'supplier_name': 'Enterkomputer Shop'
     }
 
+def test_create_invoice_date_less_than_delivery_date(client, db_session, purchase_invoice_create_params_1):
+    db_session.commit()
+    purchase_invoice_create_params_1.invoice_date = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
+    purchase_invoice_create_params_1.expected_delivery_date = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
+    response = client.post("/api/purchase-invoices", json = purchase_invoice_create_params_1.dict())
+    response_body = response.json()
+    assert response.status_code == 422
+    assert response_body == {'detail': 'Invoice date must be greater or equal than expected delivery date'}
+
+def test_update_invoice_date_less_than_delivery_date(client, db_session, purchase_invoice_update_params_1):
+    db_session.commit()
+
+    purchase_invoice_update_params_1.invoice_date = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
+    purchase_invoice_update_params_1.expected_delivery_date = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
+
+    response = client.patch(f"/api/purchase-invoices/{purchase_invoice_update_params_1.id}", json = purchase_invoice_update_params_1.dict(by_alias=True))
+    response_body = response.json()
+    assert response.status_code == 422
+    assert response_body == {'detail': 'Invoice date must be greater or equal than expected delivery date'}
+
+def test_update_completed_purchase_inovice(client, db_session, purchase_invoice_update_params_1):
+    db_session.commit()
+
+    purchase_invoice = db_session.query(PurchaseInvoice).filter(PurchaseInvoice.id == purchase_invoice_update_params_1.id).first()
+    purchase_invoice.status = 2
+    db_session.add(purchase_invoice)
+    db_session.commit()
+
+    response = client.patch(f"/api/purchase-invoices/{purchase_invoice_update_params_1.id}", json = purchase_invoice_update_params_1.dict(by_alias=True))
+    response_body = response.json()
+    assert response.status_code == 422
+    assert response_body == {'detail': 'Purchase invoice is not pending'}
+
 def test_update(client, db_session, purchase_invoice_update_params_1):
     db_session.commit()
 
@@ -307,7 +340,6 @@ def test_update(client, db_session, purchase_invoice_update_params_1):
 
     assert new_names != old_names
 
-
 def test_destroy(client, db_session, purchase_invoice_1):
     db_session.commit()
     invoice_id = purchase_invoice_1.id
@@ -322,3 +354,14 @@ def test_destroy(client, db_session, purchase_invoice_1):
     )
 
     assert purchase_invoice is None
+
+def test_destroy_not_pending(client, db_session, purchase_invoice_1):
+    db_session.commit()
+    
+    purchase_invoice_1.status = 2
+    db_session.add(purchase_invoice_1)
+    db_session.commit()
+
+    response = client.delete(f"/api/purchase-invoices/{purchase_invoice_1.id}")
+    assert response.status_code == 422
+    assert response.json() == {'detail': 'Purchase invoice is not pending'}

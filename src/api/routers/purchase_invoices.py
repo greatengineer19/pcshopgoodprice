@@ -92,7 +92,7 @@ def update(id: int, params: PurchaseInvoiceAsParams, db: Session = Depends(get_d
         return purchase_invoice
     except Exception as e:
         logging.error(f"An error occurred in update: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise
     finally:
         db.close()
 
@@ -101,12 +101,14 @@ def destroy(id: int, db: Session = Depends(get_db)):
     try:
         purchase_invoice = (
             db.query(PurchaseInvoice)
-            .filter(and_(PurchaseInvoice.id == id, PurchaseInvoice.status == 0))
+            .filter(PurchaseInvoice.id == id)
             .first()
         )
 
         if not purchase_invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
+        elif purchase_invoice.status != 0:
+            raise HTTPException(status_code=422, detail="Purchase invoice is not pending")
         
         db.delete(purchase_invoice)
         db.commit()

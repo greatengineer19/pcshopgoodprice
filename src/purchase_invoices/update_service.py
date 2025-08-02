@@ -6,6 +6,7 @@ from src.schemas import ( PurchaseInvoiceAsParams, PurchaseInvoiceLineAsParams )
 from src.purchase_invoices.service import ( Service )
 from decimal import Decimal
 from fastapi import HTTPException
+from datetime import datetime
 
 class UpdateService:
     def __init__(self, db: Session):
@@ -13,16 +14,23 @@ class UpdateService:
 
     def call(self, purchase_invoice_id: int, params: PurchaseInvoiceAsParams):
         db = self.db
-        purchase_invoice = db.query(PurchaseInvoice).filter(and_(PurchaseInvoice.id == purchase_invoice_id, PurchaseInvoice.status == 0)).first()
+        purchase_invoice = db.query(PurchaseInvoice).filter(PurchaseInvoice.id == purchase_invoice_id).first()
 
         if not purchase_invoice:
             raise HTTPException(status_code=404, detail="Purchase invoice not found")
+        elif purchase_invoice.status != 0:
+            raise HTTPException(status_code=422, detail="Purchase invoice is not pending")
 
         # Update the purchase invoice
         for key, value in params.model_dump(exclude_unset=True).items():
             # Exclude fields that are handled separately (like lines_attributes)
-            if key not in ["purchase_invoice_lines_attributes"]:
+            if key not in ["invoice_date", "expected_delivery_date", "purchase_invoice_lines_attributes"]:
                 setattr(purchase_invoice, key, value)
+
+        purchase_invoice.invoice_date = datetime.strptime(params.invoice_date, "%Y-%m-%d")
+        purchase_invoice.expected_delivery_date = datetime.strptime(params.expected_delivery_date, "%Y-%m-%d") if params.expected_delivery_date else None
+        if (purchase_invoice.expected_delivery_date and purchase_invoice.expected_delivery_date > purchase_invoice.invoice_date):
+            raise HTTPException(status_code=422, detail="Invoice date must be greater or equal than expected delivery date")
 
         service = Service(db)
         purchase_invoice.purchase_invoice_lines = self.build_lines(purchase_invoice, params)

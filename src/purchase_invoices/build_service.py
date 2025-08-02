@@ -5,6 +5,8 @@ import re
 from src.schemas import ( PurchaseInvoiceStatusEnum, PurchaseInvoiceAsParams )
 from src.purchase_invoices.service import ( Service )
 from decimal import Decimal
+from datetime import datetime
+from fastapi import HTTPException
 
 class BuildService:
     def __init__(self, db: Session):
@@ -12,12 +14,15 @@ class BuildService:
 
     def build(self, params: PurchaseInvoiceAsParams):
         purchase_invoice = PurchaseInvoice(
-            invoice_date=params.invoice_date,
-            expected_delivery_date=params.expected_delivery_date,
+            invoice_date=datetime.strptime(params.invoice_date, "%Y-%m-%d"),
+            expected_delivery_date=datetime.strptime(params.expected_delivery_date, "%Y-%m-%d") if params.expected_delivery_date else None,
             notes=params.notes,
             supplier_name=params.supplier_name,
             status=PurchaseInvoiceStatusEnum.PENDING
         )
+
+        if (purchase_invoice.expected_delivery_date and purchase_invoice.expected_delivery_date > purchase_invoice.invoice_date):
+            raise HTTPException(status_code=422, detail="Invoice date must be greater or equal than expected delivery date")
 
         purchase_invoice.purchase_invoice_lines = self.build_lines(params)
         service = Service(self.db)
