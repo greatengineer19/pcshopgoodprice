@@ -62,23 +62,42 @@ This repository is meant for the backend fastapi codes, with the project structu
     - auth (Authentication using JWT OAuth2)
     - password (Password security and verification using BCrypt)
 
+## Why FastAPI?
+In February 2025, I visualized my needs for learning AI, or LLM, or Data Science which mainly used Python for the development. Lots of companies are using either Go, Python, Ruby, Java for the backend, and because I want to learn one language that can be used interchangeably for backend and AI development, I choose to learn Python.
+Asked chatGPT for the list of popular frameworks of Python used by tech companies, and chooses FastAPI over Django or Flask because the name 'Fast' in it and less configuration that other frameworks.
 
-In this
-Hassle Free Computers Shop and Admin is a e-commerce website of a single seller brand, with capability of procuring computer components, track inventories history, and shopping and checkouts features.
-Initially named Hassle Free Computers Shop and Admin, the name is adjusted to PC Shop Good Price for more readability and easy to memorize.
+## Product Summary
+### Login as Buyer
+There are three features that buyer can do:
+- Shop
+As a buyer, sellable products are listed here with 2 columns per row that's showing the image, name, price after discount and reviews.
+Buyer can filter which products needs to be displayed, clicking on each product to direct user to detailed product page.
+The detail product page will consist of details of specifications, prices, and quantities for user to add to cart or buy directly
+- Cart
+The cart will list out all items user have added and not yet paid, where user can add or delete quantities, choose payment method to pay the order.
+And fill out address details for delivering the items.
+- Orders
+Unpaid order, paid invoices, and sales deliveries of the user will be listed with the sequence of Unpaid orders a.k.a Sales Quote, Sales Delivery, and Sales Invoice as the last sequence.
+User can see the details, address, and recipient, and tracking information of the package they've bought, as well as order status and order no.
 
-Summary of technical features are as listed:
-1. System design in one JPG
-2. All tech stacks:
-    - Frontend: Next.JS
-    - Deployment UI: Vercel
-    - Backend: FastApi Python, PyTest, PostgreSQL
-      - PyTest covered all API call, background tasks, and reusable functions such as Authorization
-      - Structured projects by folder and service, according to the model_name. E.G sales_invoices project will have directory such as src/api/sales_invoices.py (for routing), and src/sales_invoices (folder specific for model services)
-    - Deployment Server: AWS EC2, AWS RDS
-    - Infrastructure: Docker
+### Login as Seller
+Seller, alias Admin have four features:
+- Management of Computer Components
+Seller can add, edit, delete computer components, define price based on day (Monday, Tuesday, ... Sunday).
+Add one image each product, which is mainly needed for a good sales.
+- Purchase Invoice Recording
+Seller can record the purchase they made to the Vendor of the computer components they've listed at their store.
+Purchase Invoice can have invoice date, list of items, and expected inbound delivery date.
+- Inbound Delivery Recording
+Received items will be recorded here. There will be a received quantity, or damaged quantity if the item is not in a good condition.
+Delivery reference, and once it is created the delivery will be assigned status Completed, and will have inventory in_stock.
+- Report Purchase Invoices and Report Stock Movement
+All items that have been purchased to the vendor can be tracked in the report purchase invoices.
+There are filters helping the seller to adjust which invoice or product they want to see.
+And the report stock movement to record SalesDelivery and InboundDelivery, mainly to calculate the current stock, the needs to purchase more products,
+or to adjust prices based on historical demands.
 
-Timeline of finishing the project:
+## Project Timeline
 1. 1st March 2025, I began to learn about Python FastApi, Next.JS, and Docker for this self-project. The idea of building the e-commerce project was because I need to learn new stacks of programming language, and the project must be able to be used by all those stacks and can be developed further. The goal is to create more complex systems, infrastructure, and machine learning, such as distributed load, automatic delivery system and trackings, and natural language processing and so on.
 2. To produce template of Frontend codes, I used vercel's AI combined with Cursor's AI, but as the real project uses API call, I mainly coded them all by writing it manually rather than using copy paste strategy. The purpose is to absorb knowledge of pattern Frontend codes, and memorize the coding style of the Frontend.
 3. Studied several codecademy courses of Frontend such as:
