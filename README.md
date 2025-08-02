@@ -1,3 +1,69 @@
+# PCSHOPGOODPRICE
+## BUYER AND SELLER PLATFORM, AN ONLINE COMPUTER SHOP
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+[www.pcshopgoodprice.com](https://www.pcshopgoodprice.com) is a fullstack portfolio made by **Juan Andrew** between March - August 2025, as a side project after working hours.
+
+## AWS Architecture Diagram
+*available soon*
+
+## Tech stacks
+My tech stacks evolves to meet the needs of the product features, and the current tools are:
+### Backend Stacks
+1. FastAPI
+2. Python
+3. Pytest (Testing framework)
+4. SQL Alchemy (Database toolkit)
+5. Pydantic (API Schema tools)
+6. Apscheduler (Job scheduling tools for FastAPI)
+7. PostgreSQL v17.5
+### Frontend Stacks
+1. NextJS (v15.x)
+2. React (v19.x)
+3. Typescript v5
+4. Tailwind CSS
+5. Shadcn UI (Internet-provided UI components library)
+6. Radix UI (Internet-provided UI components library)
+7. Sonner (Library for displaying toast notifications)
+### Frontend Cloud Platform
+1. Vercel
+### Infrastructures
+1. Amazon E. Load Balancer
+2. Amazon Route53
+3. Amazon EC2
+4. Amazon RDS
+5. Amazon S3 Bucket
+6. Docker
+7. Nginx (Web server or reverse proxy)
+
+## Pytest (Tested them all!)
+Currently my pytest already tests all API calls, from normal CRUD operations, background tasks, decoupled services, and functions such as authorization.
+
+## Project Structure
+This repository is meant for the backend fastapi codes, with the project structures as follow:
+- src
+    - api
+        - api (includes various routers, initialized recurring background tasks, and CORS configuration) 
+        - routers (a routes or files that consists of the codes of the API entry code, or business logics)
+        - dependencies (Dependency or reusable functions accross different files) 
+    - database (engine initialization based on environment of staging, test, or production)
+    - models (SQLAlchemy models configuration)
+    - schemas (Pydantic schemas parameters and responses and validations)
+    - computer_components
+        - service (A reusable service for table or route of ComputerComponent)
+- tests
+    - factories (FactoryBoy for generating a new instance record)
+    - conftest (Configuration file before and after tests)
+- utils
+    - auth (Authentication using JWT OAuth2)
+    - password (Password security and verification using BCrypt)
+
+
+In this
 Hassle Free Computers Shop and Admin is a e-commerce website of a single seller brand, with capability of procuring computer components, track inventories history, and shopping and checkouts features.
 Initially named Hassle Free Computers Shop and Admin, the name is adjusted to PC Shop Good Price for more readability and easy to memorize.
 
