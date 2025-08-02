@@ -13,7 +13,7 @@ class Service:
         if sales_quote.sales_quote_no is not None:
             return sales_quote
         
-        uuid4_value = uuid.uuid4()
+        uuid4_value = str(uuid.uuid4())
         sales_quote.sales_quote_no = uuid4_value[:8]
         return sales_quote
     
