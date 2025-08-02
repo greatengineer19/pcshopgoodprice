@@ -78,7 +78,7 @@ def generate_report(purchase_invoices, component_name, component_category_id):
 
 def generate_headers():
     text_headers = [
-        'Purchase Invoice No', 'Invoice Date', 'Component Name',
+        'Purchase Invoice No', 'Invoice Date', 'Supplier Name', 'Status', 'Component Name',
         'Category Name', 'Quantity', 'Price Per Unit', 'Total Price',
         'Inbound Received Qty', 'Inbound Damaged Qty', 'Total Amount Received',
         'Inbound Delivery Dates', 'Inbound Delivery No(s)'

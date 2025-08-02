@@ -1,4 +1,5 @@
 from src.report.row_builder import RowBuilder
+from src.schemas import PurchaseInvoiceStatusEnum
 
 class ResponseGeneratorService:
     def call(self, purchase_invoices, component_name, component_category_id):
@@ -35,6 +36,8 @@ class ResponseGeneratorService:
             row_builder
                 .append_text(invoice.purchase_invoice_no)
                 .append_text(invoice.invoice_date.strftime("%d %B %Y"))
+                .append_text(invoice.supplier_name)
+                .append_text(PurchaseInvoiceStatusEnum(invoice.status).name)
                 .append_text(invoice_line.component_name)
                 .append_text(invoice_line.component_category_name)
                 .append_quantity(str(invoice_line.quantity))

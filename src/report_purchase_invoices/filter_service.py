@@ -49,7 +49,7 @@ class FilterService:
             query = query.filter(PurchaseInvoice.invoice_date >= self.start_date)
         if self.end_date:
             query = query.filter(PurchaseInvoice.invoice_date <= self.end_date)
-        if self.invoice_status:
+        if self.invoice_status is not None:
             query = query.filter(PurchaseInvoice.status == self.invoice_status)
         if self.keyword:
             query = query.filter((PurchaseInvoice.purchase_invoice_no.ilike(f"%{self.keyword}%")))

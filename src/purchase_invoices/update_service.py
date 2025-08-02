@@ -29,8 +29,8 @@ class UpdateService:
 
         purchase_invoice.invoice_date = datetime.strptime(params.invoice_date, "%Y-%m-%d")
         purchase_invoice.expected_delivery_date = datetime.strptime(params.expected_delivery_date, "%Y-%m-%d") if params.expected_delivery_date else None
-        if (purchase_invoice.expected_delivery_date and purchase_invoice.expected_delivery_date > purchase_invoice.invoice_date):
-            raise HTTPException(status_code=422, detail="Invoice date must be greater or equal than expected delivery date")
+        if (purchase_invoice.expected_delivery_date and purchase_invoice.expected_delivery_date < purchase_invoice.invoice_date):
+            raise HTTPException(status_code=422, detail="Invoice date must be less or equal than expected delivery date")
 
         service = Service(db)
         purchase_invoice.purchase_invoice_lines = self.build_lines(purchase_invoice, params)

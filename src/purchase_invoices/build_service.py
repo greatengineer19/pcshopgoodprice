@@ -21,8 +21,8 @@ class BuildService:
             status=PurchaseInvoiceStatusEnum.PENDING
         )
 
-        if (purchase_invoice.expected_delivery_date and purchase_invoice.expected_delivery_date > purchase_invoice.invoice_date):
-            raise HTTPException(status_code=422, detail="Invoice date must be greater or equal than expected delivery date")
+        if (purchase_invoice.expected_delivery_date and purchase_invoice.expected_delivery_date < purchase_invoice.invoice_date):
+            raise HTTPException(status_code=422, detail="Invoice date must be less or equal than expected delivery date")
 
         purchase_invoice.purchase_invoice_lines = self.build_lines(params)
         service = Service(self.db)

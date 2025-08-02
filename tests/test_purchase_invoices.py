@@ -278,25 +278,25 @@ def test_create(client, db_session, purchase_invoice_create_params_1):
         'supplier_name': 'Enterkomputer Shop'
     }
 
-def test_create_invoice_date_less_than_delivery_date(client, db_session, purchase_invoice_create_params_1):
+def test_create_invoice_date_greater_than_delivery_date(client, db_session, purchase_invoice_create_params_1):
     db_session.commit()
-    purchase_invoice_create_params_1.invoice_date = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
-    purchase_invoice_create_params_1.expected_delivery_date = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
+    purchase_invoice_create_params_1.invoice_date = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
+    purchase_invoice_create_params_1.expected_delivery_date = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
     response = client.post("/api/purchase-invoices", json = purchase_invoice_create_params_1.dict())
     response_body = response.json()
     assert response.status_code == 422
-    assert response_body == {'detail': 'Invoice date must be greater or equal than expected delivery date'}
+    assert response_body == {'detail': 'Invoice date must be less or equal than expected delivery date'}
 
-def test_update_invoice_date_less_than_delivery_date(client, db_session, purchase_invoice_update_params_1):
+def test_update_invoice_date_greater_than_delivery_date(client, db_session, purchase_invoice_update_params_1):
     db_session.commit()
 
-    purchase_invoice_update_params_1.invoice_date = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
-    purchase_invoice_update_params_1.expected_delivery_date = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
+    purchase_invoice_update_params_1.invoice_date = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
+    purchase_invoice_update_params_1.expected_delivery_date = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
 
     response = client.patch(f"/api/purchase-invoices/{purchase_invoice_update_params_1.id}", json = purchase_invoice_update_params_1.dict(by_alias=True))
     response_body = response.json()
     assert response.status_code == 422
-    assert response_body == {'detail': 'Invoice date must be greater or equal than expected delivery date'}
+    assert response_body == {'detail': 'Invoice date must be less or equal than expected delivery date'}
 
 def test_update_completed_purchase_inovice(client, db_session, purchase_invoice_update_params_1):
     db_session.commit()
