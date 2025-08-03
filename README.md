@@ -2,8 +2,6 @@
 ## BUYER AND SELLER PLATFORM, AN ONLINE COMPUTER SHOP
 
 &nbsp;
-&nbsp;
-&nbsp;
 
 ## Table of Contents
 * [Tech stacks](#tech-stacks)
