@@ -1,6 +1,9 @@
 # PCSHOPGOODPRICE
 ## BUYER AND SELLER PLATFORM, AN ONLINE COMPUTER SHOP
 
+The [www.pcshopgoodprice.com](https://www.pcshopgoodprice.com) is a fullstack portfolio made by **Juan Andrew** between March - August 2025, as a side project after working hours.
+
+&nbsp;
 &nbsp;
 
 ## Table of Contents
@@ -13,7 +16,7 @@
 
 &nbsp;
 
-[www.pcshopgoodprice.com](https://www.pcshopgoodprice.com) is a fullstack portfolio made by **Juan Andrew** between March - August 2025, as a side project after working hours.
+
 
 ## AWS Architecture Diagram
 *available soon*
