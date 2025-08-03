@@ -16,10 +16,8 @@ The [www.pcshopgoodprice.com](https://www.pcshopgoodprice.com) is a fullstack po
 
 &nbsp;
 
-
-
-## AWS Architecture Diagram
-*available soon*
+## AWS Production Infrastructure Diagram
+![Infrastructure Diagram](https://github.com/user-attachments/assets/d0bc3f76-e815-4ed5-9d85-4033e9229f02)
 
 ## Tech stacks
 My tech stacks evolves to meet the needs of the product features, and the current tools are:
