@@ -8,7 +8,11 @@
 
 ## Table of Contents
 * [Tech stacks](#tech-stacks)
-* [Pytest (Tested them all!)](#pytest)
+* [Pytest (Tested them all!)](#pytest-tested-them-all)
+* [Project Structure](#project-structure)
+* [Why FastAPI?](#why-fastapi)
+* [Product Summary](#product-summary)
+* [Project Timeline](#project-timeline)
 
 [www.pcshopgoodprice.com](https://www.pcshopgoodprice.com) is a fullstack portfolio made by **Juan Andrew** between March - August 2025, as a side project after working hours.
 
