@@ -4,7 +4,6 @@
 &nbsp;
 &nbsp;
 &nbsp;
-&nbsp;
 
 ## Table of Contents
 * [Tech stacks](#tech-stacks)
@@ -14,7 +13,6 @@
 * [Product Summary](#product-summary)
 * [Project Timeline](#project-timeline)
 
-&nbsp;
 &nbsp;
 
 [www.pcshopgoodprice.com](https://www.pcshopgoodprice.com) is a fullstack portfolio made by **Juan Andrew** between March - August 2025, as a side project after working hours.
