@@ -166,9 +166,9 @@ From April to May 2025, I improved my frontend knowledges by learning in Codecad
     - Learn JavaScript​: Asynchronous Programming by Codecademy
 
 ### Project Milestones
-**April - May 2025**: I spent 2 months to complete the "Seller Side" features.
-**May - June 2025**: Prompt the frontend skeletons of the "Buyer Side", finished the buyer side features
-**July - August 2025**: 
+**April - May 2025**: I spent 2 months to complete the "Seller Side" features.\
+**May - June 2025**: Prompt the frontend skeletons of the "Buyer Side", finished the buyer side features\
+**July - August 2025**:
 1. I dedicated this period to refactoring the entire Backend and Frontend codebase. Drawing on my 4 years experience as backend engineer, I made the code more readable and well-written.
 2. Setting up the production infrastructure such as AWS and Vercel. This involves to learn about subnets, routing table, internet gateway, application load balancer, A record and CNAME, CORS between Vercel and ALB, and finally to document the project I have created
 
