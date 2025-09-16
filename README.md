@@ -17,7 +17,7 @@ The [www.pcshopgoodprice.com](https://www.pcshopgoodprice.com) is a fullstack po
 &nbsp;
 
 ## AWS Production Infrastructure Diagram
-![Infrastructure Diagram](https://github.com/user-attachments/assets/d0bc3f76-e815-4ed5-9d85-4033e9229f02)
+![Infrastructure Diagram](https://github.com/user-attachments/assets/3d183ff2-786b-4786-8bdf-d3beacebd5bb)
 
 ## Tech stacks
 My tech stacks evolves to meet the needs of the product features, and the current tools are:
@@ -166,9 +166,9 @@ From April to May 2025, I improved my frontend knowledges by learning in Codecad
     - Learn JavaScript​: Asynchronous Programming by Codecademy
 
 ### Project Milestones
-**April - May 2025**: I spent 2 months to complete the "Seller Side" features.
-**May - June 2025**: Prompt the frontend skeletons of the "Buyer Side", finished the buyer side features
-**July - August 2025**: 
+**April - May 2025**: I spent 2 months to complete the "Seller Side" features.\
+**May - June 2025**: Prompt the frontend skeletons of the "Buyer Side", finished the buyer side features\
+**July - August 2025**:
 1. I dedicated this period to refactoring the entire Backend and Frontend codebase. Drawing on my 4 years experience as backend engineer, I made the code more readable and well-written.
 2. Setting up the production infrastructure such as AWS and Vercel. This involves to learn about subnets, routing table, internet gateway, application load balancer, A record and CNAME, CORS between Vercel and ALB, and finally to document the project I have created
 
