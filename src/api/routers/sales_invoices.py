@@ -58,7 +58,6 @@ def create(
 
         delete_query = SalesQuote.__table__.delete().where(and_(SalesQuote.id == sales_quote_id, SalesQuote.customer_id == user.id))
         db.execute(delete_query)
-        print("<<< new")
         db.add(sales_invoice)
         db.commit()
         show_service = ShowService(db=db, sales_quote_no=None, sales_invoice_id=sales_invoice.id, user_id=user.id)

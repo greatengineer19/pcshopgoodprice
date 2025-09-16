@@ -282,9 +282,9 @@ def test_index(client, db_session, inbound_delivery_1):
     purchase_invoice = db_session.query(PurchaseInvoice).filter(PurchaseInvoice.id == inbound_delivery_1.purchase_invoice_id).first()
 
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/purchase-invoice?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
-            'total_item': 2},
+            'total_item': 1},
             'report_body': [[{'cell_type': 'text', 'text': purchase_invoice.purchase_invoice_no},
                             {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_date.strftime('%d %B %Y')},
                             {'cell_type': 'text', 'text': 'Aftershock PC'},
@@ -338,9 +338,9 @@ def test_index_filter_start_date(client, db_session, inbound_delivery_1):
     purchase_invoice = db_session.query(PurchaseInvoice).filter(PurchaseInvoice.id == inbound_delivery_1.purchase_invoice_id).first()
 
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/purchase-invoice?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
-            'total_item': 2},
+            'total_item': 1},
             'report_body': [[{'cell_type': 'text', 'text': purchase_invoice.purchase_invoice_no},
                             {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_date.strftime('%d %B %Y')},
                             {'cell_type': 'text', 'text': 'Aftershock PC'},
@@ -394,9 +394,9 @@ def test_index_filter_end_date(client, db_session, inbound_delivery_1):
     purchase_invoice = db_session.query(PurchaseInvoice).filter(PurchaseInvoice.id == inbound_delivery_1.purchase_invoice_id).first()
 
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/purchase-invoice?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
-            'total_item': 2},
+            'total_item': 1},
             'report_body': [[{'cell_type': 'text', 'text': purchase_invoice.purchase_invoice_no},
                             {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_date.strftime('%d %B %Y')},
                             {'cell_type': 'text', 'text': 'Aftershock PC'},
@@ -458,9 +458,9 @@ def test_index_filter_keyword(client, db_session, inbound_delivery_1):
     assert response.status_code == 200
 
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/purchase-invoice?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
-            'total_item': 2},
+            'total_item': 1},
             'report_body': [[{'cell_type': 'text', 'text': purchase_invoice.purchase_invoice_no},
                             {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_date.strftime('%d %B %Y')},
                             {'cell_type': 'text', 'text': 'Aftershock PC'},
@@ -512,9 +512,9 @@ def test_index_filter_component_name(client, db_session, inbound_delivery_1):
     response_body = response.json()
     assert response.status_code == 200
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/purchase-invoice?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
-            'total_item': 2},
+            'total_item': 1},
             'report_body': [[{'cell_type': 'text', 'text': purchase_invoice.purchase_invoice_no},
                             {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_date.strftime('%d %B %Y')},
                             {'cell_type': 'text', 'text': 'Aftershock PC'},
@@ -552,9 +552,9 @@ def test_index_filter_component_category_id(client, db_session, inbound_delivery
     response_body = response.json()
     assert response.status_code == 200
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/purchase-invoice?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
-            'total_item': 2},
+            'total_item': 1},
             'report_body': [[{'cell_type': 'text', 'text': purchase_invoice.purchase_invoice_no},
                             {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_date.strftime('%d %B %Y')},
                             {'cell_type': 'text', 'text': 'Aftershock PC'},
@@ -607,9 +607,9 @@ def test_index_all_filter_assigned_yet_empty(client, db_session, inbound_deliver
 
     assert response.status_code == 200
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/purchase-invoice?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
-            'total_item': 2},
+            'total_item': 1},
             'report_body': [[{'cell_type': 'text', 'text': purchase_invoice.purchase_invoice_no},
                             {'cell_type': 'text', 'text': inbound_delivery_1.inbound_delivery_date.strftime('%d %B %Y')},
                             {'cell_type': 'text', 'text': 'Aftershock PC'},

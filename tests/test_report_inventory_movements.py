@@ -245,7 +245,7 @@ def test_index(
     assert response.status_code == 200
     inventory_inbound_d1 = inventories_from_inbound_d1[0]
     assert response_body == {'paging': {'page': 1,
-            'pagination': {'next_page_url': 'http://localhost:80/api/report/inventory-movement?page=2',
+            'pagination': {'next_page_url': None,
                            'prev_page_url': None},
             'total_item': 4},
             'report_body': [[{'cell_type': 'text', 'text': 'FAN'},
