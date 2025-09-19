@@ -20,7 +20,7 @@ def index(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     page: str = Query('1'),
-    item_per_page: int = 25,
+    item_per_page: int = 10,
     component_name: Optional[str] = Query(None),
     component_category_id: Optional[str] = Query(None),
     transaction_type: Optional[str] = Query(None),

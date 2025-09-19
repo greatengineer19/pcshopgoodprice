@@ -19,7 +19,8 @@ from src.api.routers import (
     users,
     seeds,
     report_inventory_movements,
-    report_purchase_invoices
+    report_purchase_invoices,
+    report_analyzer
 )
 from src.api.routers.sales_payment import (
     bank_transfer,
@@ -72,6 +73,7 @@ app.include_router(sales_invoices.router)
 app.include_router(sales_deliveries.router)
 app.include_router(users.router)
 app.include_router(seeds.router)
+app.include_router(report_analyzer.router)
 
 @app.get("/")
 async def root():

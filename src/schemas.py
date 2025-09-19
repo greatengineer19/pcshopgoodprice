@@ -570,3 +570,9 @@ class UserParams(BaseModel):
             except KeyError:
                 values["role"] = f"UNKNOWN({role})"
         return values
+    
+class ReportAnalyzerParams(BaseModel):
+    user_input: str
+
+class ReportAnalyzerResponse(BaseModel):
+    chatgpt_response: str

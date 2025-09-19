@@ -16,3 +16,4 @@ python-jose
 PyJWT>=2.0.0
 faker
 apscheduler
+openai

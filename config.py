@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     DB_PRODUCTION_DATABASE: str
     AWS_IPV4_PUBLIC_ADDRESS: str
     WEB_ENVIRONMENT: str
+    OPENAI_API_KEY: str
+    OPENAI_BOT_MODEL: str
 
     class Config:
         env_file = Path(Path(__file__).resolve().parent) / ".env"
