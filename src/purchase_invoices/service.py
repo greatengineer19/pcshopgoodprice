@@ -29,7 +29,7 @@ class Service:
         else:
             next_number = 1
 
-        invoice.purchase_invoice_no = f"BUY-{next_number:08d}"
+        invoice.purchase_invoice_no = f"BUY-{next_number:07d}"
         return invoice
     
     def calculate_sum_total_line_amounts(self, invoice: PurchaseInvoice):

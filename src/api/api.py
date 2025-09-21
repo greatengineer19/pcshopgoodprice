@@ -81,7 +81,7 @@ def create_sales_delivery_every_thirty_seconds(db: Session = next(get_db())):
     create_service.call()
 
 def bulk_insert_invoices(db: Session = next(get_db())):
-    count = 10000
+    count = 5000
     components = db.query(ComputerComponent).options(joinedload(ComputerComponent.component_category)).all()
 
     purchase_invoice_no = None
