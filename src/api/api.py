@@ -112,7 +112,7 @@ def bulk_insert_invoices(db: Session = next(get_db())):
         match = re.search(r"BUY-(\d+)", purchase_invoice_no)
         last_number = int(match.group(1))
         next_number = last_number + 1
-        purchase_invoice_no = f"BUY-{next_number:05d}"
+        purchase_invoice_no = f"BUY-{next_number:07d}"
 
     db.commit()
 
