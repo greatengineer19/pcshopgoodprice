@@ -115,7 +115,6 @@ def bulk_insert_invoices(db: Session = next(get_db())):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds\
-    scheduler.add_job(bulk_insert_invoices, 'interval', seconds=60)
 
     if os.environ.get('WEB_ENVIRONMENT'): # adding os environ to prevent EVENT LOOP error in each test call
         scheduler.start()
