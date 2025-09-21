@@ -37,15 +37,90 @@ from fastapi import Depends
 from src.sales_deliveries.create_service import CreateService as SalesDeliveryCreateService
 from config import setting
 
+from src.purchase_invoices.build_service import BuildService
+from src.models import (
+    PurchaseInvoice,
+    ComputerComponent
+)
+from src.schemas import (
+    PurchaseInvoiceAsParams,
+    PurchaseInvoiceAsResponse,
+    PurchaseInvoicesList,
+    PurchaseInvoiceStatusEnum,
+    BulkInsertParams,
+    PurchaseInvoiceLineAsParams
+)
+import random
+from sqlalchemy.orm import joinedload, Session
+from datetime import timedelta
+import re
+
 scheduler = AsyncIOScheduler()
+
+def random_date_in_august_2025():
+    start_date = datetime(2025, 8, 1)
+    end_date = datetime(2025, 8, 31)
+
+    delta = end_date - start_date
+    random_days = random.randint(0, delta.days)
+
+    return (start_date + timedelta(days=random_days)).strftime('%Y-%m-%d')
+
+def random_supplier_name():
+    supplier_names = ["Aftershock PC Singapore",
+                      "COC Computer Indonesia", "Yodobashi PC Japan",
+                      "Amazon Sydney", "Amazon Canada",
+                      "Amazon Germany",
+                      "Amazon Denmark"]
+    supplier_name = random.choice(supplier_names)
+    return supplier_name
+
 
 def create_sales_delivery_every_thirty_seconds(db: Session = next(get_db())):
     create_service = SalesDeliveryCreateService(db)
     create_service.call()
 
+def bulk_insert_invoices(db: Session = next(get_db())):
+    count = 1000
+    components = db.query(ComputerComponent).options(joinedload(ComputerComponent.component_category)).all()
+
+    purchase_invoice_no = None
+    for i in range(count):
+        component = random.choice(components)
+        create_params = PurchaseInvoiceAsParams(invoice_date=random_date_in_august_2025(),
+            expected_delivery_date=None,
+            notes=None,
+            supplier_name=random_supplier_name(),
+            status=0,
+            purchase_invoice_lines_attributes= [
+                PurchaseInvoiceLineAsParams(
+                    quantity=5,
+                    price_per_unit=9900000,
+                    component_id=component.id,
+                    component_name=component.name,
+                    component_category_id=component.component_category.id,
+                    component_category_name=component.component_category.name
+                )
+            ])
+        build_service = BuildService(db)
+        purchase_invoice = build_service.build(create_params)
+        if purchase_invoice_no is not None:
+            purchase_invoice.purchase_invoice_no = purchase_invoice_no
+        else:
+            purchase_invoice_no = purchase_invoice.purchase_invoice_no
+        db.add(purchase_invoice)
+        match = re.search(r"BUY-(\d+)", purchase_invoice_no)
+        last_number = int(match.group(1))
+        next_number = last_number + 1
+        purchase_invoice_no = f"BUY-{next_number:05d}"
+
+    db.commit()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds\
+    scheduler.add_job(bulk_insert_invoices, 'interval', seconds=30)
+
     if os.environ.get('WEB_ENVIRONMENT'): # adding os environ to prevent EVENT LOOP error in each test call
         scheduler.start()
 
