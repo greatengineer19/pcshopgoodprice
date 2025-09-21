@@ -51,6 +51,7 @@ from src.schemas import (
     PurchaseInvoiceLineAsParams
 )
 import random
+import string
 from sqlalchemy.orm import joinedload, Session
 from datetime import timedelta
 import re
@@ -84,7 +85,6 @@ def bulk_insert_invoices(db: Session = next(get_db())):
     count = 2500
     components = db.query(ComputerComponent).options(joinedload(ComputerComponent.component_category)).all()
 
-    purchase_invoice_no = None
     for i in range(count):
         component = random.choice(components)
         create_params = PurchaseInvoiceAsParams(invoice_date=random_date_in_august_2025(),
@@ -102,17 +102,13 @@ def bulk_insert_invoices(db: Session = next(get_db())):
                     component_category_name=component.component_category.name
                 )
             ])
-        build_service = BuildService(db)
+        build_service = BuildService(db, True)
         purchase_invoice = build_service.build(create_params)
-        if purchase_invoice_no is not None:
-            purchase_invoice.purchase_invoice_no = purchase_invoice_no
-        else:
-            purchase_invoice_no = purchase_invoice.purchase_invoice_no
+        characters = string.ascii_letters + string.digits
+        random_string = ''.join(random.choices(characters, k=9))
+        purchase_invoice.purchase_invoice_no = random_string
+
         db.add(purchase_invoice)
-        match = re.search(r"BUY-(\d+)", purchase_invoice_no)
-        last_number = int(match.group(1))
-        next_number = last_number + 1
-        purchase_invoice_no = f"BUY-{next_number:07d}"
 
     db.commit()
 

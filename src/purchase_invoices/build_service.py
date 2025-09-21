@@ -9,8 +9,9 @@ from datetime import datetime
 from fastapi import HTTPException
 
 class BuildService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, skip_generate_invoice_no: False):
         self.db = db
+        self.skip_generate_invoice_no = skip_generate_invoice_no
 
     def build(self, params: PurchaseInvoiceAsParams):
         purchase_invoice = PurchaseInvoice(
@@ -26,7 +27,8 @@ class BuildService:
 
         purchase_invoice.purchase_invoice_lines = self.build_lines(params)
         service = Service(self.db)
-        service.generate_invoice_no(purchase_invoice)
+        if not self.skip_generate_invoice_no:
+            service.generate_invoice_no(purchase_invoice)
         service.calculate_sum_total_line_amounts(purchase_invoice)
 
         return purchase_invoice
