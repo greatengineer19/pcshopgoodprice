@@ -365,3 +365,13 @@ def test_destroy_not_pending(client, db_session, purchase_invoice_1):
     response = client.delete(f"/api/purchase-invoices/{purchase_invoice_1.id}")
     assert response.status_code == 422
     assert response.json() == {'detail': 'Purchase invoice is not pending'}
+
+def test_bulk_insert(client, db_session, component_liquid_cooling_fan_1, component_fan_1):
+    db_session.commit()
+
+    response = client.post(f"/api/purchase-invoices/bulk_insert", json = { 'count': 2 })
+    count_invoice = db_session.query(PurchaseInvoice).count()
+    assert count_invoice == 2
+    assert response.status_code == 200
+
+

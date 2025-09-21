@@ -224,6 +224,9 @@ class PurchaseInvoiceAsParams(PurchaseInvoiceBase):
         use_enum_values = True
         validate_by_name = True
 
+class BulkInsertParams(BaseModel):
+    count: int
+
 class InboundDeliveryBase(BaseModel):
     purchase_invoice_no: str
     inbound_delivery_reference: str
@@ -576,3 +579,13 @@ class ReportAnalyzerParams(BaseModel):
 
 class ReportAnalyzerResponse(BaseModel):
     chatgpt_response: str
+
+class DataPoints(BaseModel):
+    data_count: int
+    query_time1: Decimal
+    query_time2: Decimal
+    query_time3: Decimal
+
+class PurchaseInvoicesQueryAnalysis(BaseModel):
+    message: str
+    data: List[DataPoints]

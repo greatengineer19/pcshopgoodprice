@@ -20,7 +20,8 @@ from src.api.routers import (
     seeds,
     report_inventory_movements,
     report_purchase_invoices,
-    report_analyzer
+    ai_report_analyzer,
+    purchase_invoices_query_analysis
 )
 from src.api.routers.sales_payment import (
     bank_transfer,
@@ -44,7 +45,7 @@ def create_sales_delivery_every_thirty_seconds(db: Session = next(get_db())):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds
+    scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds\
     if os.environ.get('WEB_ENVIRONMENT'): # adding os environ to prevent EVENT LOOP error in each test call
         scheduler.start()
 
@@ -73,7 +74,8 @@ app.include_router(sales_invoices.router)
 app.include_router(sales_deliveries.router)
 app.include_router(users.router)
 app.include_router(seeds.router)
-app.include_router(report_analyzer.router)
+app.include_router(ai_report_analyzer.router)
+app.include_router(purchase_invoices_query_analysis.router)
 
 @app.get("/")
 async def root():
