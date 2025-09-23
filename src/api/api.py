@@ -37,80 +37,12 @@ from fastapi import Depends
 from src.sales_deliveries.create_service import CreateService as SalesDeliveryCreateService
 from config import setting
 
-from src.purchase_invoices.build_service import BuildService
-from src.models import (
-    PurchaseInvoice,
-    ComputerComponent
-)
-from src.schemas import (
-    PurchaseInvoiceAsParams,
-    PurchaseInvoiceAsResponse,
-    PurchaseInvoicesList,
-    PurchaseInvoiceStatusEnum,
-    BulkInsertParams,
-    PurchaseInvoiceLineAsParams
-)
-import random
-import string
-from sqlalchemy.orm import joinedload, Session
-from datetime import timedelta
-import re
-
 scheduler = AsyncIOScheduler()
-
-def random_date_in_august_2025():
-    start_date = datetime(2025, 8, 1)
-    end_date = datetime(2025, 8, 31)
-
-    delta = end_date - start_date
-    random_days = random.randint(0, delta.days)
-
-    return (start_date + timedelta(days=random_days)).strftime('%Y-%m-%d')
-
-def random_supplier_name():
-    supplier_names = ["Aftershock PC Singapore",
-                      "COC Computer Indonesia", "Yodobashi PC Japan",
-                      "Amazon Sydney", "Amazon Canada",
-                      "Amazon Germany",
-                      "Amazon Denmark"]
-    supplier_name = random.choice(supplier_names)
-    return supplier_name
 
 
 def create_sales_delivery_every_thirty_seconds(db: Session = next(get_db())):
     create_service = SalesDeliveryCreateService(db)
     create_service.call()
-
-def bulk_insert_invoices(db: Session = next(get_db())):
-    count = 2500
-    components = db.query(ComputerComponent).options(joinedload(ComputerComponent.component_category)).all()
-
-    for i in range(count):
-        component = random.choice(components)
-        create_params = PurchaseInvoiceAsParams(invoice_date=random_date_in_august_2025(),
-            expected_delivery_date=None,
-            notes=None,
-            supplier_name=random_supplier_name(),
-            status=0,
-            purchase_invoice_lines_attributes= [
-                PurchaseInvoiceLineAsParams(
-                    quantity=5,
-                    price_per_unit=9900000,
-                    component_id=component.id,
-                    component_name=component.name,
-                    component_category_id=component.component_category.id,
-                    component_category_name=component.component_category.name
-                )
-            ])
-        build_service = BuildService(db, True)
-        purchase_invoice = build_service.build(create_params)
-        characters = string.ascii_letters + string.digits
-        random_string = ''.join(random.choices(characters, k=9))
-        purchase_invoice.purchase_invoice_no = random_string
-
-        db.add(purchase_invoice)
-
-    db.commit()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -224,9 +224,6 @@ class PurchaseInvoiceAsParams(PurchaseInvoiceBase):
         use_enum_values = True
         validate_by_name = True
 
-class BulkInsertParams(BaseModel):
-    count: int
-
 class InboundDeliveryBase(BaseModel):
     purchase_invoice_no: str
     inbound_delivery_reference: str

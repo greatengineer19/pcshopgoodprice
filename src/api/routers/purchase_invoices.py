@@ -5,9 +5,7 @@ from src.schemas import (
     PurchaseInvoiceAsParams,
     PurchaseInvoiceAsResponse,
     PurchaseInvoicesList,
-    PurchaseInvoiceStatusEnum,
-    BulkInsertParams,
-    PurchaseInvoiceLineAsParams
+    PurchaseInvoiceStatusEnum
 )
 from src.models import (
     PurchaseInvoice,
