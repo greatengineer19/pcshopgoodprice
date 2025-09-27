@@ -31,7 +31,7 @@ def index(db: Session = Depends(get_db)):
             db.query(PurchaseInvoice)
             .options(joinedload(PurchaseInvoice.purchase_invoice_lines))
             .order_by(desc(PurchaseInvoice.created_at))
-            .all()
+            .limit(100)
         )
         
         for invoice in purchase_invoices:
