@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     WEB_ENVIRONMENT: str
     OPENAI_API_KEY: str
     OPENAI_BOT_MODEL: str
+    ADYEN_API_KEY: str
+    ADYEN_MERCHANT_ACCOUNT: str
+    ADYEN_CLIENT_KEY: str
+    ADYEN_HMAC_KEY: str
 
     class Config:
         env_file = Path(Path(__file__).resolve().parent) / ".env"

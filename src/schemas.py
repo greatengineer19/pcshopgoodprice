@@ -557,6 +557,37 @@ class UserAPIResponse(BaseModel):
     access_token: str
     refresh_token: str
 
+class AdyenAmount(BaseModel):
+    currency: str
+    value: int
+    
+class AdyenSessionRequest(BaseModel):
+    amount: AdyenAmount
+    reference: str
+    returnUrl: str
+    countryCode: str
+    lineItems: List = []
+    merchantAccount: str
+
+class SessionParams(BaseModel):
+    id: int
+
+class AdyenSessionResponse(BaseModel):
+    amount: AdyenAmount
+    countryCode: str
+    expiresAt: str
+    id: str
+    lineItems: List = []
+    merchantAccount: str
+    reference: str
+    returnUrl: str
+    shopperLocale: Optional[str] = None
+    mode: Optional[str] = None
+    sessionData: Optional[str] = None
+    pay_link: str
+    sales_quote_no: str
+    sales_quote_id: int
+
 class UserParams(BaseModel):
     role: str
 

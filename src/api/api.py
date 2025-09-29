@@ -27,6 +27,10 @@ from src.api.routers.sales_payment import (
     bank_transfer,
     virtual_account
 )
+from src.api.routers.sales_payment.adyen import (
+    webhook,
+    sessions
+)
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
@@ -78,6 +82,8 @@ app.include_router(users.router)
 app.include_router(seeds.router)
 app.include_router(ai_report_analyzer.router)
 app.include_router(purchase_invoices_query_analysis.router)
+app.include_router(webhook.router)
+app.include_router(sessions.router)
 
 @app.get("/")
 async def root():
