@@ -32,7 +32,7 @@ def index(db: Session = Depends(get_db)):
             .options(joinedload(PurchaseInvoice.purchase_invoice_lines))
             .order_by(desc(PurchaseInvoice.created_at))
             .limit(100)
-        )
+        ).all()
         
         for invoice in purchase_invoices:
             invoice.status = PurchaseInvoiceStatusEnum(invoice.status).name.lower()
