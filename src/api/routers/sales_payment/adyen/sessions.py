@@ -19,9 +19,6 @@ def sessions(params: SessionParams, request: Request, db: Session = Depends(get_
     try:
         host_url = request.headers.get('origin')
 
-        print("<<< Request !!!!")
-        print(request.__dict__)
-
         sales_quote = db.query(SalesQuote).filter(SalesQuote.id == params.id).first()
         adyen = Adyen.Adyen()
         adyen.payment.client.xapikey = setting.ADYEN_API_KEY
@@ -31,9 +28,11 @@ def sessions(params: SessionParams, request: Request, db: Session = Depends(get_
         request_body = {
             'amount': {"value": str(int(sales_quote.total_payable_amount)), "currency": "IDR"},
             'reference': f"Reference {uuid.uuid4()}",
-            'returnUrl': f"{host_url}/handleShopperRedirect?shopperOrder=myRef",
+            'returnUrl': f"{host_url}/orders",
             'countryCode': "ID",
             'lineItems': [],
+            'mode': 'hosted',
+            'themeId': 'e3ef2338-aed4-42df-b1c0-542864b786d4',
             'merchantAccount': setting.ADYEN_MERCHANT_ACCOUNT
         }
         result = adyen.checkout.payments_api.sessions(request_body)
@@ -43,8 +42,14 @@ def sessions(params: SessionParams, request: Request, db: Session = Depends(get_
         response_data['sales_quote_no'] = sales_quote.sales_quote_no
         response_data['sales_quote_id'] = sales_quote.id
 
+        sales_quote.credit_card_bank_name = request_body['reference']
+        db.add(sales_quote)
+        db.commit()
+
         session_response = AdyenSessionResponse(**response_data)
         return session_response
     except Exception as e:
         logging.error(f" An error occured in sessions: {e}")
         raise
+    finally:
+        db.close()

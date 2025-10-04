@@ -580,6 +580,9 @@ class AdyenSessionResponse(BaseModel):
     lineItems: List = []
     merchantAccount: str
     reference: str
+    storePaymentMethod: bool
+    storePaymentMethodMode: str
+    url: str
     returnUrl: str
     shopperLocale: Optional[str] = None
     mode: Optional[str] = None
