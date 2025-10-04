@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import ( Optional )
 from sqlalchemy import (
         desc,
 )
@@ -18,19 +19,28 @@ from utils.auth import get_current_user
 from src.sales_quotes.show_service import ShowService
 from src.sales_quotes.build_service import BuildService
 from src.computer_components.image_service import ImageService
+from datetime import datetime
 
 router = APIRouter(prefix='/api/sales-quotes', tags=["Sales Quotes"])
 
 @router.get("", response_model=SalesQuoteList)
-def index(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def index(user: User = Depends(get_current_user), db: Session = Depends(get_db), start_date: Optional[str] = Query(None)):
     try:
-        sales_quotes = (
+        query = (
             db.query(SalesQuote)
-              .options(joinedload(SalesQuote.sales_quote_lines)
-                        .subqueryload(SalesQuoteLine.component))
-              .filter(SalesQuote.customer_id == user.id)
-              .order_by(desc(SalesQuote.id)).all()
+            .options(
+                joinedload(SalesQuote.sales_quote_lines)
+                .subqueryload(SalesQuoteLine.component)
+            )
+            .filter(SalesQuote.customer_id == user.id)
         )
+        
+        if start_date is not None:
+            # Convert string date to datetime object for proper comparison
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(SalesQuote.created_at >= start_datetime)
+        
+        sales_quotes = query.order_by(desc(SalesQuote.id)).all()
 
         if sales_quotes is None:
             return { 'sales_quotes': [] }

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import ( Optional )
 from sqlalchemy import ( desc, and_, func )
 from src.schemas import ( SalesInvoiceResponse, SalesInvoiceList, SalesInvoiceStatusEnum, SalesDeliveryStatusEnum, SalesInvoiceCreateParam )
 from src.models import ( SalesInvoice, SalesInvoiceLine, User, SalesQuote, SalesQuoteLine, SalesDelivery )
@@ -8,19 +9,27 @@ from utils.auth import get_current_user
 from src.sales_invoices.show_service import ShowService
 from src.sales_invoices.build_service import BuildService
 from src.computer_components.image_service import ImageService
+from datetime import datetime
 
 router = APIRouter(prefix='/api/sales-invoices', tags=["Sales Invoices"])
 
 @router.get("", response_model=SalesInvoiceList, status_code=200)
-def index(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def index(user: User = Depends(get_current_user), db: Session = Depends(get_db), start_date: Optional[str] = Query(None)):
     try:
-        sales_invoices = (
+        query = (
             db.query(SalesInvoice)
               .options(joinedload(SalesInvoice.sales_invoice_lines).subqueryload(SalesInvoiceLine.component))
               .filter(SalesInvoice.customer_id == user.id)
-              .order_by(desc(SalesInvoice.id)).all()
+              
         )
 
+        if start_date is not None:
+            # Convert string date to datetime object for proper comparison
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(SalesInvoice.created_at >= start_datetime)
+
+
+        sales_invoices = query.order_by(desc(SalesInvoice.id)).all()
         if sales_invoices is None:
             return { 'sales_invoices': [] }
         

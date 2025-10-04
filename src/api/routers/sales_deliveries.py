@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import ( Optional )
 from sqlalchemy import (desc)
 from src.schemas import (
     SalesDeliveryList,
@@ -18,21 +19,27 @@ from src.sales_deliveries.query_show_service import QueryShowService
 from src.sales_deliveries.show_service import ShowService
 from src.sales_deliveries.create_inventory_service import CreateInventoryService
 from src.sales_deliveries.void_service import VoidService
+from datetime import datetime
 
 router = APIRouter(prefix='/api/sales-deliveries', tags=["Sales Deliveries"])
 
 @router.get("", response_model=SalesDeliveryList, status_code=200)
-def index(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def index(user: User = Depends(get_current_user), db: Session = Depends(get_db), start_date: Optional[str] = Query(None)):
     try:
-        sales_deliveries = (
+        query = (
             db.query(SalesDelivery)
               .join(SalesDelivery.sales_invoice)
               .options(joinedload(SalesDelivery.sales_invoice))
               .options(joinedload(SalesDelivery.sales_delivery_lines).subqueryload(SalesDeliveryLine.component))
               .filter(SalesInvoice.customer_id == user.id)
-              .order_by(desc(SalesDelivery.id)).all()
         )
 
+        if start_date is not None:
+            # Convert string date to datetime object for proper comparison
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(SalesDelivery.created_at >= start_datetime)
+
+        sales_deliveries = query.order_by(desc(SalesDelivery.id)).all()
         if sales_deliveries is None:
             return { 'sales_deliveries': [] }
         
