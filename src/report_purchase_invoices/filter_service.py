@@ -58,7 +58,7 @@ class FilterService:
         if self.component_category_id:
             query = query.filter(PurchaseInvoiceLine.component_category_id == self.component_category_id)
 
-        invoice_ids = [id[0] for id in query.all()]
+        invoice_ids = [id[0] for id in query.distinct().limit(100).all()]
         purchase_invoices = (
             self.db.query(PurchaseInvoice)
                 .options(joinedload(PurchaseInvoice.purchase_invoice_lines)
