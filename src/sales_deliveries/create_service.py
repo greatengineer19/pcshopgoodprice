@@ -11,7 +11,7 @@ class CreateService:
 
     # TODO: Possibility of later scheduler run in parallel with its previous scheduler, need to ensure later scheduler WAITS previous.
     def call(self):
-        print(f"<<< on SalesDeliveryCreateService at: {datetime.now()}")
+        print(f"<<< Performing scheduled SalesDeliveryCreateService at: {datetime.now()}")
 
         pending_invoices = (
             self.db.query(SalesInvoice).options(joinedload(SalesInvoice.sales_invoice_lines))

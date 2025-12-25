@@ -19,6 +19,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, object_session
 from typing import List
 from decimal import Decimal
 from datetime import datetime, date
+# Import DDD models to register them with SQLAlchemy
+from src.infrastructure.persistence.models.account import Account
+from src.infrastructure.persistence.models.payment import Payment
 
 class User(Base):
     __tablename__ = "users"
