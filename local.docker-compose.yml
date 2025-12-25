@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/src
+      - .:/app
     environment:
       - DB_HOST=${DB_STAGING_HOST}
       - DB_PORT=${DB_STAGING_PORT}
