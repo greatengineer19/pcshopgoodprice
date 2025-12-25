@@ -14,7 +14,7 @@ import logging
 from sqlalchemy.orm import joinedload, Session
 from decimal import Decimal
 import re
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from datetime import datetime, date
 from src.report_purchase_invoices.filter_service import FilterService
 from src.report_purchase_invoices.total_item_query_service import TotalItemQueryService

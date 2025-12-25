@@ -13,7 +13,7 @@ from src.models import (
 import logging
 from src.api.s3_dependencies import ( bucket_name, s3_client )
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 
 router = APIRouter(
     prefix='/api/computer-component-categories'

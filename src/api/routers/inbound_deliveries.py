@@ -23,7 +23,7 @@ import logging
 from sqlalchemy.orm import joinedload, Session, subqueryload
 from decimal import Decimal
 import re
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from src.api.s3_dependencies import ( bucket_name, s3_client )
 from src.inbound_deliveries.build_service import ( BuildService )
 from src.inbound_deliveries.show_service import ( ShowService )

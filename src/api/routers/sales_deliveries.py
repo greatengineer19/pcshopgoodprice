@@ -13,7 +13,7 @@ from src.models import (
     User
 )
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from utils.auth import get_current_user
 from src.sales_deliveries.query_show_service import QueryShowService
 from src.sales_deliveries.show_service import ShowService

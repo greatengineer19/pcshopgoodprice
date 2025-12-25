@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request, Depends
 from Adyen.util import is_valid_hmac_notification
 from config import setting
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from src.sales_invoices.show_service import ShowService
 from src.sales_invoices.build_service import BuildService
 from src.models import ( SalesInvoice, SalesInvoiceLine, User, SalesQuote, SalesQuoteLine, SalesDelivery )

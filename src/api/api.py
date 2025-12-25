@@ -21,7 +21,8 @@ from src.api.routers import (
     report_inventory_movements,
     report_purchase_invoices,
     ai_report_analyzer,
-    purchase_invoices_query_analysis
+    purchase_invoices_query_analysis,
+    payment
 )
 from src.api.routers.sales_payment import (
     bank_transfer,
@@ -35,7 +36,7 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 import os
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from src.sales_deliveries.create_service import CreateService as SalesDeliveryCreateService
@@ -43,16 +44,14 @@ from config import setting
 
 scheduler = AsyncIOScheduler()
 
-
 def create_sales_delivery_every_thirty_seconds(db: Session = next(get_db())):
     create_service = SalesDeliveryCreateService(db)
     create_service.call()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds\
-
     if os.environ.get('WEB_ENVIRONMENT'): # adding os environ to prevent EVENT LOOP error in each test call
+        scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds\
         scheduler.start()
 
     yield
@@ -84,6 +83,7 @@ app.include_router(ai_report_analyzer.router)
 app.include_router(purchase_invoices_query_analysis.router)
 app.include_router(webhook.router)
 app.include_router(sessions.router)
+app.include_router(payment.router)
 
 @app.get("/")
 async def root():

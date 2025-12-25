@@ -6,8 +6,8 @@ from src.models import (CartLine, User, ComputerComponent, PaymentMethod)
 import logging
 from src.api.s3_dependencies import ( bucket_name, s3_client )
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
-from datetime import datetime, timedelta
+from src.api.session_db import get_db
+from datetime import datetime, timedelta, timezone
 from utils.auth import ( oauth2_scheme, decode_jwt_and_pass_expiry_errors, create_access_token, create_refresh_token )
 
 router = APIRouter(
@@ -40,8 +40,8 @@ def show_user(
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.utcnow()):
-            expires_at = datetime.utcnow() + timedelta(minutes=3600)
+        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.now(timezone.utc)):
+            expires_at = datetime.now(timezone.utc) + timedelta(minutes=3600)
             new_refresh_token = create_refresh_token(user.id, expires_at)
             user.refresh_token_expiry_at = expires_at
             user.refresh_token = new_refresh_token
@@ -78,8 +78,8 @@ def show_default_user(db: Session = Depends(get_db)):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.utcnow()):
-            expires_at = datetime.utcnow() + timedelta(minutes=3600)
+        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.now(timezone.utc)):
+            expires_at = datetime.now(timezone.utc) + timedelta(minutes=3600)
             new_refresh_token = create_refresh_token(user.id, expires_at)
             user.refresh_token_expiry_at = expires_at
             user.refresh_token = new_refresh_token
@@ -119,8 +119,8 @@ def signin_as_superbuyer(db: Session = Depends(get_db)):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.utcnow()):
-            expires_at = datetime.utcnow() + timedelta(minutes=3600)
+        if (user.refresh_token is None or user.refresh_token_expiry_at < datetime.now(timezone.utc)):
+            expires_at = datetime.now(timezone.utc) + timedelta(minutes=3600)
             new_refresh_token = create_refresh_token(user.id, expires_at)
             user.refresh_token_expiry_at = expires_at
             user.refresh_token = new_refresh_token

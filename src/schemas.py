@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
+from pydantic import BaseModel, Field, field_validator, model_validator, model_serializer, ConfigDict
 from typing import (Dict, List, Optional, Union)
 from datetime import datetime
 from decimal import Decimal, ROUND_DOWN
@@ -191,12 +191,18 @@ class PurchaseInvoiceAsListResponse(PurchaseInvoiceBase):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S") if v else None,
-            Decimal: lambda v: str(v)
-        }
+    model_config = ConfigDict(from_attributes=True)
+    
+    @model_serializer(mode='wrap')
+    def serialize_model(self, serializer):
+        data = serializer(self)
+        # Convert datetime fields to string format
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                data[key] = value.strftime("%Y-%m-%d %H:%M:%S") if value else None
+            elif isinstance(value, Decimal):
+                data[key] = str(value)
+        return data
 
 class PurchaseInvoicesList(BaseModel):
     purchase_invoices: List[PurchaseInvoiceAsListResponse]
@@ -260,12 +266,18 @@ class InboundDeliveryAsListResponse(InboundDeliveryBase):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S") if v else None,
-            Decimal: lambda v: str(v)
-        }
+    model_config = ConfigDict(from_attributes=True)
+    
+    @model_serializer(mode='wrap')
+    def serialize_model(self, serializer):
+        data = serializer(self)
+        # Convert datetime fields to string format
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                data[key] = value.strftime("%Y-%m-%d %H:%M:%S") if value else None
+            elif isinstance(value, Decimal):
+                data[key] = str(value)
+        return data
 
 class InboundDeliveriesList(BaseModel):
     inbound_deliveries: List[InboundDeliveryAsListResponse]

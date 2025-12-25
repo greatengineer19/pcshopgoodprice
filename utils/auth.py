@@ -3,13 +3,13 @@ from utils.password import secure_pwd
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
 from jose import jwt, JWTError
 from config import setting
-from datetime import date, datetime, timedelta, time
+from datetime import date, datetime, timedelta, time, timezone
 from fastapi import HTTPException, status, Request
 from typing import Union, Any, Optional
 import jwt
 from jwt import InvalidTokenError
 from fastapi import Depends
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from src.models import ( User )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -60,7 +60,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 def create_access_token(subject: Union[str, Any], expires_delta: Optional[int] = None) -> str:
     additional_time = expires_delta if expires_delta is not None else setting.ACCESS_TOKEN_EXPIRE_MINUTES
-    expires_delta = datetime.utcnow() + timedelta(minutes=additional_time)
+    expires_delta = datetime.now(timezone.utc) + timedelta(minutes=additional_time)
 
     to_encode = { "exp": expires_delta, "sub": str(subject) }
     encoded_jwt = jwt.encode(to_encode, setting.JWT_SECRET_KEY, setting.JWT_ALGORITHM)

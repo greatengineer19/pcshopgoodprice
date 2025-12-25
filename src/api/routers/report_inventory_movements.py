@@ -5,7 +5,7 @@ from src.schemas import (
 )
 import logging
 from sqlalchemy.orm import  Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from src.report.paging_service import PagingService
 from src.report.header_generator_service import HeaderGeneratorService
 from src.report_inventory_movements.filter_service import FilterService

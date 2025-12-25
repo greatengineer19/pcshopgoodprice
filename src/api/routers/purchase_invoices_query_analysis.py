@@ -5,7 +5,7 @@ from src.schemas import (
 import logging
 from src.chatgpt.ask_chatgpt import AskChatGPT
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 import random
 
 

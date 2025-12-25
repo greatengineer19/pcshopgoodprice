@@ -15,7 +15,7 @@ from src.models import (
 )
 import logging
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from datetime import datetime
 from utils.auth import get_current_user
 from src.computer_components.service import Service

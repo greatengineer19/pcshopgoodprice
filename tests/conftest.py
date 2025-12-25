@@ -10,13 +10,15 @@ import inspect
 import importlib
 from pathlib import Path
 from tests.factories import BaseFactory
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from tests.factories.component_factory import ComponentFactory
 from tests.factories.component_category_factory import ComponentCategoryFactory
 from tests.factories.computer_component_sell_price_setting_factory import ComputerComponentSellPriceSettingFactory
 from tests.factories.computer_component_review_factory import ComputerComponentReviewFactory
 from tests.factories.user_factory import UserFactory
 from tests.factories.payment_method_factory import PaymentMethodFactory
+from tests.factories.account_factory import AccountFactory
+from tests.factories.payment_factory import PaymentFactory
 from src.schemas import DayTypeEnum
 
 @pytest.fixture
@@ -210,6 +212,8 @@ def setup_factories(db_session):
     from tests.factories.sales_delivery_factory import SalesDeliveryFactory
     from tests.factories.sales_invoice_line_factory import SalesInvoiceLineFactory
     from tests.factories.sales_delivery_line_factory import SalesDeliveryLineFactory
+    from tests.factories.payment_factory import PaymentFactory
+    from tests.factories.account_factory import AccountFactory
 
     print(f"\nSetting up factories with session: {id(db_session)}")
 
@@ -233,6 +237,8 @@ def setup_factories(db_session):
     SalesDeliveryFactory._meta.sqlalchemy_session = db_session
     SalesInvoiceLineFactory._meta.sqlalchemy_session = db_session
     SalesDeliveryLineFactory._meta.sqlalchemy_session = db_session
+    PaymentFactory._meta.sqlalchemy_session = db_session
+    AccountFactory._meta.sqlalchemy_session = db_session
 
     factories = [
         ComponentCategoryFactory,
@@ -253,7 +259,9 @@ def setup_factories(db_session):
         SalesInvoiceFactory,
         SalesInvoiceLineFactory,
         SalesDeliveryFactory,
-        SalesDeliveryLineFactory
+        SalesDeliveryLineFactory,
+        PaymentFactory,
+        AccountFactory
     ]
 
     # Set persistence mode

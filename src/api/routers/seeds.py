@@ -21,7 +21,7 @@ import logging
 import faker
 from src.api.s3_dependencies import ( bucket_name, s3_client )
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 import random
 from src.data.review_schema import component_reviews_hash_map
 

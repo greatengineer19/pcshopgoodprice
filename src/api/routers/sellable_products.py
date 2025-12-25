@@ -11,7 +11,7 @@ from src.models import (
     ComputerComponentCategory
 )
 from sqlalchemy.orm import joinedload, Session
-from src.api.dependencies import get_db
+from src.api.session_db import get_db
 from src.sellable_products.injected_component_ids_and_rating_per_categories_service import InjectedComponentIdsAndRatingPerCategoriesService
 from src.sellable_products.filter_service import FilterService
 from src.sellable_products.ratings_in_component_ids_service import RatingsInComponentIdsService
