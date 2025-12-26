@@ -1,5 +1,6 @@
 from datetime import datetime
 from fastapi import BackgroundTasks, Depends, HTTPException, Depends
+import logging
 import httpx
 from ..commands.process_payment_command import ProcessPaymentCommand
 from src.domain.payment.entities.payment_transaction import PaymentTransaction
@@ -70,13 +71,24 @@ class PaymentCommandHandler:
                 raise HTTPException(status_code=404, detail="User not found")
 
     async def _create_sales_journal(self, payment: PaymentTransaction, token: str):
-        async with httpx.AsyncClient() as client:
-            await client.post(
-                f"http://basic-service:3001/api/sales-journal",
-                json={
-                    "payment_id": payment.id
-                },
-                headers= {
-                    "Authorization": f"Bearer {token}"
-                }
-            )
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.post(
+                    f"http://basic-service:3001/api/sales-journal",
+                    json={
+                        "payment_id": payment.id
+                    },
+                    headers={
+                        "Authorization": f"Bearer {token}"
+                    }
+                )
+                response.raise_for_status()
+        except httpx.ConnectError:
+            logging.error(f"Failed to connect to basic-service:3001 for sales journal.")
+            raise HTTPException(status_code=503, detail="Sales journal service is unavailable")
+        except httpx.HTTPStatusError as e:
+            logging.error(f"HTTP error for sales journal: {e.response.text}")
+            raise HTTPException(status_code=500, detail="Failed to create sales journal")
+        except Exception as e:
+            logging.error(f"Unexpected error creating sales journal: {e}")
+            raise HTTPException(status_code=500, detail="Internal server error in payment handling")
