@@ -1,0 +1,45 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: <%= ENV["DB_STAGING_DATABASE"] %>
+  username: <%= ENV["DB_STAGING_USERNAME"] %>
+  password: <%= ENV["DB_STAGING_PASSWORD"] %>
+  host: <%= ENV["DB_STAGING_HOST"] %>
+  port: <%= ENV["DB_STAGING_PORT"] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: user00
+  username: user00
+  password: chocolatecake
+  host: localhost
+  port: 5433
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+
+# Store production database in the storage/ directory, which by default
+# is mounted as a persistent Docker volume in config/deploy.yml.
+production:
+  primary: &primary_production
+    <<: *default
+    database: railway
+    username: postgres
+    password: <%= ENV["EXAM_API_DATABASE_PASSWORD"] %>
+    host: postgres.railway.internal
+  cache:
+    <<: *primary_production
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    migrations_paths: db/cable_migrate

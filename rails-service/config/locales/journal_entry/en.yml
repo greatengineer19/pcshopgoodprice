@@ -1,0 +1,5 @@
+en:
+  journal_entry:
+    not_balance: "journal entry is not balance"
+  journal_entry_line:
+    debit_or_credit_invalid: "debit/credit must be positive"

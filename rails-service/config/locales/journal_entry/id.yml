@@ -1,0 +1,5 @@
+id:
+  journal_entry:
+    not_balance: "jumlah entri jurnal tidak sama"
+  journal_entry_line:
+    debit_or_credit_invalid: "jumlah debit/kredit harus positif"
