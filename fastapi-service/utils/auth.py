@@ -23,7 +23,7 @@ def decode_jwt_and_pass_expiry_errors(token: str, db: Session):
     payload = decodeJWT(token)
     if payload is None:
         return None
-    user_id = payload.get("sub")
+    user_id = payload.get("user_id")
     if user_id is None:
         raise credentials_exception
     user = db.query(User).filter(User.id == int(user_id)).first()
@@ -43,7 +43,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         payload = decodeJWT(token)
         if payload is None:
             raise credentials_exception
-        user_id = payload.get("sub")
+        user_id = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
         user = db.query(User).filter(User.id == int(user_id)).first()
@@ -62,12 +62,12 @@ def create_access_token(subject: Union[str, Any], expires_delta: Optional[int] =
     additional_time = expires_delta if expires_delta is not None else setting.ACCESS_TOKEN_EXPIRE_MINUTES
     expires_delta = datetime.now(timezone.utc) + timedelta(minutes=additional_time)
 
-    to_encode = { "exp": expires_delta, "sub": str(subject) }
+    to_encode = { "exp": expires_delta, "user_id": str(subject) }
     encoded_jwt = jwt.encode(to_encode, setting.JWT_SECRET_KEY, setting.JWT_ALGORITHM)
     return encoded_jwt
 
 def create_refresh_token(subject: Union[str, Any], expires_at: int) -> str:
-    to_encode = { "exp": expires_at, "sub": str(subject) }
+    to_encode = { "exp": expires_at, "user_id": str(subject) }
     encoded_jwt = jwt.encode(to_encode, setting.JWT_REFRESH_KEY, setting.JWT_ALGORITHM)
     return encoded_jwt
 

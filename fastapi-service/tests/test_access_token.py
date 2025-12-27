@@ -28,7 +28,7 @@ def test_decode_jwt(db_session, user_sean_ali):
 
     jwt = create_access_token(user_sean_ali.id, 30)
     decoded = decodeJWT(jwt)
-    assert list(decoded.keys()) == ['exp', 'sub']
+    assert list(decoded.keys()) == ['exp', 'user_id']
 
 def test_get_current_user(db_session, user_sean_ali):
     db_session.commit()

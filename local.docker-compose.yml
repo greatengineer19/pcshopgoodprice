@@ -19,7 +19,7 @@ services:
     command: python main.py
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://fastapi:8000/" ]
-      interval: 30s
+      interval: 40s
       timeout: 10s
       retries: 3
     restart: unless-stopped
@@ -90,7 +90,7 @@ services:
 
 volumes:
   postgres_data:
-    # static_volume:
+
 
 networks:
   app-network:

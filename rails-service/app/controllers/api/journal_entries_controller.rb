@@ -3,6 +3,8 @@ module Api
     include JsonWebTokenAuthenticator
 
     before_action :authenticate_request, only: %i[create]
+    skip_before_action :verify_authenticity_token
+    skip_forgery_protection
     
     def create
       source = create_params[:reference_type].constantize.find(create_params[:reference_id])

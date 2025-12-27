@@ -50,8 +50,15 @@ class PaymentCommandHandler:
             )
 
             db.add(payment_model)
+            # Flush to generate the payment ID without committing the transaction
+            # This allows us to pass the ID to Rails while keeping rollback capability
+            db.flush()
+            
+            # Call Rails with the generated payment ID
+            # If this fails, the exception will trigger rollback in the except block
             response = await self._create_sales_journal(payment_model, token)
-            # TODO: Need to check whether it is possible to query the payment in the Ruby on Rails
+            
+            # Only commit if Rails call succeeded
             db.commit()
 
             return payment_model
@@ -74,9 +81,13 @@ class PaymentCommandHandler:
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.post(
-                    f"http://rails:3000/api/sales-journal",
+                    f"http://rails:3000/api/journal_entries",
                     json={
-                        "payment_id": payment.id
+                        "journal_entry": {
+                            "reference_id": payment.id,
+                            "reference_type": "Payment",
+                            "reversed_by_id": None
+                        }
                     },
                     headers={
                         "Authorization": f"Bearer {token}"

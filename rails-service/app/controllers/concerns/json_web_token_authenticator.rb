@@ -13,6 +13,9 @@ module JsonWebTokenAuthenticator
     return render_unauthorized('Token missing') unless token
 
     decoded_token = JsonWebToken.decode(token)
+    puts "token is decoded"
+    puts "=" * 60
+    puts decoded_token
     @current_user = User.find(decoded_token[:user_id])
   rescue ActiveRecord::RecordNotFound
     render_unauthorized('User not found')
