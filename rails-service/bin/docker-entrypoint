@@ -1,12 +1,15 @@
 #!/bin/bash
 set -e
 
+echo "Current RAILS_ENV: ${RAILS_ENV:-development}"
+
 # Remove a potentially pre-existing server.pid for Rails.
 rm -f /app/tmp/pids/server.pid
 
 # If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
+if [ "${1}" = "./bin/rails" ] && [ "${2}" = "server" ] && [ "${RAILS_ENV}" != "test" ]; then
+  echo "Running database migrations..."
+  ./bin/rails db:migrate
 fi
 
 exec "${@}"

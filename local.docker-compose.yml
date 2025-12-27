@@ -14,11 +14,11 @@ services:
       - DB_USER=${DB_STAGING_USERNAME}
       - DB_PASSWORD=${DB_STAGING_PASSWORD}
       - DB_NAME=${DB_STAGING_DATABASE}
-      - DEBUG=False  # Disable debug mode in production
+      - DEBUG=False # Disable debug mode in production
       - WEB_ENVIRONMENT=${WEB_ENVIRONMENT}
     command: python main.py
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://fastapi:8000/"]
+      test: [ "CMD", "curl", "-f", "http://fastapi:8000/" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -32,12 +32,19 @@ services:
       - .env
   rails:
     build: ./rails-service
+    environment:
+      - RAILS_ENV=development
+      - DB_STAGING_HOST=db
+      - DB_STAGING_PORT=5432
+      - DB_STAGING_DATABASE=${DB_STAGING_DATABASE}
+      - DB_STAGING_USERNAME=${DB_STAGING_USERNAME}
+      - DB_STAGING_PASSWORD=${DB_STAGING_PASSWORD}
     ports:
       - "3000:3000"
     volumes:
       - ./rails-service:/app
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://rails:3000/up"]
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -71,7 +78,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -83,7 +90,7 @@ services:
 
 volumes:
   postgres_data:
-  # static_volume:
+    # static_volume:
 
 networks:
   app-network:

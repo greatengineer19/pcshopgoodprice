@@ -15,7 +15,7 @@ class CreateAccounts < ActiveRecord::Migration[8.1]
       t.references :parent, foreign_key: { to_table: :accounts }
       t.integer :normal_balance, null: false
       t.boolean :is_active
-      t.references :tax_codes
+      t.references :tax_code, foreign_key: { to_table: :tax_codes }
 
       t.timestamps
     end

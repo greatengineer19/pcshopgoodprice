@@ -1,6 +1,6 @@
 class CreateJournalEntries < ActiveRecord::Migration[8.1]
   def change
-    create_table :journal_entries do |t|
+    create_table :journal_entries, if_not_exists: true do |t|
       t.string :entry_number, null: false
       # Polymorphic, reference is transaction id + type
       t.integer :reference_id, null: false
@@ -13,7 +13,7 @@ class CreateJournalEntries < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    create_table :journal_entry_lines do |t|
+    create_table :journal_entry_lines, if_not_exists: true do |t|
       t.references :journal_entry
       t.integer :line_number, null: false
       t.references :accounts
@@ -30,7 +30,7 @@ class CreateJournalEntries < ActiveRecord::Migration[8.1]
         (debit > 0 AND credit = 0) OR 
         (credit > 0 AND debit = 0) OR 
         (debit = 0 AND credit = 0)
-      )
+      ) IF NOT EXISTS;
     SQL
   end
 end

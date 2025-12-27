@@ -1,6 +1,6 @@
 class CreatePayments < ActiveRecord::Migration[8.1]
   def change
-    create_table :payments do |t|
+    create_table :payments, if_not_exists: true do |t|
       t.references :user, null: false
       t.references :account, null: false
       t.decimal :amount, precision: 20, scale: 6, default: "0.0", null: false
