@@ -64,7 +64,7 @@ class PaymentCommandHandler:
         """Validate user exists"""
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"http://basic-service:3001/api/users/{user_id}"
+                f"http://rails:3000/api/users/{user_id}"
             )
 
             if response.status_code != 200:
@@ -74,7 +74,7 @@ class PaymentCommandHandler:
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.post(
-                    f"http://basic-service:3001/api/sales-journal",
+                    f"http://rails:3000/api/sales-journal",
                     json={
                         "payment_id": payment.id
                     },
@@ -84,7 +84,7 @@ class PaymentCommandHandler:
                 )
                 response.raise_for_status()
         except httpx.ConnectError:
-            logging.error(f"Failed to connect to basic-service:3001 for sales journal.")
+            logging.error(f"Failed to connect to rails:3000 for sales journal.")
             raise HTTPException(status_code=503, detail="Sales journal service is unavailable")
         except httpx.HTTPStatusError as e:
             logging.error(f"HTTP error for sales journal: {e.response.text}")

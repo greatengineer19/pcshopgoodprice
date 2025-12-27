@@ -1,12 +1,13 @@
 version: "3.9"
+# pisgop (people shop good price)
 
 services:
-  backend:
-    build: .
+  fastapi:
+    build: ./fastapi-service
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - ./fastapi-service:/app
     environment:
       - DB_HOST=${DB_STAGING_HOST}
       - DB_PORT=${DB_STAGING_PORT}
@@ -17,7 +18,26 @@ services:
       - WEB_ENVIRONMENT=${WEB_ENVIRONMENT}
     command: python main.py
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://backend:8000/"]
+      test: ["CMD", "curl", "-f", "http://fastapi:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    env_file:
+      - .env
+  rails:
+    build: ./rails-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./rails-service:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://rails:3000/up"]
       interval: 30s
       timeout: 10s
       retries: 3
