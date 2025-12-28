@@ -50,21 +50,34 @@ class PaymentCommandHandler:
             )
 
             db.add(payment_model)
-            # Flush to generate the payment ID without committing the transaction
-            # This allows us to pass the ID to Rails while keeping rollback capability
-            db.flush()
-            
-            # Call Rails with the generated payment ID
-            # If this fails, the exception will trigger rollback in the except block
-            response = await self._create_sales_journal(payment_model, token)
-            
-            # Only commit if Rails call succeeded
             db.commit()
+            
+            await self._create_sales_journal(payment_model, token)
 
             return payment_model
+        except HTTPException as e:
+            # Cleanup
+            try:
+                db.delete(payment_model)
+                db.commit()
+            except Exception as cleanup_error:
+                logging.error(f"Cleanup failed: {cleanup_error}")
+            
+            raise HTTPException(
+                status_code=424,
+                detail=f"Payment created but journal failed: {e.detail}"
+            )
         except Exception as e:
-            db.rollback()
-            raise e
+            try:
+                db.delete(payment_model)
+                db.commit()
+            except Exception as cleanup_error:
+                logging.error(f"Cleanup failed: {cleanup_error}")
+            
+            raise HTTPException(
+                status_code=500,
+                detail=f"Payment processing failed: {str(e)}"
+            )
     
     async def _validate_user(self, user_id: int):
         return

@@ -10,7 +10,7 @@ module Api
 
     # GET /users/1 or /users/1.json
     def show
-      user = User.find(params[:id])
+      user = User.find(params.expect(:id))
       render json: user, serializer: UserSerializer
     end
 
