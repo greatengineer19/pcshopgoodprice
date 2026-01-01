@@ -258,8 +258,9 @@ def test_index(client, db_session, inbound_delivery_1):
     assert len(inbound_deliveries) == 1
     
     inbound_delivery = inbound_deliveries[0]
+    db_delivery = db_session.query(InboundDelivery).filter(InboundDelivery.id == inbound_delivery_1.id).first()
     assert inbound_delivery == {
-        'created_at': inbound_delivery_1.created_at,
+        'created_at': db_delivery.created_at.replace(microsecond=0).isoformat(),
         'deleted': False,
         'id': inbound_delivery_1.id,
         'inbound_delivery_date': inbound_delivery_1.inbound_delivery_date,
@@ -269,7 +270,7 @@ def test_index(client, db_session, inbound_delivery_1):
         'purchase_invoice_no': inbound_delivery_1.purchase_invoice_no,
         'received_by': 'Sean Ali',
         'status': 'delivered',
-        'updated_at': inbound_delivery_1.updated_at
+        'updated_at': db_delivery.updated_at.replace(microsecond=0).isoformat()
     }
 
 def test_show(client, db_session, inbound_delivery_1):
