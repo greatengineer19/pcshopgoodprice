@@ -1,12 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe "Api::Users", type: :request do
-  let(:taro_yamada) { create(:user, user_id: "TaroYamada", password: "PaSSwd4TY", password_confirmation: "PaSSwd4TY") }
+  let(:taro_yamada) { create(:user, fullname: "TaroYamada", password: "PaSSwd4TY", password_confirmation: "PaSSwd4TY") }
 
-  def basic_auth_header(user_id, password)
-    credentials = Base64.strict_encode64("#{user_id}:#{password}")
+  def jwt_auth_maker(user_id, password)
+    credentials = JsonWebToken.encode({
+      user_id: user_id,
+      password: password
+    })
 
-    { 'Authorization' => "Basic #{credentials}"}
+    { 'Authorization' => "Bearer #{credentials}"}
   end
 
   xdescribe "GET /api/posts" do
@@ -19,56 +22,24 @@ RSpec.describe "Api::Users", type: :request do
     end
   end
 
-  xdescribe "GET /users/:user_id" do
-    context 'no nickname' do
+  describe "GET /api/users/:user_id" do
+    context 'default' do
       it "returns the user" do
-        get "/users/#{taro_yamada.user_id}", headers: basic_auth_header(taro_yamada.user_id, "PaSSwd4TY")
+        get "/api/users/#{taro_yamada.id}", headers: jwt_auth_maker(taro_yamada.id, "PaSSwd4TY")
 
         response_body = JSON.parse(response.body)
         expect(response).to have_http_status(:ok)
-        expect(response_body).to eq({"message"=>"User details by user_id", "user"=>{"user_id"=>"TaroYamada", "nickname"=>"TaroYamada"}})
-      end
-    end
-    
-    context 'have nickname' do
-      before do
-        taro_yamada.update!(nickname: "Taro")
-      end
-
-      it "returns the user" do
-        get "/users/#{taro_yamada.user_id}", headers: basic_auth_header(taro_yamada.user_id, "PaSSwd4TY")
-
-        response_body = JSON.parse(response.body)
-        expect(response).to have_http_status(:ok)
-        expect(response_body).to eq({"message"=>"User details by user_id", "user"=>{"user_id"=>"TaroYamada", "nickname"=>"Taro", "comment"=>"I'm happy."}})
-      end
-    end
-
-    context 'no user_id' do
-      before do
-        taro_yamada.update!(nickname: "Taro")
-      end
-
-      it "returns the user" do
-        get "/users/any", headers: basic_auth_header(taro_yamada.user_id, "PaSSwd4TY")
-
-        response_body = JSON.parse(response.body)
-        expect(response.status).to eql(404)
-        expect(response_body).to eq({"message"=>"No user found"})
+        expect(response_body).to eq({"id" => taro_yamada.id, "role" => 0, "fullname" => "TaroYamada", "created_at" => taro_yamada.created_at.iso8601(3)})
       end
     end
 
     context 'no auth' do
-      before do
-        taro_yamada.update!(nickname: "Taro")
-      end
-
       it "returns the user" do
-        get "/users/#{taro_yamada.user_id}"
+        get "/api/users/#{taro_yamada.id}"
 
         response_body = JSON.parse(response.body)
         expect(response.status).to eql(401)
-        expect(response_body).to eq({"message"=>"Authentication failed"})
+        expect(response_body).to eq({"error" => "Token missing"})
       end
     end
   end

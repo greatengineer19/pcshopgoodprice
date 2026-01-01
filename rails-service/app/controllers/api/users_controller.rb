@@ -1,6 +1,11 @@
 module Api
   class UsersController < ApplicationController
+    include JsonWebTokenAuthenticator
+  
     before_action :set_user, only: %i[ show edit update destroy ]
+    before_action :authenticate_request, only: %i[show]
+    skip_before_action :verify_authenticity_token
+    skip_forgery_protection
 
     # GET /users or /users.json
     def index
@@ -10,8 +15,7 @@ module Api
 
     # GET /users/1 or /users/1.json
     def show
-      user = User.find(params.expect(:id))
-      render json: user, serializer: UserSerializer
+      render json: @user, serializer: UserSerializer
     end
 
     # GET /users/new

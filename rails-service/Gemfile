@@ -34,6 +34,8 @@ gem 'timecop'
 gem 'redis'
 gem 'connection_pool'
 
+gem "active_model_serializers"
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
@@ -59,6 +61,7 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+  gem 'dotenv'
 end
 
 group :development do
