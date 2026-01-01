@@ -60,7 +60,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 def create_access_token(subject: Union[str, Any], expires_delta: Optional[int] = None) -> str:
     additional_time = expires_delta if expires_delta is not None else setting.ACCESS_TOKEN_EXPIRE_MINUTES
-    expires_delta = datetime.now(timezone.utc) + timedelta(minutes=additional_time)
+    expires_delta = datetime.now() + timedelta(minutes=additional_time)
 
     to_encode = { "exp": expires_delta, "user_id": str(subject) }
     encoded_jwt = jwt.encode(to_encode, setting.JWT_SECRET_KEY, setting.JWT_ALGORITHM)
