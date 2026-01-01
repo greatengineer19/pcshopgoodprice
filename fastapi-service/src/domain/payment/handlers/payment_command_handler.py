@@ -21,7 +21,7 @@ class PaymentCommandHandler:
         token: str,
         db: Session
     ) -> PaymentTransaction:
-        await self._validate_user(command.user_id)
+        await self._validate_user(command.user_id, token)
     
         try:
             payment = PaymentTransaction(
@@ -79,12 +79,14 @@ class PaymentCommandHandler:
                 detail=f"Payment processing failed: {str(e)}"
             )
     
-    async def _validate_user(self, user_id: int):
-        return
+    async def _validate_user(self, user_id: int, token: str):
         """Validate user exists"""
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"http://rails:3000/api/users/{user_id}"
+                f"http://rails:3000/api/users/{user_id}",
+                headers={
+                    "Authorization": f"Bearer {token}"
+                }
             )
 
             if response.status_code != 200:
