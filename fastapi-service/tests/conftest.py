@@ -20,6 +20,13 @@ from tests.factories.payment_method_factory import PaymentMethodFactory
 from tests.factories.account_factory import AccountFactory
 from tests.factories.payment_factory import PaymentFactory
 from src.schemas import DayTypeEnum
+import os
+
+@pytest.fixture(scope="session", autouse=True)
+def set_test_env():
+    os.environ["TESTING"] = "true"
+    yield
+    os.environ.pop("TESTING", None)
 
 @pytest.fixture
 def user_sean_ali():

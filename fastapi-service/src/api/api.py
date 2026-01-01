@@ -50,14 +50,14 @@ def create_sales_delivery_every_thirty_seconds(db: Session = next(get_db())):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if os.environ.get('WEB_ENVIRONMENT'): # adding os environ to prevent EVENT LOOP error in each test call
+    if not os.environ.get('TESTING'):
         scheduler.add_job(create_sales_delivery_every_thirty_seconds, 'interval', seconds=30) # Run every 30 seconds\
         scheduler.start()
 
     yield
 
-    if os.environ.get('WEB_ENVIRONMENT'):
-        scheduler.shutdown() # Shut down on application exit
+    if not os.environ.get('TESTING'):
+        scheduler.shutdown()
 
 app = FastAPI(lifespan=lifespan) # add lifespan to fastapi initialization
 
@@ -66,6 +66,7 @@ origins = [
     "https://www.pcshopgoodprice.com",
     "https://pcshopgoodprice.com",
     "http://localhost:3000",
+    "http://localhost:3003",
     'localhost',
     "http://frontend:3000",
     "http://backend:8000",
