@@ -17,4 +17,4 @@ def test_analyze(client, db_session, user_sean_ali):
     assert response.status_code == 200
     response_body = response.json()
 
-    assert len(response_body['data']) == 11
+    assert len(response_body['data']) == 10

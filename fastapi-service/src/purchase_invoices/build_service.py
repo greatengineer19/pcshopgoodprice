@@ -9,7 +9,7 @@ from datetime import datetime
 from fastapi import HTTPException
 
 class BuildService:
-    def __init__(self, db: Session, skip_generate_invoice_no: False):
+    def __init__(self, db: Session, skip_generate_invoice_no: bool = False):
         self.db = db
         self.skip_generate_invoice_no = skip_generate_invoice_no
 

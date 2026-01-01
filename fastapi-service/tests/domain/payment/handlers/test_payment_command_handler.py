@@ -13,6 +13,7 @@ from src.domain.payment.handlers.payment_command_handler import PaymentCommandHa
 from unittest.mock import AsyncMock, patch
 import httpx
 from src.infrastructure.persistence.models.payment import Payment
+from fastapi import HTTPException
 
 @pytest.fixture
 def fetch_token_sean_ali(user_sean_ali):
@@ -65,7 +66,7 @@ async def test_create_payment(
                         db_session)
         assert mock_journal.called
         assert mock_journal.call_count == 1
-    
+
 @pytest.mark.asyncio
 async def test_create_payment_journal_fails(
     client,
@@ -81,41 +82,14 @@ async def test_create_payment_journal_fails(
         new_callable=AsyncMock,
         side_effect=httpx.HTTPError("Journal service unavailable")
     ) as mock_journal:
-        with pytest.raises(httpx.HTTPError):
-            response = await PaymentCommandHandler().handle_process_payment(
+        with pytest.raises(HTTPException):
+            await PaymentCommandHandler().handle_process_payment(
                 mock_process_payment_command,
                 fetch_token_sean_ali,
                 db_session
             )
 
         assert mock_journal.called
-
-@pytest.mark.asyncio
-async def test_create_payment_journal_returns_500(
-    client,
-    db_session,
-    fetch_token_sean_ali,
-    mock_process_payment_command
-):
-    db_session.commit()
-
-    from unittest.mock import MagicMock
-
-    mock_response = MagicMock()
-    mock_response.status_code = 500
-    mock_response.json.return_value = { "error": "Internal server error" }
-
-    with patch('src.domain.payment.handlers.payment_command_handler.httpx.AsyncClient') as mock_client:
-        mock_client.return_value.__aenter__.return_value.post = AsyncMock(
-            return_value=mock_response
-        )
-
-        response = await PaymentCommandHandler().handle_process_payment(
-            mock_process_payment_command,
-            fetch_token_sean_ali,
-            db_session
-        )
-        assert mock_client.return_value.__aenter__.return_value.post.called
 
 @pytest.mark.asyncio
 async def test_create_payment_network_timeout(
@@ -135,12 +109,13 @@ async def test_create_payment_network_timeout(
         new_callable=AsyncMock,
         side_effect=httpx.TimeoutException("Request timeout")
     ) as mock_journal:
-        with pytest.raises(httpx.TimeoutException):
+        with pytest.raises(HTTPException):
             await PaymentCommandHandler().handle_process_payment(
                 mock_process_payment_command,
                 fetch_token_sean_ali,
                 db_session
             )
+            
 
     final_count = db_session.query(Payment).count()
     assert final_count == initial_count

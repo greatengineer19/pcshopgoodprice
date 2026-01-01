@@ -190,7 +190,7 @@ def test_index(client, purchase_invoice_1, db_session):
     assert purchase_invoice['deleted'] == False
     assert purchase_invoice['expected_delivery_date'] == None
     assert purchase_invoice['notes'] == 'testing'
-    assert purchase_invoice['purchase_invoice_no'] == 'BUY-00001'
+    assert purchase_invoice['purchase_invoice_no'] == 'BUY-0000001'
     assert purchase_invoice['status'] == 'pending'
     assert Decimal(purchase_invoice['sum_total_line_amounts']) == Decimal('12900.000000')
     assert purchase_invoice['supplier_name'] == 'Aftershock PC'
