@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     resources :users
     resources :journal_entries, only: [:create]
     resources :accounts
+    resources :payments
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

@@ -10,7 +10,7 @@ module Api
     # GET /users or /users.json
     def index
       @users = User.includes(:accounts).page(params[:page])
-      render json: users, each_serializer: UserSerializer
+      render json: @users, each_serializer: UserSerializer
     end
 
     # GET /users/1 or /users/1.json
