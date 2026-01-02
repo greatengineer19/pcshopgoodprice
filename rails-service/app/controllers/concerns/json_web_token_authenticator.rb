@@ -16,7 +16,7 @@ module JsonWebTokenAuthenticator
     puts "token is decoded"
     puts "=" * 60
     puts decoded_token
-    @current_user = User.find(decoded_token[:user_id])
+    @current_user = User.find(decoded_token[:user_id].presence || decoded_token[:sub])
   rescue ActiveRecord::RecordNotFound
     render_unauthorized('User not found')
   rescue JsonWebToken::TokenExpiredError => e

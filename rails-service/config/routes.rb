@@ -1,9 +1,8 @@
 Rails.application.routes.draw do
-  resources :accounts
-
   namespace :api do
     resources :users
     resources :journal_entries, only: [:create]
+    resources :accounts
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

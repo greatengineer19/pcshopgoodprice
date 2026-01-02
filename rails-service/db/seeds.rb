@@ -7,3 +7,12 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+Account.create!(
+	account_code: "4010",
+	account_name: "Sales Revenue",
+	account_type: :revenue,
+	is_active: true,
+	normal_balance: :credit,
+	subtype: 0
+)
