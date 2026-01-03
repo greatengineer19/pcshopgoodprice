@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Api::Payments", type: :request do
   let(:user) { create(:user) }
+
   let(:cash_account) {
     create(:account,
       account_code: "1000",
@@ -62,9 +63,15 @@ RSpec.describe "Api::Payments", type: :request do
     it "return payments" do
       get "/api/payments", headers: jwt_auth_maker(user.id, user.password)
       response_body = JSON.parse(response.body)
+      expect(response_body.size).to eql(2)
 
-      payment = response_body.first
-      expect(payment.keys).to eql(["debit_account_id", "amount", "payment_method", "currency", "created_at", "debit_account"])
+      filtered_payment = response_body.detect { |row| row['id'].to_i == payment.id }
+      expect(filtered_payment.keys).to match_array(["id", "debit_account_id", "amount", "payment_method", "currency", "created_at", "debit_account"])
+      expect(filtered_payment['amount']).to eql('500000.0')
+      expect(filtered_payment['payment_method']).to eql('cash')
+      expect(filtered_payment['currency']).to eql('idr')
+      expect(filtered_payment['debit_account_id']).to eql(cash_account.id)
+      expect(filtered_payment['debit_account']['id']).to eql(cash_account.id)
     end
   end
 end

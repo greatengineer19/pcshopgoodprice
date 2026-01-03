@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from src.api.api import app
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.pool import NullPool
 from src.database import Base
@@ -21,6 +21,7 @@ from tests.factories.account_factory import AccountFactory
 from tests.factories.payment_factory import PaymentFactory
 from src.schemas import DayTypeEnum
 import os
+
 
 @pytest.fixture(scope="session", autouse=True)
 def set_test_env():
@@ -168,9 +169,15 @@ def engine():
         echo=False,
         poolclass=NullPool
     )
+    with engine.begin() as conn:
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS public"))
+
     Base.metadata.create_all(engine)
     yield engine
-    Base.metadata.drop_all(engine)
+
+    with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA IF EXISTS public CASCADE"))
+
     engine.dispose()
 
 @pytest.fixture
