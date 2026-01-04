@@ -84,4 +84,5 @@ class PaymentLoadTestHandler:
         }
 
         logger.info(f"Load test completed: {result}")
+        print(f"Load test completed: {result}")
         return result

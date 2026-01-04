@@ -2,9 +2,9 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class PaymentLoadTestRequestSchema(BaseModel):
-    num_requests: int = Field(default=10000, gt=0, le=100000, description="Number of payment requests to generate")
-    user_id: int = Field(default=1, gt=0, description="User ID for test payments")
-    account_id: int = Field(default=1, gt=0, description="Account ID for test payments")
+    num_requests: int = Field(gt=0, le=100000, description="Number of payment requests to generate")
+    user_id: int = Field(gt=0, description="User ID for test payments")
+    account_id: int = Field(gt=0, description="Account ID for test payments")
 
     class Config:
         json_schema_extra = {

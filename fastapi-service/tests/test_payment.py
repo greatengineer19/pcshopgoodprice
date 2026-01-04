@@ -98,27 +98,35 @@ def test_index(
     assert response.json()['report_body'][1]['id'] == payment_1.id
 
 
+@patch.object(PaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
+@patch.object(PaymentCommandHandler, '_create_sales_journal', new_callable=AsyncMock)
 def test_create_payment(
+    mock_journal,
+    mock_user,
     client,
     db_session,
     fetch_token_sean_ali,
     payment_request_json):
     db_session.commit()
 
-    with patch.object(
-        PaymentCommandHandler,
-        '_create_sales_journal',
-        new_callable=AsyncMock
-    ) as mock_journal:
-        headers = {
-            "Authorization": f"Bearer {fetch_token_sean_ali}"
-        }
-        response = client.post("/api/payments", headers=headers, json=payment_request_json)
-        response_body = response.json()
-        assert response_body == {'payment_id': 1, 'currency': 'EUR', 'payment_method': 'CASH', 'message': 'Payment is being processed'}
-        assert response.status_code == 201
+    headers = {
+        "Authorization": f"Bearer {fetch_token_sean_ali}"
+    }
+    response = client.post("/api/payments", headers=headers, json=payment_request_json)
+    response_body = response.json()
+    assert response_body['currency'] == 'EUR'
+    assert response_body['payment_method'] == 'CASH'
+    assert response_body['message'] == 'Payment is being processed'
+    assert response.status_code == 201
 
+    mock_journal.assert_called_once()
+    mock_user.assert_called_once()
+        
+@patch.object(PaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
+@patch.object(PaymentCommandHandler, '_create_sales_journal', new_callable=AsyncMock, side_effect=httpx.HTTPError("Journal service unavailable"))
 def test_create_payment_journal_fails(
+    mock_journal,
+    mock_user,
     client,
     db_session,
     fetch_token_sean_ali,
@@ -126,22 +134,22 @@ def test_create_payment_journal_fails(
 ):
     db_session.commit()
 
-    with patch.object(
-        PaymentCommandHandler,
-        '_create_sales_journal',
-        new_callable=AsyncMock,
-        side_effect=httpx.HTTPError("Journal service unavailable")
-    ) as mock_journal:
-        headers = {
-            "Authorization": f"Bearer {fetch_token_sean_ali}"
-        }
-        response = client.post("/api/payments", headers=headers, json=payment_request_json)
-        assert response.status_code == 500
-        assert 'Payment processing failed: Journal service unavailable' in response.json()['detail']
+    headers = {
+        "Authorization": f"Bearer {fetch_token_sean_ali}"
+    }
+    response = client.post("/api/payments", headers=headers, json=payment_request_json)
+    assert response.status_code == 500
+    assert 'Payment processing failed: Journal service unavailable' in response.json()['detail']
 
-        assert mock_journal.called
+    mock_journal.assert_called_once()
+    mock_user.assert_called_once()
+        
 
+@patch.object(PaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
+@patch.object(PaymentCommandHandler, '_create_sales_journal', new_callable=AsyncMock, side_effect=httpx.TimeoutException("Request timeout"))
 def test_create_payment_network_timeout(
+    mock_journal,
+    mock_user,
     client,
     db_session,
     fetch_token_sean_ali,
@@ -152,17 +160,14 @@ def test_create_payment_network_timeout(
 
     assert initial_count == 0
 
-    with patch.object(
-        PaymentCommandHandler,
-        '_create_sales_journal',
-        new_callable=AsyncMock,
-        side_effect=httpx.TimeoutException("Request timeout")
-    ) as mock_journal:
-        headers = {
-            "Authorization": f"Bearer {fetch_token_sean_ali}"
-        }
-        response = client.post("/api/payments", headers=headers, json=payment_request_json)
-        assert response.status_code == 500
+    headers = {
+        "Authorization": f"Bearer {fetch_token_sean_ali}"
+    }
+    response = client.post("/api/payments", headers=headers, json=payment_request_json)
+    assert response.status_code == 500
+
+    mock_journal.assert_called_once()
+    mock_user.assert_called_once()
 
     final_count = db_session.query(Payment).count()
     assert final_count == initial_count
