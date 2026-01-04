@@ -22,7 +22,8 @@ from src.api.routers import (
     report_purchase_invoices,
     ai_report_analyzer,
     purchase_invoices_query_analysis,
-    payment
+    payment,
+    jobs
 )
 from src.api.routers.sales_payment import (
     bank_transfer,
@@ -93,6 +94,7 @@ app.include_router(purchase_invoices_query_analysis.router)
 app.include_router(webhook.router)
 app.include_router(sessions.router)
 app.include_router(payment.router)
+app.include_router(jobs.router)
 
 @app.get("/")
 async def root():
