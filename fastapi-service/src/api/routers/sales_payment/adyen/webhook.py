@@ -24,7 +24,7 @@ async def webhook_notifications(request: Request, db: Session = Depends(get_db))
         notifications = request_body['notificationItems']
         notification = notifications[0]
 
-        print("<<< webhooked from adyen")
+        print("<<< Webhook of Adyen")
         print(notifications)
         if is_valid_hmac_notification(notification['NotificationRequestItem'], setting.ADYEN_HMAC_KEY):
             consume_event(notification)
