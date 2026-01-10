@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Api::JournalEntriesController", type: :request do
+RSpec.describe "Rails::Api::JournalEntriesController", type: :request do
   let(:user) { create(:user) }
   let(:cash_account) {
     create(:account,
@@ -48,7 +48,7 @@ RSpec.describe "Api::JournalEntriesController", type: :request do
     { 'Authorization' => "Bearer #{credentials}" }
   end
 
-  describe "POST /api/journal_entries" do
+  describe "POST /rails/api/journal_entries" do
     context 'when from payment' do
       before do
         cash_account
@@ -58,7 +58,7 @@ RSpec.describe "Api::JournalEntriesController", type: :request do
   
       it "creates a new post" do
         expect {
-          post "/api/journal_entries",
+          post "/rails/api/journal_entries",
           params: valid_attributes,
           headers: token_header
         }.to change(JournalEntry, :count).by(1)

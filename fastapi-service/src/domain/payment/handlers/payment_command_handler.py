@@ -83,7 +83,7 @@ class PaymentCommandHandler:
         """Validate user exists"""
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"http://rails:3000/api/users/{user_id}",
+                f"http://rails:3000/rails/api/users/{user_id}",
                 headers={
                     "Authorization": f"Bearer {token}"
                 }
@@ -96,7 +96,7 @@ class PaymentCommandHandler:
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.post(
-                    f"http://rails:3000/api/journal_entries",
+                    f"http://rails:3000/rails/api/journal_entries",
                     json={
                         "journal_entry": {
                             "reference_id": payment.id,

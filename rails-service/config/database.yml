@@ -30,10 +30,11 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: railway
-    username: postgres
-    password: <%= ENV["EXAM_API_DATABASE_PASSWORD"] %>
-    host: postgres.railway.internal
+    database: <%= ENV["DB_STAGING_DATABASE"] %>
+    username: <%= ENV["DB_STAGING_USERNAME"] %>
+    password: <%= ENV["DB_STAGING_PASSWORD"] %>
+    host: <%= ENV["DB_STAGING_HOST"] %>
+    port: <%= ENV["DB_STAGING_PORT"] %>
   cache:
     <<: *primary_production
     migrations_paths: db/cache_migrate

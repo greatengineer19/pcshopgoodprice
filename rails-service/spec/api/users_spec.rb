@@ -12,20 +12,20 @@ RSpec.describe "Api::Users", type: :request do
     { 'Authorization' => "Bearer #{credentials}"}
   end
 
-  xdescribe "GET /api/posts" do
+  xdescribe "GET /rails/api/posts" do
     it "returns a status ok" do
       create_list(:post, 3)
       
-      get "/api/posts"
+      get "/rails/api/posts"
       
       expect(response).to have_http_status(:ok)
     end
   end
 
-  describe "GET /api/users/:user_id" do
+  describe "GET /rails/api/users/:user_id" do
     context 'default' do
       it "returns the user" do
-        get "/api/users/#{taro_yamada.id}", headers: jwt_auth_maker(taro_yamada.id, "PaSSwd4TY")
+        get "/rails/api/users/#{taro_yamada.id}", headers: jwt_auth_maker(taro_yamada.id, "PaSSwd4TY")
 
         response_body = JSON.parse(response.body)
         expect(response).to have_http_status(:ok)
@@ -35,7 +35,7 @@ RSpec.describe "Api::Users", type: :request do
 
     context 'no auth' do
       it "returns the user" do
-        get "/api/users/#{taro_yamada.id}"
+        get "/rails/api/users/#{taro_yamada.id}"
 
         response_body = JSON.parse(response.body)
         expect(response.status).to eql(401)
@@ -111,7 +111,7 @@ RSpec.describe "Api::Users", type: :request do
     let(:new_attributes) { { title: 'Updated Title' } }
     
     xit "updates the USER" do
-      patch "/api/posts/#{post.id}", params: { post: new_attributes }
+      patch "/rails/api/posts/#{post.id}", params: { post: new_attributes }
       
       post.reload
       expect(response).to have_http_status(:ok)
@@ -147,7 +147,7 @@ RSpec.describe "Api::Users", type: :request do
     end
   end
 
-  xdescribe "DELETE /api/posts/:id" do
+  xdescribe "DELETE /rails/api/posts/:id" do
     let!(:post) { create(:post, :with_comments) }
 
     before do
@@ -156,7 +156,7 @@ RSpec.describe "Api::Users", type: :request do
     
     it "deletes the post" do
       expect {
-        delete "/api/posts/#{post.id}"
+        delete "/rails/api/posts/#{post.id}"
       }.to change(Post, :count).by(-1)
       
       expect(response).to have_http_status(:no_content)
@@ -164,7 +164,7 @@ RSpec.describe "Api::Users", type: :request do
     
     it "removes record from PostgreSQL" do
       post_id = post.id
-      delete "/api/posts/#{post_id}"
+      delete "/rails/api/posts/#{post_id}"
       
       expect(Post.exists?(post_id)).to be false
     end

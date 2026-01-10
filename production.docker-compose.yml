@@ -1,21 +1,60 @@
 version: "3.9"
 
 services:
-  backend:
-    build: .
+  fastapi:
+    build: ./fastapi-service
     ports:
       - "8000:8000"
+    volumes:
+      - ./fastapi-service:/app
     environment:
+      - DB_HOST=${DB_PRODUCTION_HOST}
+      - DB_PORT=${DB_PRODUCTION_PORT}
+      - DB_USER=${DB_PRODUCTION_USERNAME}
+      - DB_PASSWORD=${DB_PRODUCTION_PASSWORD}
+      - DB_NAME=${DB_PRODUCTION_DATABASE}
       - DEBUG=False # Disable debug mode in production
       - WEB_ENVIRONMENT=${WEB_ENVIRONMENT}
     command: python main.py
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://fastapi:8000/" ]
+      interval: 40s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - static_volume:/app/static
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - app-network
+    env_file:
+      - .env
+  rails:
+    build: ./rails-service
+    environment:
+      - RAILS_ENV=development
+      - DB_PRODUCTION_HOST=${DB_PRODUCTION_HOST}
+      - DB_PRODUCTION_PORT=${DB_PRODUCTION_PORT}
+      - DB_PRODUCTION_PASSWORD=${DB_PRODUCTION_PASSWORD}
+      - DB_PRODUCTION_USERNAME=${DB_PRODUCTION_USERNAME}
+      - DB_PRODUCTION_PASSWORD=${DB_PRODUCTION_PASSWORD}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./rails-service:/app
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    env_file:
+      - .env
   nginx:
     image: nginx:alpine
     ports:
@@ -26,7 +65,8 @@ services:
       - ./certs:/etc/nginx/certs:ro # ADD THIS
       - static_volume:/app/static:ro
     depends_on:
-      - backend
+      - rails
+      - fastapi
     networks:
       - app-network
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Api::Payments", type: :request do
+RSpec.describe "Rails::Api::Payments", type: :request do
   let(:user) { create(:user) }
 
   let(:cash_account) {
@@ -54,14 +54,14 @@ RSpec.describe "Api::Payments", type: :request do
     { 'Authorization' => "Bearer #{credentials}"}
   end
 
-  describe "GET /api/payments" do
+  describe "GET /rails/api/payments" do
     before do
       payment
       payment_2
     end
 
     it "return payments" do
-      get "/api/payments", headers: jwt_auth_maker(user.id, user.password)
+      get "/rails/api/payments", headers: jwt_auth_maker(user.id, user.password)
       response_body = JSON.parse(response.body)
       expect(response_body.size).to eql(2)
 
