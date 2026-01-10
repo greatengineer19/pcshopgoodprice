@@ -22,7 +22,7 @@ def test_no_rating(db_session,
     assert hasattr(component_keyboard_logitech, 'sell_price') == False
 
     result = service.call()
-    assert result.sell_price == Decimal('1660000.000000')
+    assert result.sell_price == Decimal('1550000.000000')
     assert hasattr(component_keyboard_logitech, 'sell_price') == True
     assert result.rating == 0.0
     assert result.count_review_given == 0

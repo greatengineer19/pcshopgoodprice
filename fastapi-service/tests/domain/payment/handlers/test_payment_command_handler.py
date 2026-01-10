@@ -48,27 +48,32 @@ def mock_process_payment_command(user_sean_ali, account_0):
     )
 
 @pytest.mark.asyncio
+@patch.object(PaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
+@patch.object(PaymentCommandHandler, '_create_sales_journal', new_callable=AsyncMock)
 async def test_create_payment(
+    mock_journal,
+    mock_user,
     client,
     db_session,
     fetch_token_sean_ali,
     mock_process_payment_command):
     db_session.commit()
 
-    with patch.object(
-        PaymentCommandHandler,
-        '_create_sales_journal',
-        new_callable=AsyncMock
-    ) as mock_journal:
-        response = await PaymentCommandHandler().handle_process_payment(
+    response = await PaymentCommandHandler().handle_process_payment(
                         mock_process_payment_command,
                         fetch_token_sean_ali,
                         db_session)
-        assert mock_journal.called
-        assert mock_journal.call_count == 1
+
+    assert mock_journal.call_count == 1
+    assert mock_user.call_count == 1
+        
 
 @pytest.mark.asyncio
+@patch.object(PaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
+@patch.object(PaymentCommandHandler, '_create_sales_journal', new_callable=AsyncMock, side_effect=httpx.HTTPError("Journal service unavailable"))
 async def test_create_payment_journal_fails(
+    mock_journal,
+    mock_user,
     client,
     db_session,
     fetch_token_sean_ali,
@@ -76,23 +81,20 @@ async def test_create_payment_journal_fails(
 ):
     db_session.commit()
 
-    with patch.object(
-        PaymentCommandHandler,
-        '_create_sales_journal',
-        new_callable=AsyncMock,
-        side_effect=httpx.HTTPError("Journal service unavailable")
-    ) as mock_journal:
-        with pytest.raises(HTTPException):
-            await PaymentCommandHandler().handle_process_payment(
-                mock_process_payment_command,
-                fetch_token_sean_ali,
-                db_session
-            )
+    with pytest.raises(HTTPException):
+        await PaymentCommandHandler().handle_process_payment(
+            mock_process_payment_command,
+            fetch_token_sean_ali,
+            db_session
+        )
 
-        assert mock_journal.called
+    assert mock_journal.call_count == 1
+        
 
 @pytest.mark.asyncio
+@patch.object(PaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
 async def test_create_payment_network_timeout(
+    mock_user,
     client,
     db_session,
     fetch_token_sean_ali,
@@ -119,3 +121,5 @@ async def test_create_payment_network_timeout(
 
     final_count = db_session.query(Payment).count()
     assert final_count == initial_count
+
+    assert mock_user.call_count == 1
