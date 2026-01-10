@@ -1,1 +1,30 @@
+# Root
 .env
+.env.local
+.DS_Store
+
+# Rails Service
+rails-service/.bundle
+rails-service/.env*
+rails-service/log/*
+rails-service/tmp/*
+!rails-service/log/.keep
+!rails-service/tmp/.keep
+rails-service/tmp/pids/*
+!rails-service/tmp/pids/
+!rails-service/tmp/pids/.keep
+rails-service/storage/*
+!rails-service/storage/.keep
+rails-service/tmp/storage/*
+!rails-service/tmp/storage/
+!rails-service/tmp/storage/.keep
+rails-service/public/assets
+rails-service/config/*.key
+
+# FastAPI Service
+fastapi-service/__pycache__/
+fastapi-service/*.py[cod]
+fastapi-service/.pytest_cache/
+fastapi-service/.env
+fastapi-service/.venv/
+fastapi-service/venv/

@@ -1,0 +1,5 @@
+de:
+  journal_entry:
+    not_balance: "Der Buchungssatz ist nicht ausgeglichen"
+  journal_entry_line:
+    debit_or_credit_invalid: "soll/haben muss positiv sein"
