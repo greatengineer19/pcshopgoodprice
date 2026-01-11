@@ -30,11 +30,11 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: <%= ENV["DB_STAGING_DATABASE"] %>
-    username: <%= ENV["DB_STAGING_USERNAME"] %>
-    password: <%= ENV["DB_STAGING_PASSWORD"] %>
-    host: <%= ENV["DB_STAGING_HOST"] %>
-    port: <%= ENV["DB_STAGING_PORT"] %>
+    database: <%= ENV["DB_PRODUCTION_DATABASE"] %>
+    username: <%= ENV["DB_PRODUCTION_USERNAME"] %>
+    password: <%= ENV["DB_PRODUCTION_PASSWORD"] %>
+    host: <%= ENV["DB_PRODUCTION_HOST"] %>
+    port: <%= ENV["DB_PRODUCTION_PORT"] %>
   cache:
     <<: *primary_production
     migrations_paths: db/cache_migrate
