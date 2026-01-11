@@ -31,6 +31,9 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
+RUN mkdir -p tmp/cache tmp/pids tmp/sockets && \
+    chmod -R 755 tmp
+
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
