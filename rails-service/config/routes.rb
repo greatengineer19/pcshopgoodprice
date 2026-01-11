@@ -3,7 +3,11 @@ Rails.application.routes.draw do
     namespace :api do
       resources :users
       resources :journal_entries, only: [:create]
-      resources :accounts
+      resources :accounts do
+        collection do
+          get :seeds
+        end
+      end
       resources :payments
     end
   end

@@ -3,6 +3,60 @@ module Rails
     class AccountsController < ApplicationController
       before_action :set_account, only: %i[ show edit update destroy ]
 
+      def seeds
+        acc = Account.find_or_initialize_by(account_code: 4010)
+        if acc.id.blank?
+          acc.account_name = 'Sales Revenue'
+          acc.account_type = :revenue
+          acc.is_active = true
+          acc.normal_balance = :credit
+          acc.subtype = 0
+          acc.save!
+        end
+
+        acc = Account.find_or_initialize_by(account_code: 1010)
+        if acc.id.blank?
+          acc.account_name = 'Cash'
+          acc.account_type = :asset
+          acc.is_active = true
+          acc.normal_balance = :debit
+          acc.subtype = 0
+          acc.save!
+        end
+
+        acc = Account.find_or_initialize_by(account_code: 1011)
+        if acc.id.blank?
+          acc.account_name = 'Petty Cash'
+          acc.account_type = :asset
+          acc.is_active = true
+          acc.normal_balance = :debit
+          acc.subtype = 0
+          acc.save!
+        end
+
+        acc = Account.find_or_initialize_by(account_code: 1030)
+        if acc.id.blank?
+          acc.account_name = 'BCA (Transfer)'
+          acc.account_type = :asset
+          acc.is_active = true
+          acc.normal_balance = :debit
+          acc.subtype = 0
+          acc.save!
+        end
+
+        acc = Account.find_or_initialize_by(account_code: 1031)
+        if acc.id.blank?
+          acc.account_name = 'BNI (Transfer)'
+          acc.account_type = :asset
+          acc.is_active = true
+          acc.normal_balance = :debit
+          acc.subtype = 0
+          acc.save!
+        end
+
+        return 'ok'
+      end
+
       # GET /accounts or /accounts.json
       def index
         @accounts = Account.all
