@@ -32,13 +32,14 @@ services:
       - RAILS_ENV=production
       - DB_PRODUCTION_HOST=${DB_PRODUCTION_HOST}
       - DB_PRODUCTION_PORT=${DB_PRODUCTION_PORT}
-      - DB_PRODUCTION_PASSWORD=${DB_PRODUCTION_PASSWORD}
       - DB_PRODUCTION_USERNAME=${DB_PRODUCTION_USERNAME}
       - DB_PRODUCTION_PASSWORD=${DB_PRODUCTION_PASSWORD}
     ports:
       - "3000:3000"
     volumes:
       - ./rails-service:/app
+      - rails_tmp:/app/tmp
+      - rails_cache:/app/tmp/cache
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
       interval: 30s
@@ -66,6 +67,8 @@ services:
 
 volumes:
   static_volume:
+  rails_tmp:
+  rails_cache:
 
 
 networks:
