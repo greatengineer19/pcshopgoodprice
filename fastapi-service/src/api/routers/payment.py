@@ -42,6 +42,7 @@ async def index(
 
 def generate_response(payments):
     result = []
+
     for payment in payments:
         result.append({
             'id': payment.id,

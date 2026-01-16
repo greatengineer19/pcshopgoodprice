@@ -12,13 +12,17 @@ RSpec.describe "Api::Users", type: :request do
     { 'Authorization' => "Bearer #{credentials}"}
   end
 
-  xdescribe "GET /rails/api/posts" do
+  describe "GET /rails/api/users" do
+    before do
+      taro_yamada
+    end
+
     it "returns a status ok" do
-      create_list(:post, 3)
-      
-      get "/rails/api/posts"
-      
+      get "/rails/api/users"
+
       expect(response).to have_http_status(:ok)
+      response_body = JSON.parse(response.body)
+      expect(response_body.size).to eql(1)
     end
   end
 

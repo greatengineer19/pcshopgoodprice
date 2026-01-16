@@ -54,7 +54,7 @@ module Rails
           acc.save!
         end
 
-        return 'ok'
+        render json: { status: 'success', message: 'Accounts seeded successfully' }, status: :ok
       end
 
       # GET /accounts or /accounts.json

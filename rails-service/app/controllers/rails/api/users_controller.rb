@@ -10,7 +10,7 @@ module Rails
 
       # GET /users or /users.json
       def index
-        @users = User.includes(:accounts).page(params[:page])
+        @users = User.all.limit(50).offset(pagination)
         render json: @users, each_serializer: UserSerializer
       end
 
@@ -67,6 +67,10 @@ module Rails
       end
 
       private
+
+      def pagination
+        params[:page] || 0
+      end
 
       # Use callbacks to share common setup or constraints between actions.
       def set_user
