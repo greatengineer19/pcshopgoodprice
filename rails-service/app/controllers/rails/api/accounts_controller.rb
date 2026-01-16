@@ -36,7 +36,7 @@ module Rails
 
         acc = Account.find_or_initialize_by(account_code: 1030)
         if acc.id.blank?
-          acc.account_name = 'BCA (Transfer)'
+          acc.account_name = 'Bank BCA Account'
           acc.account_type = :asset
           acc.is_active = true
           acc.normal_balance = :debit
@@ -46,7 +46,7 @@ module Rails
 
         acc = Account.find_or_initialize_by(account_code: 1031)
         if acc.id.blank?
-          acc.account_name = 'BNI (Transfer)'
+          acc.account_name = 'Bank BNI Account'
           acc.account_type = :asset
           acc.is_active = true
           acc.normal_balance = :debit

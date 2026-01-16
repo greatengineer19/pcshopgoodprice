@@ -17,15 +17,19 @@ ENV RAILS_ENV=$RAILS_ENV \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
-# Install packages needed to build gems
+# Install packages needed to build gems and clean up in same layer
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev pkg-config libyaml-dev libvips-dev && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
-# Install application gems
+# Install application gems with aggressive cleanup
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
+RUN bundle config set --local cache_all false && \
+    bundle config set --local clean true && \
+    bundle install --jobs 4 --retry 3 && \
+    bundle clean --force && \
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git "${BUNDLE_PATH}"/ruby/*/gems/*/test "${BUNDLE_PATH}"/ruby/*/gems/*/spec "${BUNDLE_PATH}"/ruby/*/gems/*/features "${BUNDLE_PATH}"/ruby/*/gems/*/*.md "${BUNDLE_PATH}"/ruby/*/gems/*/*.txt && \
     bundle exec bootsnap precompile --gemfile
 
 # Copy application code
@@ -36,7 +40,10 @@ RUN mkdir -p tmp/cache tmp/pids tmp/sockets && \
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
-RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+
+# Precompile assets and clean up temporary files
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile && \
+    rm -rf tmp/cache/* node_modules .git
 
 # Final stage for app image
 FROM base
@@ -44,7 +51,8 @@ FROM base
 # Install packages needed for deployment
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libpq-dev libyaml-0-2 libvips42 && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 # Copy built gems and application code from build stage
 COPY --from=build /usr/local/bundle /usr/local/bundle
