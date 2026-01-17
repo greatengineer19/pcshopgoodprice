@@ -50,6 +50,15 @@ services:
       - app-network
     env_file:
       - .env
+    mem_limit: 512m
+    memswap_limit: 1536m
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          memory: 256M
   nginx:
     image: nginx:alpine
     ports:
