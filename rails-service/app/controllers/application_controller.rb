@@ -1,4 +1,4 @@
-class ApplicationController < ActionController::API
+class ApplicationController < ActionController::Base
   rescue_from StandardError, NameError, with: :handle_standard_error
   rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
   rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
