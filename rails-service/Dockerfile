@@ -19,7 +19,7 @@ FROM base AS build
 
 # Install packages needed to build gems and clean up in same layer
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev pkg-config libyaml-dev libvips-dev && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev pkg-config libyaml-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
@@ -42,15 +42,14 @@ RUN mkdir -p tmp/cache tmp/pids tmp/sockets && \
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompile assets and clean up temporary files
-RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile && \
-    rm -rf tmp/cache/* node_modules .git
+RUN rm -rf tmp/cache/* node_modules .git
 
 # Final stage for app image
 FROM base
 
 # Install packages needed for deployment
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libpq5 libyaml-0-2 libvips42 && \
+    apt-get install --no-install-recommends -y curl libpq5 libyaml-0-2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
