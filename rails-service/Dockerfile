@@ -20,6 +20,7 @@ RUN apt-get update -qq && \
     build-essential \
     git \
     libpq-dev \
+    libyaml-dev \
     pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
@@ -52,7 +53,8 @@ FROM base
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     curl \
-    libpq5 && \
+    libpq5 \
+    libyaml-0-2 && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy from build stage
