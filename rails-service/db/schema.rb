@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_21_151543) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_17_120704) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -181,6 +181,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_151543) do
     t.integer "currency", null: false
     t.integer "debit_account_id", null: false
     t.integer "payment_method", null: false
+    t.string "request_uuid"
     t.datetime "updated_at", precision: nil, default: -> { "now()" }, null: false
     t.integer "user_id", null: false
     t.index ["account_id"], name: "index_payments_on_account_id"

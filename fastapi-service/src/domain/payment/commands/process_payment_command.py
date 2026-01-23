@@ -11,4 +11,5 @@ class ProcessPaymentCommand:
     currency: str
     payment_method: str
     description: Optional[str] = None
+    request_uuid: Optional[str] = None
     

@@ -54,6 +54,58 @@ RSpec.describe "Rails::Api::Payments", type: :request do
     { 'Authorization' => "Bearer #{credentials}"}
   end
 
+  describe "POST /rails/api/payments/bulk_create" do
+    let(:request_uuid) do
+      SecureRandom.uuid
+    end
+
+    let(:create_attributes) do
+      {
+        total_payments: 12,
+        request_uuid: request_uuid
+      }
+    end
+
+    it "should be able to create request to the background job" do
+      expect(BulkPaymentJob).to receive(:perform_later).with(total_payments: 12, request_uuid: request_uuid)
+      post "/rails/api/payments/bulk_create", headers: jwt_auth_maker(user.id, user.password), params: create_attributes
+
+      response_body = JSON.parse(response.body)
+
+      expect(response_body['message']).to eql("Bulk payment job started")
+      expect(response.status).to eql(202)
+    end
+  end
+
+  describe "POST /rails/api/payments" do
+    let(:create_attributes) do
+      {
+        user_id: user.id,
+        debit_account_id: cash_account.id,
+        account_id: cash_account.id,
+        amount: 500000,
+        currency: :idr,
+        payment_method: :cash
+      }
+    end
+
+    before do
+      sales_revenue_account
+    end
+
+    it "should be able to create payment" do
+      expect do
+        post "/rails/api/payments", headers: jwt_auth_maker(user.id, user.password), params: create_attributes
+      end
+        .to change { Payment.count }.by(1)
+        .and change { JournalEntry.count }.by(1)
+        .and change { JournalEntryLine.count }.by(2)
+
+      response_body = JSON.parse(response.body)
+      expect(response_body['payment'].present?).to be_truthy
+    end
+  end
+
   describe "GET /rails/api/payments" do
     before do
       payment

@@ -28,3 +28,10 @@ fastapi-service/.pytest_cache/
 fastapi-service/.env
 fastapi-service/.venv/
 fastapi-service/venv/
+fastapi-service/__pycache__/
+fastapi-service/*.pyc
+fastapi-service/*.pyo
+fastapi-service/*.pyd
+fastapi-service/.pytest_cache/
+fastapi-service/*.py[cod]
+fastapi-service/*$py.class
