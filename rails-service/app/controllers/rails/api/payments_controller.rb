@@ -1,6 +1,9 @@
 module Rails
 	module Api
 		class PaymentsController < ApplicationController
+			skip_before_action :verify_authenticity_token
+		    skip_forgery_protection
+
 			def index
 				@payments = Payment.all.limit(50).offset(pagination)
 				render json: @payments, each_serializer: PaymentSerializer
