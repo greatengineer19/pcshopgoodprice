@@ -3,7 +3,9 @@ from tests.factories.user_factory import UserFactory
 from tests.factories.account_factory import AccountFactory
 from tests.factories.payment_factory import PaymentFactory
 from tests.conftest import (
-    client, db_session, setup_factories,
+    client,
+    db_session,
+    setup_factories,
     user_sean_ali,
     component_category_gpu
 )
@@ -11,10 +13,12 @@ from utils.auth import create_access_token, create_refresh_token, decodeJWT, get
 from src.domain.payment.commands.process_payment_command import ProcessPaymentCommand
 from decimal import Decimal
 from src.domain.payment.handlers.payment_command_handler import PaymentCommandHandler
+from src.domain.payment.handlers.bulk_payment_command_handler import BulkPaymentCommandHandler
 from unittest.mock import AsyncMock, patch
 import httpx
 from src.infrastructure.persistence.models.payment import Payment
 from src.api.schemas.payment_schemas import PaymentRequestSchema
+from src.api.routers.payment import process_bulk_payments_task
 
 @pytest.fixture
 def fetch_token_sean_ali(user_sean_ali):
@@ -96,6 +100,36 @@ def test_index(
     assert len(response.json()['report_body']) == 2
     assert response.json()['report_body'][0]['id'] == payment_2.id
     assert response.json()['report_body'][1]['id'] == payment_1.id
+
+@patch.object(BulkPaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
+@patch.object(BulkPaymentCommandHandler, '_create_payment', new_callable=AsyncMock)
+def test_process_bulk_payments_task(
+    client,
+    db_session
+):
+    db_session.commit()
+
+    response = process_bulk_payments_task(db_session, '1234567890', '1234567890',10, [1,2], [1,2])
+    assert response == 'Done processing bulk payments'
+
+@patch.object(process_bulk_payments_task, 'delay', new_callable=AsyncMock)
+def test_create_bulk_payment(
+    mock_bulk_payment_job,
+    client,
+    db_session,
+    fetch_token_sean_ali
+):
+    db_session.commit()
+    headers = {
+        "Authorization": f"Bearer {fetch_token_sean_ali}"
+    }
+
+    response = client.post("/api/payments/bulk_create", headers=headers, json={"total_payments": 10})
+    assert response.status_code == 202
+    assert response.json()['message'] == "Background job is processed"
+    assert response.json()['status'] == "accepted"
+
+    mock_bulk_payment_job.assert_called_once()
 
 
 @patch.object(PaymentCommandHandler, '_validate_user', new_callable=AsyncMock)

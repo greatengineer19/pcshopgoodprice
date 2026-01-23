@@ -92,6 +92,44 @@ class PaymentCommandHandler:
             if response.status_code != 200:
                 raise HTTPException(status_code=404, detail="User not found")
 
+    async def _create_payment(
+        self,
+        user_id: int,
+        account_id: int,
+        amount: int,
+        currency: int,
+        payment_method: str,
+        request_uuid: str,
+        token: str
+    ):
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.post(
+                    f"http://rails:3000/rails/api/payments",
+                    json={
+                        "user_id": user_id,
+                        "debit_account_id": account_id,
+                        "account_id": account_id,
+                        "amount": amount,
+                        "currency": currency,
+                        "payment_method": payment_method,
+                        "request_uuid": request_uuid
+                    },
+                    headers={
+                        "Authorization": f"Bearer {token}"
+                    }
+                )
+                response.raise_for_status()
+        except httpx.ConnectError:
+            logging.error(f"Failed to connect to rails:3000 for payments")
+            raise HTTPException(status_code=503, detail="Rails payment service is unavailable")
+        except httpx.HTTPStatusError as e:
+            logging.error(f"HTTP error for payment: {e.response.text}")
+            raise HTTPException(status_code=500, detail="Failed to create payment")
+        except Exception as e:
+            logging.error(f"Unexpected error creating payment: {e}")
+            raise HTTPException(status_code=500, detail="Internal server error")
+
     async def _create_sales_journal(self, payment: PaymentTransaction, token: str):
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:

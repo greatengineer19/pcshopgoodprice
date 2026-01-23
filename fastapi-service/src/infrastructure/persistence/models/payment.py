@@ -19,6 +19,7 @@ class Payment(Base):
     )
     currency: Mapped[int] = mapped_column(Integer, nullable=False)
     payment_method: Mapped[int] = mapped_column(Integer, nullable=False)
+    request_uuid: Mapped[str] = mapped_column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 

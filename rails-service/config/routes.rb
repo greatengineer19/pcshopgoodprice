@@ -8,7 +8,11 @@ Rails.application.routes.draw do
           get :seeds
         end
       end
-      resources :payments
+      resources :payments do
+        collection do
+          post :bulk_create
+        end
+      end
     end
   end
 

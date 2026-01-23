@@ -21,6 +21,15 @@ module Rails
 				render json: { payment: payment }, status: :ok
 			end
 
+			def bulk_create
+				total_payments = (bulk_payment_params[:total_payments].presence || 10).to_i
+				total_payments = 50 if total_payments > 50
+
+				BulkPaymentJob.perform_later(total_payments: total_payments, request_uuid: bulk_payment_params[:request_uuid])
+
+				render json: { message: "Bulk payment job started" }, status: :accepted
+			end
+
 			private
 
 			def pagination
@@ -28,14 +37,19 @@ module Rails
 			end
 
 			def create_params
-				params.require(
+				params.permit(
 					:user_id,
+					:request_uuid,
 					:debit_account_id,
+					:account_id,
 					:amount,
 					:currency,
-					:payment_method,
-					:description
+					:payment_method
 				)
+			end
+
+			def bulk_payment_params
+				params.permit(:total_payments, :request_uuid)
 			end
 		end
 	end

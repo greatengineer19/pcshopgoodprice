@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, BackgroundTasks, Query
-from ..schemas.payment_schemas import PaymentRequestSchema, PaymentResponseSchema
+from ..schemas.payment_schemas import PaymentRequestSchema, PaymentResponseSchema, BulkPaymentRequestSchema
 from src.domain.payment.commands.process_payment_command import ProcessPaymentCommand
 from src.domain.payment.handlers.payment_command_handler import PaymentCommandHandler
+from src.domain.payment.handlers.bulk_payment_command_handler import BulkPaymentCommandHandler
 from src.api.dependencies.token_fetcher import get_token
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from src.api.session_db import get_db
 from src.domain.payment.value_objects.currency import CurrencyEnum
 from src.domain.payment.value_objects.payment_method import PaymentMethod
@@ -11,8 +13,62 @@ from src.domain.payment.entities.payment_index import PaymentIndex
 from src.payments.filter_service import FilterService
 import logging
 from fastapi import HTTPException
+from celery import Celery
+import uuid
+import random
+from src.models import User, Account
+from src.domain.payment.value_objects.payment_method import PaymentMethod
 
 router = APIRouter(prefix='/api/payments', tags=['payments'])
+celery = Celery('tasks', broker='redis://localhost:6379/0')
+
+@celery.task
+def process_bulk_payments_task(
+        db: Session,
+        request_uuid: str,
+        token: str,
+        total_payments: int,
+        user_ids: list[int],
+        account_ids: list[int]
+    ) -> str:
+    payment_methods = [e.name.lower() for e in PaymentMethod]
+
+    for _ in range(total_payments):
+        user_id = random.choice(user_ids)
+        account_id = random.choice(account_ids)
+        amount = random.randint(100, 999)
+        currency = 'idr'
+        payment_method = random.choice(payment_methods)
+
+        command = ProcessPaymentCommand(
+            user_id=user_id,
+            debit_account_id=account_id,
+            amount=amount,
+            currency=currency,
+            payment_method=payment_method,
+            request_uuid=request_uuid
+        )
+
+        BulkPaymentCommandHandler()._create_bulk_payment(
+            command=command,
+            token=token,
+            db=db
+        )
+
+    return 'Done processing bulk payments'
+
+@router.post("/bulk_create", status_code=202)
+async def create_bulk_payments(
+    request: BulkPaymentRequestSchema,
+    token: str = Depends(get_token),
+    db: Session = Depends(get_db)
+):
+    request_uuid = str(uuid.uuid4())
+    user_ids = db.scalars(select(User.id)).all()
+    account_ids = db.scalars(select(Account.id).filter(Account.account_type == 3)).all()
+    await process_bulk_payments_task.delay(request_uuid, token, request.total_payments, user_ids, account_ids)
+
+    return { "message": "Background job is processed", "status": "accepted" }
 
 @router.get("", response_model=PaymentIndex, status_code=200)
 async def index(
@@ -54,7 +110,6 @@ def generate_response(payments):
         })
 
     return result
-
 
 @router.post("", response_model=PaymentResponseSchema, status_code=201)
 async def create_payment(

@@ -1,6 +1,6 @@
 class JournalEntry < ApplicationRecord
   belongs_to :reference, polymorphic: true
-  has_many :journal_entry_lines
+  has_many :journal_entry_lines, dependent: :destroy
 
   before_validation :generate_entry_number, on: :create
   after_validation :change_status, on: :create
