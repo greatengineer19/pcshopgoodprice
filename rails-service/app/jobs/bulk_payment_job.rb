@@ -1,7 +1,14 @@
 class BulkPaymentJob < ApplicationJob
   queue_as :default
 
-  def perform(total_payments: 0, request_uuid:)
+  def perform(total_payments: 0, start_time: Time.zone.now, request_uuid:)
+    return if total_payments.zero?
+
+    entry = ImportPaymentEntry.create!({
+      total_payments: total_payments,
+      start_time: start_time,
+      request_uuid: request_uuid
+    })
     processed_payments = 0
 
     user_ids = User.limit(10).pluck(:id)
@@ -36,6 +43,7 @@ class BulkPaymentJob < ApplicationJob
       processed_payments += 10
     end
 
+    entry.update!(end_time: Time.zone.now)
     return "Bulk payment job completed #{processed_payments} payments"
   rescue StandardError => e
     # TODO: Create an entity called BulkPaymentRequest to capture completed / failed requests
