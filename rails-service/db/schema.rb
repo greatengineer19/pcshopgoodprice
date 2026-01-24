@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_24_043311) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_24_115059) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,6 +79,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_24_043311) do
     t.index ["id"], name: "ix_computer_components_id"
     t.unique_constraint ["name"], name: "computer_components_name_key"
     t.unique_constraint ["product_code"], name: "computer_components_product_code_key"
+  end
+
+  create_table "import_payment_entries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "end_time"
+    t.string "request_uuid"
+    t.datetime "start_time"
+    t.integer "total_payments"
+    t.datetime "updated_at", null: false
   end
 
   create_table "inbound_deliveries", id: :serial, force: :cascade do |t|

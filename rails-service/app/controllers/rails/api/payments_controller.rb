@@ -26,7 +26,7 @@ module Rails
 
 			def bulk_create
 				total_payments = (bulk_payment_params[:total_payments].presence || 10).to_i
-				total_payments = 50 if total_payments > 50
+				total_payments = 10000 if total_payments > 10000
 
 				BulkPaymentJob.perform_later(total_payments: total_payments, request_uuid: bulk_payment_params[:request_uuid])
 
