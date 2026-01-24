@@ -11,6 +11,16 @@ if [ "${1}" = "./bin/rails" ] && [ "${2}" = "server" ] && [ "${RAILS_ENV}" != "t
   echo "Running database migrations..."
   ./bin/rails db:migrate
   echo "All databases ready!"
+  
+  # Start SolidQueue worker in background
+  echo "Starting SolidQueue worker..."
+  bundle exec rake solid_queue:start &
+  WORKER_PID=$!
+  
+  # Trap signals to gracefully shutdown both server and worker
+  trap "echo 'Shutting down...'; kill -TERM $WORKER_PID 2>/dev/null || true; wait $WORKER_PID 2>/dev/null || true" SIGTERM SIGINT EXIT
+  
+  echo "SolidQueue worker started (PID: $WORKER_PID)"
 fi
 
 exec "${@}"
