@@ -9,15 +9,7 @@ rm -f /app/tmp/pids/server.pid
 # If running the rails server then create or migrate existing database
 if [ "${1}" = "./bin/rails" ] && [ "${2}" = "server" ] && [ "${RAILS_ENV}" != "test" ]; then
   echo "Running database migrations..."
-  ./bin/rails db:migrate 2>/dev/null || true
-  
-  # Load schema for Solid* databases (Rails 8 uses schema files, not migrations)
-  echo "Setting up cache database..."
-  ./bin/rails db:schema:load:cache 2>/dev/null || true
-  echo "Setting up queue database..."
-  ./bin/rails db:schema:load:queue 2>/dev/null || true
-  echo "Setting up cable database..."
-  ./bin/rails db:schema:load:cable 2>/dev/null || true
+  ./bin/rails db:migrate
   echo "All databases ready!"
 fi
 
