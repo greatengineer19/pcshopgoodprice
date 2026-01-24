@@ -18,44 +18,64 @@ import uuid
 import random
 from src.models import User, Account
 from src.domain.payment.value_objects.payment_method import PaymentMethod
+from src.infrastructure.persistence.models.import_payment_entry import ImportPaymentEntry
+from datetime import datetime
 
 router = APIRouter(prefix='/api/payments', tags=['payments'])
 celery = Celery('tasks', broker='redis://localhost:6379/0')
 
 @celery.task
 def process_bulk_payments_task(
-        db: Session,
         request_uuid: str,
         token: str,
         total_payments: int,
         user_ids: list[int],
         account_ids: list[int]
     ) -> str:
-    payment_methods = [e.name.lower() for e in PaymentMethod]
 
-    for _ in range(total_payments):
-        user_id = random.choice(user_ids)
-        account_id = random.choice(account_ids)
-        amount = random.randint(100, 999)
-        currency = 'idr'
-        payment_method = random.choice(payment_methods)
+    db = next(get_db())
+    entry = ImportPaymentEntry(
+                request_uuid=request_uuid,
+                total_payments=total_payments,
+                start_time=datetime.now(),
+                end_time=None
+            )
+        
+    try:
+        payment_methods = [e.name.lower() for e in PaymentMethod]
 
-        command = ProcessPaymentCommand(
-            user_id=user_id,
-            debit_account_id=account_id,
-            amount=amount,
-            currency=currency,
-            payment_method=payment_method,
-            request_uuid=request_uuid
-        )
+        for _ in range(total_payments):
+            user_id = random.choice(user_ids)
+            account_id = random.choice(account_ids)
+            amount = random.randint(100, 999)
+            currency = 'idr'
+            payment_method = random.choice(payment_methods)
 
-        BulkPaymentCommandHandler()._create_bulk_payment(
-            command=command,
-            token=token,
-            db=db
-        )
+            command = ProcessPaymentCommand(
+                user_id=user_id,
+                debit_account_id=account_id,
+                amount=amount,
+                currency=currency,
+                payment_method=payment_method,
+                request_uuid=request_uuid
+            )
 
-    return 'Done processing bulk payments'
+            BulkPaymentCommandHandler()._create_bulk_payment(
+                command=command,
+                token=token,
+                db=db
+            )
+
+        entry.end_time = datetime.now()
+        db.add(entry)
+        db.commit()
+    
+        return 'Done processing bulk payments'
+    except Exception as e:
+        db.rollback()  # ✅ Rollback on error
+        raise
+    finally:
+        db.close()
 
 @router.post("/bulk_create", status_code=202)
 async def create_bulk_payments(

@@ -1,0 +1,2 @@
+class ImportPaymentEntry < ApplicationRecord
+end
