@@ -20,9 +20,10 @@ from src.models import User, Account
 from src.domain.payment.value_objects.payment_method import PaymentMethod
 from src.infrastructure.persistence.models.import_payment_entry import ImportPaymentEntry
 from datetime import datetime
+import os
 
 router = APIRouter(prefix='/api/payments', tags=['payments'])
-celery = Celery('tasks', broker='redis://localhost:6379/0')
+celery = Celery('tasks', broker=os.getenv('CELERY_BROKER_URL'))
 
 @celery.task
 def process_bulk_payments_task(
@@ -86,7 +87,7 @@ async def create_bulk_payments(
     request_uuid = str(uuid.uuid4())
     user_ids = db.scalars(select(User.id)).all()
     account_ids = db.scalars(select(Account.id).filter(Account.account_type == 3)).all()
-    await process_bulk_payments_task.delay(request_uuid, token, request.total_payments, user_ids, account_ids)
+    process_bulk_payments_task.delay(request_uuid, token, request.total_payments, user_ids, account_ids)
 
     return { "message": "Background job is processed", "status": "accepted" }
 

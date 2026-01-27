@@ -1,7 +1,15 @@
-version: "3.9"
+# version: "3.9"
 # pisgop (people shop good price)
 
 services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
   fastapi:
     build: ./fastapi-service
     ports:
@@ -30,8 +38,26 @@ services:
       - app-network
     env_file:
       - .env
+  fastapi-celery:
+    build: ./fastapi-service
+    command: celery -A src.api.routers.payment worker --loglevel=info
+    volumes:
+      - ./fastapi-service:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+    restart: unless-stopped
+    depends_on:
+      - fastapi
+      - redis
+    networks:
+      - app-network
+    env_file:
+      - .env
   rails:
-    build: ./rails-service
+    build:
+      context: ./rails-service
+      dockerfile: Dockerfile.dev
+      shm_size: '2gb'
     environment:
       - RAILS_ENV=development
       - DB_STAGING_HOST=db
@@ -43,20 +69,21 @@ services:
       - "3000:3000"
     volumes:
       - ./rails-service:/app
+      - ./rails-service:/app:cached
+      - /app/tmp
+      - /app/log
+      - bundle_cache:/usr/local/bundle
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
       interval: 30s
       timeout: 10s
       retries: 3
-    mem_limit: 512m
-    memswap_limit: 1536m
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          memory: 256M
     restart: unless-stopped
     depends_on:
       db:
@@ -101,6 +128,8 @@ services:
 volumes:
   postgres_data:
   static_volume:
+  redis_data:
+  bundle_cache:
 
 
 networks:

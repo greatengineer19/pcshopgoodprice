@@ -21,3 +21,4 @@ Adyen == 13.3.0
 pytest-asyncio
 pytest-mock
 celery
+redis
