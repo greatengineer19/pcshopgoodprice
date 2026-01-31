@@ -40,11 +40,14 @@ services:
       - .env
   fastapi-celery:
     build: ./fastapi-service
+    ports:
+      - "5678:5678"
     command: celery -A src.api.routers.payment worker --loglevel=info
     volumes:
       - ./fastapi-service:/app
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
     depends_on:
       - fastapi

@@ -44,7 +44,17 @@ def process_bulk_payments_task(
         
     try:
         payment_methods = [e.name.lower() for e in PaymentMethod]
+        print(f"Total payments to create: {total_payments}")
+        print(f"User IDs: {user_ids}")
+        print(f"Account IDs: {account_ids}")
 
+        # Add validation
+        if not user_ids:
+            raise ValueError("user_ids list is empty")
+        if not account_ids:
+            raise ValueError("account_ids list is empty")
+        
+        print("Starting payment creation...")
         for _ in range(total_payments):
             user_id = random.choice(user_ids)
             account_id = random.choice(account_ids)
