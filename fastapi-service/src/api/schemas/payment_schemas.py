@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, field_validator, condecimal
 from typing import Optional, Union
 
 class BulkPaymentRequestSchema(BaseModel):
-    total_payments: int = Field(..., gt=0, lt=50, description="Total Payments must be positive")
+    total_payments: int = Field(..., gt=0, lt=5000, description="Total Payments must be positive")
 
 class PaymentRequestSchema(BaseModel):
     """Request schema for creating payment"""

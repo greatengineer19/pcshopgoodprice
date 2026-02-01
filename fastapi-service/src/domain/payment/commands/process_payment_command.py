@@ -12,4 +12,5 @@ class ProcessPaymentCommand:
     payment_method: str
     description: Optional[str] = None
     request_uuid: Optional[str] = None
+    fastapi_last_iter: Optional[bool] = False
     

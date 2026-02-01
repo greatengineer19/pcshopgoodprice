@@ -57,7 +57,7 @@ def process_bulk_payments_task(
             raise ValueError("account_ids list is empty")
         
         print("Starting payment creation...")
-        for _ in range(total_payments):
+        for i_range in range(total_payments):
             user_id = random.choice(user_ids)
             account_id = random.choice(account_ids)
             amount = random.randint(100, 999)
@@ -70,7 +70,8 @@ def process_bulk_payments_task(
                 amount=amount,
                 currency=currency,
                 payment_method=payment_method,
-                request_uuid=request_uuid
+                request_uuid=request_uuid,
+                fastapi_last_iter= i_range == total_payments - 1
             )
 
             BulkPaymentCommandHandler()._create_bulk_payment(

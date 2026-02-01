@@ -63,7 +63,8 @@ class BulkPaymentCommandHandler:
                         "account_id": command.debit_account_id,
                         "amount": command.amount,
                         "currency": command.currency,
-                        "payment_method": command.payment_method
+                        "payment_method": command.payment_method,
+                        "fastapi_last_iter": command.fastapi_last_iter
                     },
                     headers={
                         "Authorization": f"Bearer {token}"
