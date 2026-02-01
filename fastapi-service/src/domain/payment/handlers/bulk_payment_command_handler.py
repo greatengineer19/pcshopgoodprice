@@ -15,16 +15,16 @@ class BulkPaymentCommandHandler:
     def __init__(self):
         pass
 
-    async def _create_bulk_payment(
+    def _create_bulk_payment(
         self,
         command: ProcessPaymentCommand,
         token: str,
         db: Session
     ) -> str:
-        await self._validate_user(command.user_id, token)
+        self._validate_user(command.user_id, token)
     
         try:
-            await self._create_payment(command, token, db)
+            self._create_payment(command, token)
 
             return 'Payment is created successfully'
         except HTTPException as e:
@@ -38,10 +38,10 @@ class BulkPaymentCommandHandler:
                 detail=f"Failed to create payment: {str(e)}"
             )
     
-    async def _validate_user(self, user_id: int, token: str):
+    def _validate_user(self, user_id: int, token: str):
         """Validate user exists"""
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        with httpx.Client() as client:
+            response = client.get(
                 f"http://rails:3000/rails/api/users/{user_id}",
                 headers={
                     "Authorization": f"Bearer {token}"
@@ -51,16 +51,16 @@ class BulkPaymentCommandHandler:
             if response.status_code != 200:
                 raise HTTPException(status_code=404, detail="User not found")
 
-    async def _create_payment(self, command: ProcessPaymentCommand, token: str):
+    def _create_payment(self, command: ProcessPaymentCommand, token: str):
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
-                response = await client.post(
+            with httpx.Client(timeout=5.0) as client:
+                response = client.post(
                     f"http://rails:3000/rails/api/payments",
                     json={
                         "user_id": command.user_id,
                         "request_uuid": command.request_uuid,
                         "debit_account_id": command.debit_account_id,
-                        "account_id": command.account_id,
+                        "account_id": command.debit_account_id,
                         "amount": command.amount,
                         "currency": command.currency,
                         "payment_method": command.payment_method

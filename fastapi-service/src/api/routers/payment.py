@@ -39,7 +39,9 @@ def process_bulk_payments_task(
                 request_uuid=request_uuid,
                 total_payments=total_payments,
                 start_time=datetime.now(),
-                end_time=None
+                end_time=None,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
             )
         
     try:

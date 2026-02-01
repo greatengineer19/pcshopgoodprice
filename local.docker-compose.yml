@@ -12,6 +12,7 @@ services:
       - app-network
   fastapi:
     build: ./fastapi-service
+    container_name: 'pisgop-fastapi'
     ports:
       - "8000:8000"
     volumes:
@@ -40,6 +41,7 @@ services:
       - .env
   fastapi-celery:
     build: ./fastapi-service
+    container_name: 'pisgop-fastapi-celery'
     ports:
       - "5678:5678"
     command: celery -A src.api.routers.payment worker --loglevel=info
@@ -61,6 +63,7 @@ services:
       context: ./rails-service
       dockerfile: Dockerfile.dev
       shm_size: '2gb'
+    container_name: 'pisgop-rails'
     environment:
       - RAILS_ENV=development
       - DB_STAGING_HOST=db
