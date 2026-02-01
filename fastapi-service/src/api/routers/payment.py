@@ -20,9 +20,10 @@ from src.models import User, Account
 from src.domain.payment.value_objects.payment_method import PaymentMethod
 from src.infrastructure.persistence.models.import_payment_entry import ImportPaymentEntry
 from datetime import datetime
+import os
 
 router = APIRouter(prefix='/api/payments', tags=['payments'])
-celery = Celery('tasks', broker='redis://localhost:6379/0')
+celery = Celery('tasks', broker=os.getenv('CELERY_BROKER_URL'))
 
 @celery.task
 def process_bulk_payments_task(
@@ -38,12 +39,24 @@ def process_bulk_payments_task(
                 request_uuid=request_uuid,
                 total_payments=total_payments,
                 start_time=datetime.now(),
-                end_time=None
+                end_time=None,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
             )
         
     try:
         payment_methods = [e.name.lower() for e in PaymentMethod]
+        print(f"Total payments to create: {total_payments}")
+        print(f"User IDs: {user_ids}")
+        print(f"Account IDs: {account_ids}")
 
+        # Add validation
+        if not user_ids:
+            raise ValueError("user_ids list is empty")
+        if not account_ids:
+            raise ValueError("account_ids list is empty")
+        
+        print("Starting payment creation...")
         for _ in range(total_payments):
             user_id = random.choice(user_ids)
             account_id = random.choice(account_ids)
@@ -86,7 +99,7 @@ async def create_bulk_payments(
     request_uuid = str(uuid.uuid4())
     user_ids = db.scalars(select(User.id)).all()
     account_ids = db.scalars(select(Account.id).filter(Account.account_type == 3)).all()
-    await process_bulk_payments_task.delay(request_uuid, token, request.total_payments, user_ids, account_ids)
+    process_bulk_payments_task.delay(request_uuid, token, request.total_payments, user_ids, account_ids)
 
     return { "message": "Background job is processed", "status": "accepted" }
 

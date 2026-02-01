@@ -9,7 +9,14 @@ rm -f /app/tmp/pids/server.pid
 # If running the rails server then create or migrate existing database
 if [ "${1}" = "./bin/rails" ] && [ "${2}" = "server" ] && [ "${RAILS_ENV}" != "test" ]; then
   echo "Running database migrations..."
-  ./bin/rails db:migrate
+  ./bin/rails db:migrate:status
+  if ./bin/rails db:version 2>/dev/null; then
+    echo "Database exists, running migrations..."
+    ./bin/rails db:migrate
+  else
+    echo "Database does not exist, setting up..."
+    ./bin/rails db:setup
+  fi
   echo "All databases ready!"
   
   # Start SolidQueue worker in background

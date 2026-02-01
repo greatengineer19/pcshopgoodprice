@@ -174,7 +174,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_24_115059) do
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_journal_entry_lines_on_account_id"
     t.index ["journal_entry_id"], name: "index_journal_entry_lines_on_journal_entry_id"
-    t.check_constraint "debit > 0::numeric AND credit = 0::numeric OR credit > 0::numeric AND debit = 0::numeric OR debit = 0::numeric AND credit = 0::numeric", name: "check_debit_credit"
+    t.check_constraint "debit > 0::numeric AND credit = 0::numeric OR credit > 0::numeric AND debit = 0::numeric", name: "check_debit_credit"
   end
 
   create_table "payment_methods", id: :serial, force: :cascade do |t|

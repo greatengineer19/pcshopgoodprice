@@ -25,12 +25,12 @@ class CreateJournalEntries < ActiveRecord::Migration[8.1]
 
     # Add CHECK constraint
     execute <<-SQL
-      ALTER TABLE journal_entry_lines
-      ADD CONSTRAINT check_debit_credit CHECK (
+      ALTER TABLE journal_entry_lines 
+      ADD CONSTRAINT check_debit_credit 
+      CHECK (
         (debit > 0 AND credit = 0) OR 
-        (credit > 0 AND debit = 0) OR 
-        (debit = 0 AND credit = 0)
-      ) IF NOT EXISTS;
+        (credit > 0 AND debit = 0)
+      );
     SQL
   end
 end

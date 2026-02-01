@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
+    CELERY_BROKER_URL: str
     DB_TEST_ENGINE: str
     DB_TEST_USERNAME: str
     DB_TEST_PASSWORD: str
