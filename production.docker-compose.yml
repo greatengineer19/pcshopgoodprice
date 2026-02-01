@@ -1,8 +1,17 @@
 version: "3.9"
 
 services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
   fastapi:
     build: ./fastapi-service
+    container_name: 'pisgop-fastapi'
     ports:
       - "8000:8000"
     volumes:
@@ -26,6 +35,25 @@ services:
       - app-network
     env_file:
       - .env
+  fastapi-celery:
+    build: ./fastapi-service
+    container_name: 'pisgop-fastapi-celery'
+    ports:
+      - "5678:5678"
+    command: celery -A src.api.routers.payment worker --loglevel=info
+    volumes:
+      - ./fastapi-service:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    depends_on:
+      - fastapi
+      - redis
+    networks:
+      - app-network
+    env_file:
+      - .env
   rails:
     build: ./rails-service
     environment:
@@ -40,6 +68,7 @@ services:
       - ./rails-service:/app
       - rails_tmp:/app/tmp
       - rails_cache:/app/tmp/cache
+      - bundle_cache:/usr/local/bundle
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
       interval: 30s
@@ -78,6 +107,7 @@ volumes:
   static_volume:
   rails_tmp:
   rails_cache:
+  redis_data:
 
 
 networks:
