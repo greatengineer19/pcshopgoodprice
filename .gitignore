@@ -3,6 +3,14 @@
 .env.local
 .DS_Store
 
+# Python cache files (global)
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+
 # Rails Service
 rails-service/.bundle
 rails-service/.env*
