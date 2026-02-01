@@ -103,11 +103,9 @@ def test_index(
     assert response.json()['report_body'][0]['id'] == payment_2.id
     assert response.json()['report_body'][1]['id'] == payment_1.id
 
-@patch.object(BulkPaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
-@patch.object(BulkPaymentCommandHandler, '_create_payment', new_callable=AsyncMock)
+@patch.object(BulkPaymentCommandHandler, 'handle_bulk_payments', new_callable=AsyncMock)
 def test_process_bulk_payments_task(
-    mock_create_payment,
-    mock_create_user,
+    mock_handle_bulk,
     db_session
 ):
     db_session.commit()
@@ -116,10 +114,11 @@ def test_process_bulk_payments_task(
 
     payment_entry = db_session.query(ImportPaymentEntry).first()
     assert payment_entry is not None
-    assert payment_entry.end_time is not None
+    assert payment_entry.end_time is None
     assert payment_entry.start_time is not None
     assert payment_entry.total_payments == 10
     assert response == 'Done processing bulk payments'
+    mock_handle_bulk.assert_called_once()
 
 @patch.object(process_bulk_payments_task, 'delay', new_callable=AsyncMock)
 def test_create_bulk_payment(

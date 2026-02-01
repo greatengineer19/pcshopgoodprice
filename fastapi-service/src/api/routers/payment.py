@@ -60,6 +60,7 @@ def process_bulk_payments_task(
         db.commit()
         
         print("Starting payment creation...")
+        commands = []
         for i_range in range(total_payments):
             user_id = random.choice(user_ids)
             account_id = random.choice(account_ids)
@@ -76,12 +77,16 @@ def process_bulk_payments_task(
                 request_uuid=request_uuid,
                 fastapi_last_iter= i_range == total_payments - 1
             )
+            commands.append(command)
 
-            BulkPaymentCommandHandler()._create_bulk_payment(
-                command=command,
+        import asyncio
+        asyncio.run(
+            BulkPaymentCommandHandler().handle_bulk_payments(
+                commands=commands,
                 token=token,
                 db=db
             )
+        )
     
         return 'Done processing bulk payments'
     except Exception as e:

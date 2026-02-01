@@ -49,9 +49,10 @@ def mock_process_payment_command(user_sean_ali, account_0):
         request_uuid='1234abcd'
     )
 
-@patch.object(BulkPaymentCommandHandler, '_validate_user', new_callable=AsyncMock)
-@patch.object(BulkPaymentCommandHandler, '_create_payment', new_callable=AsyncMock)
-def test_create_payment(
+@patch.object(BulkPaymentCommandHandler, '_validate_user_async', new_callable=AsyncMock)
+@patch.object(BulkPaymentCommandHandler, '_create_payment_async', new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_create_payment(
     mock_payment,
     mock_user,
     client,
@@ -60,11 +61,11 @@ def test_create_payment(
     mock_process_payment_command):
     db_session.commit()
 
-    response =  BulkPaymentCommandHandler()._create_bulk_payment(
-                        mock_process_payment_command,
+    response = await BulkPaymentCommandHandler().handle_bulk_payments(
+                        [mock_process_payment_command],
                         fetch_token_sean_ali,
                         db_session)
 
     assert mock_payment.call_count == 1
     assert mock_user.call_count == 1
-    assert response == 'Payment is created successfully'
+    assert response == 'Bulk payments processed successfully'
