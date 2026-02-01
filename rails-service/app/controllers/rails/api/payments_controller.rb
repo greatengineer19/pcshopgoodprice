@@ -21,7 +21,7 @@ module Rails
 					).call!
 				end
 
-				if create_params[:fastapi_last_iter]
+				if params[:fastapi_last_iter]
 					payment_counts = Payment.where(request_uuid: create_params[:request_uuid]).count
 					entry = ImportPaymentEntry.find_by(request_uuid: create_params[:request_uuid])
 					if entry.total_payments <= payment_counts
@@ -55,8 +55,7 @@ module Rails
 					:account_id,
 					:amount,
 					:currency,
-					:payment_method,
-					:fastapi_last_iter
+					:payment_method
 				)
 			end
 
