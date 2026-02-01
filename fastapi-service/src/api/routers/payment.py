@@ -55,6 +55,9 @@ def process_bulk_payments_task(
             raise ValueError("user_ids list is empty")
         if not account_ids:
             raise ValueError("account_ids list is empty")
+
+        db.add(entry)
+        db.commit()
         
         print("Starting payment creation...")
         for i_range in range(total_payments):
@@ -79,10 +82,6 @@ def process_bulk_payments_task(
                 token=token,
                 db=db
             )
-
-        entry.end_time = datetime.now()
-        db.add(entry)
-        db.commit()
     
         return 'Done processing bulk payments'
     except Exception as e:
