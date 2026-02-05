@@ -33,6 +33,7 @@ def account_0(db_session):
         tax_code_id=None
     )
 
+
     db_session.add(account)
     db_session.commit()
 
