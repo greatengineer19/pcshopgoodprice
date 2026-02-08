@@ -1,0 +1,31 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Payments Test Websocket" %>
+
+<h1>Payments Test Websocket</h1>
+
+<div style="border: 1px solid #ccc; padding: 20px; margin: 20px 0;">
+  <h2>Chat Messages</h2>
+  <div id="messages" style="height: 300px; overflow-y: scroll; border: 1px solid #eee; padding: 10px; margin-bottom: 10px;">
+    <!-- Messages will appear here -->
+  </div>
+  
+  <input 
+    type="text" 
+    id="chat-input" 
+    placeholder="Type a message and press Enter..." 
+    style="width: 80%; padding: 10px;"
+  />
+  <button id="send-btn" style="padding: 10px;">Send</button>
+</div>
+
+<div style="background: #f0f0f0; padding: 10px; margin-top: 20px;">
+  <h3>WebSocket Status</h3>
+  <p id="status">Connecting...</p>
+</div>
+
+<script>
+  // This will show when the page loads
+  console.log("Test WebSocket page loaded!");
+  console.log("Chat channel should be connecting...");
+</script>

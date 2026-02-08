@@ -4,6 +4,11 @@ module Rails
 			skip_before_action :verify_authenticity_token
 		    skip_forgery_protection
 
+			def test_websocket
+				# Render the HTML view for testing WebSocket
+				render 'test_websocket', layout: 'application'
+			end
+
 			def index
 				@payments = Payment.all.limit(50).offset(pagination)
 				render json: @payments, each_serializer: PaymentSerializer

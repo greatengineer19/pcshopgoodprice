@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount ActionCable.server => "/cable"
+
   namespace :rails do
     namespace :api do
       resources :users
@@ -11,6 +13,7 @@ Rails.application.routes.draw do
       resources :payments do
         collection do
           post :bulk_create
+          get :test_websocket
         end
       end
     end
