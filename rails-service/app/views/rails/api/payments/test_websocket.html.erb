@@ -24,8 +24,32 @@
   <p id="status">Connecting...</p>
 </div>
 
-<script>
-  // This will show when the page loads
+<script type="module">
+  import chatChannel from "channels/chat_channel";
+  
   console.log("Test WebSocket page loaded!");
-  console.log("Chat channel should be connecting...");
+  console.log("Chat channel imported:", chatChannel);
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const messages = document.getElementById('messages');
+    
+    // Send message when button clicked
+    sendBtn.addEventListener('click', () => {
+      const message = input.value;
+      if (message.trim()) {
+        // Send via ActionCable
+        chatChannel.sendMessage(message);
+        input.value = '';
+      }
+    });
+    
+    // Send on Enter key
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendBtn.click();
+      }
+    });
+  });
 </script>

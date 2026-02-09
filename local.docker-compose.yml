@@ -79,6 +79,8 @@ services:
       - /app/tmp
       - /app/log
       - bundle_cache:/usr/local/bundle
+    tty: true
+    stdin_open: true
     deploy:
       resources:
         limits:
