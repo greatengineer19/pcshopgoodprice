@@ -40,10 +40,22 @@ class BulkPaymentJob < ApplicationJob
         end
       end
 
+      ActionCable.server.broadcast("payment_broadcast",
+      {
+        type: "progress",
+        message: "Processing payment...",
+        progress: processed_payments
+      })
+
       processed_payments += 10
     end
 
     entry.update!(end_time: Time.zone.now)
+    ActionCable.server.broadcast("payment_broadcast",
+    {
+      type: "complete",
+      message: "Payment completed successfully"
+    })
     return "Bulk payment job completed #{processed_payments} payments"
   rescue StandardError => e
     # TODO: Create an entity called BulkPaymentRequest to capture completed / failed requests
